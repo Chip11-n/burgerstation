@@ -9,6 +9,9 @@
 /obj/item/light/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
 	if(istype(object,light_type))
+		INTERACT_CHECK
+		INTERACT_CHECK_OBJECT
+		INTERACT_DELAY(5)
 		var/obj/structure/interactive/lighting/L = object
 		if(L.desired_light_color)
 			var/obj/item/light/LT = new src.type(object.loc)

@@ -15,6 +15,8 @@
 
 	var/next_interact = 0
 
+	dir_offset = TILE_SIZE - 8
+
 /obj/structure/interactive/light_switch/off
 	on = FALSE
 
@@ -77,10 +79,12 @@
 
 /obj/structure/interactive/light_switch/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
-	INTERACT_CHECK
-
 	if(next_interact >= world.time)
 		return TRUE
+
+	INTERACT_CHECK
+	INTERACT_CHECK_OBJECT
+	INTERACT_DELAY(5)
 
 	toggle(caller)
 

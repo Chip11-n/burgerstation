@@ -1,31 +1,3 @@
-/atom/movable/proc/setup_dir_offsets()
-	var/x_offset = 0
-	var/y_offset = 0
-
-	if(dir & NORTH)
-		pixel_y -= 32
-		light_offset_y -= 16
-		y_offset++
-
-	if(dir & SOUTH)
-		pixel_y += 32
-		light_offset_y += 16
-		y_offset--
-
-	if(dir & EAST)
-		pixel_x -= 32
-		light_offset_x -= 16
-		x_offset++
-
-	if(dir & WEST)
-		pixel_x += 32
-		light_offset_x += 16
-		x_offset--
-
-	loc = locate(x+x_offset,y+y_offset,z) //Legitimately don't know why force_move or get_step doesn't work here. Even in initialize.
-
-	return TRUE
-
 obj/structure/interactive/computer/wall
 	name = "wall computer"
 	desc = "Compute walls!"
@@ -87,9 +59,8 @@ obj/structure/interactive/computer/wall/dorms
 /obj/structure/interactive/computer/wall/remote_flight/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
 	INTERACT_CHECK
-
-	if(!is_advanced(caller))
-		return ..()
+	INTERACT_CHECK_OBJECT
+	INTERACT_DELAY(5)
 
 	if(desired_shuttle_controller.time_restricted && !SSgamemode.active_gamemode.allow_launch)
 		caller.to_chat(span("warning","\The [desired_shuttle_controller.name] isn't ready to launch yet!"))
@@ -125,9 +96,8 @@ obj/structure/interactive/computer/wall/dorms
 /obj/structure/interactive/computer/wall/flight/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
 	INTERACT_CHECK
-
-	if(!is_advanced(caller))
-		return ..()
+	INTERACT_CHECK_OBJECT
+	INTERACT_DELAY(5)
 
 	var/obj/shuttle_controller/SC = locate() in get_area(src)
 

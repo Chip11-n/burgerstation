@@ -60,21 +60,22 @@
 	return ..()
 
 /obj/item/container/syringe/click_self(var/mob/caller,location,control,params)
+	INTERACT_CHECK
+	INTERACT_DELAY(1)
 	injecting = !injecting
 	update_sprite()
 	return TRUE
 
 /obj/item/container/syringe/proc/can_inject(var/mob/caller,var/atom/target)
 
-	INTERACT_CHECK
-	INTERACT_CHECK_OTHER(target)
+	INTERACT_CHECK_NO_DELAY(src)
+	INTERACT_CHECK_NO_DELAY(target)
 
 	if(!target.reagents)
 		caller.to_chat(span("warning","You can't target \the [target.name]!"))
 		return FALSE
 
 	return TRUE
-
 
 /obj/item/container/syringe/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
@@ -89,6 +90,10 @@
 
 	if(!defer_object.reagents)
 		return ..()
+
+	INTERACT_CHECK
+	INTERACT_CHECK_OBJECT
+	INTERACT_DELAY(1)
 
 	if(istype(defer_object,/obj/item/container/))
 		inject(caller,defer_object,injecting ? inject_amount : -draw_amount)
@@ -108,9 +113,9 @@
 		var/transfer_amount = 0
 		if(injecting)
 			transfer_amount = inject_amount
-			caller.visible_message(span("danger","\The [caller.name] tries to inject \the [real_object_name] with \the [src.name]!"))
+			caller.visible_message(span("danger","\The [caller.name] tries to inject \the [real_object_name] with \the [src.name]!"),span("warning","You try to inject \the [real_object_name] with \the [src.name]."))
 		else
-			caller.visible_message(span("danger","\The [caller.name] tries to draw blood from \the [real_object_name] with \the [src.name]!"))
+			caller.visible_message(span("danger","\The [caller.name] tries to draw blood from \the [real_object_name] with \the [src.name]!"),span("warnning","You try to draw blood from \the [real_object_name] with \the [src.name]."))
 			transfer_amount = -draw_amount
 
 		PROGRESS_BAR(caller,src,self_inject ? BASE_INJECT_TIME_SELF : BASE_INJECT_TIME,.proc/inject,caller,object,transfer_amount)

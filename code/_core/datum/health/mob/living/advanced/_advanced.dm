@@ -152,10 +152,10 @@
 		else if( (health_current > 0 || A.status_effects[ADRENALINE]) && A.status_effects[CRIT])
 			A.remove_status_effect(CRIT)
 
-		if(damage[PAIN] >= health_current && !A.status_effects[PAINKILLER] && !A.status_effects[PAINCRIT])
+		if(damage[PAIN] > 0 && damage[PAIN] >= health_current && !A.status_effects[PAINKILLER] && !A.status_effects[PAINCRIT])
 			A.add_status_effect(PAINCRIT,-1,-1,force = TRUE)
 
-		else if((damage[PAIN] < health_current || A.status_effects[PAINKILLER]) && A.status_effects[PAINCRIT])
+		else if((damage[PAIN] <= 0 || damage[PAIN] < health_current || A.status_effects[PAINKILLER]) && A.status_effects[PAINCRIT])
 			A.remove_status_effect(PAINCRIT)
 
 	return .
@@ -198,7 +198,7 @@
 		var/obj/item/item_to_block_with
 
 		if(A.right_item && A.right_item.can_block())
-			if(A.left_item && A.left_item.can_block() && A.left_item.value > A.right_item.value)
+			if(A.left_item && A.left_item.can_block() && A.left_item.block_defense_value > A.right_item.block_defense_value)
 				item_to_block_with = A.left_item
 			else
 				item_to_block_with = A.right_item

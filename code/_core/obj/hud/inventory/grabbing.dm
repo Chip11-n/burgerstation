@@ -37,7 +37,7 @@
 	if(!isturf(caller.loc))
 		return FALSE
 
-	if(length(held_objects) || grabbed_object)
+	if(is_occupied())
 		caller.to_chat(span("notice","You need an empty hand to grab this!"))
 		return FALSE
 
@@ -75,6 +75,8 @@
 	return TRUE
 
 /obj/hud/inventory/proc/release_object(var/mob/caller as mob)
+	if(!grabbed_object)
+		return FALSE
 	if(caller) caller.to_chat(span("notice","You release \the [grabbed_object.name]."))
 	if(is_living(grabbed_object))
 		var/mob/living/L = grabbed_object

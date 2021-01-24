@@ -22,6 +22,8 @@
 
 #define HEAT "heat"
 #define COLD "cold"
+#define SHOCK "shock"
+
 #define BOMB "bomb"
 #define BIO "bioweapon"
 #define RAD "radiation"
@@ -62,3 +64,5 @@
 #define DAMAGE_GREATCLUB 105
 #define SPEED_GREATCLUB 20
 #define AP_GREATCLUB 120
+
+#define BASE_MELEE_MUL 1.25

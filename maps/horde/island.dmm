@@ -621,9 +621,9 @@
 /turf/simulated/floor/tile/dark,
 /area/lz_001/outpost/syndicate/jungle)
 "cW" = (
-/obj/structure/interactive/ore_box,
-/turf/simulated/floor/wood/brown,
-/area/lz_001/jungle)
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/xeno,
+/area/lz_001/caves/hive)
 "cX" = (
 /obj/marker/antag/revolutionary,
 /turf/simulated/floor/tile/grey,
@@ -1159,6 +1159,10 @@
 "fm" = (
 /turf/simulated/wall/metal/reinforced,
 /area/lz_001/forest/village)
+"fn" = (
+/mob/living/advanced/npc/unique/knight/green,
+/turf/simulated/floor/cave_dirt,
+/area/lz_001/caves/knight/cave)
 "fo" = (
 /obj/structure/smooth/wall/wood,
 /turf/simulated/floor/colored/dirt,
@@ -2642,9 +2646,9 @@
 /turf/simulated/floor/colored/sand,
 /area/lz_001/caves/desert_cave)
 "ly" = (
-/obj/marker/syndicate,
-/turf/simulated/floor/cave_dirt,
-/area/lz_001/caves/glow_cave)
+/obj/marker/map_node,
+/turf/simulated/floor/wood/dock,
+/area/lz_001/caves)
 "lz" = (
 /obj/marker/syndicate,
 /turf/simulated/floor/colored/dirt/cave,
@@ -2680,6 +2684,18 @@
 /obj/marker/lobby,
 /turf/simulated/floor/colored/grass,
 /area/lz_001/forest/village)
+"lI" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/cave_dirt,
+/area/lz_001/outpost/syndicate/canman)
+"lJ" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/wood/boat/starting,
+/area/lz_001/caves/lagoon/ship)
+"lK" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/colored/dirt/cave,
+/area/lz_001/caves/knight/cave)
 "lL" = (
 /mob/living/simple/spider/desert,
 /turf/simulated/floor/colored/sand/desert,
@@ -2688,6 +2704,41 @@
 /mob/living/advanced/npc/zombie/desert,
 /turf/simulated/floor/colored/sand/desert,
 /area/lz_001/desert)
+"lN" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/cave_dirt,
+/area/lz_001/caves/knight)
+"lO" = (
+/turf/simulated/floor/plating,
+/area/lz_001/caves/lagoon)
+"lP" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/plating,
+/area/lz_001/caves/lagoon)
+"lQ" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/cave_dirt,
+/area/lz_001/caves)
+"lR" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/wood/brown,
+/area/lz_001/jungle)
+"lS" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/colored/dirt/jungle,
+/area/lz_001/jungle)
+"lT" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/cave_dirt,
+/area/lz_001/jungle)
+"lU" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/wood/brown,
+/area/lz_001/outpost/russian/snow)
+"lV" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/colored/dirt/snow,
+/area/lz_001/snow)
 "lW" = (
 /obj/marker/map_node,
 /turf/simulated/floor/cave_dirt,
@@ -2789,9 +2840,13 @@
 /turf/simulated/hazard/water,
 /area/lz_001/forest)
 "mt" = (
-/mob/living/advanced/npc/unique/knight/red,
-/turf/simulated/floor/cave_dirt,
-/area/lz_001/caves/knight/cave)
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/wood/dock,
+/area/lz_001/forest/village)
+"mu" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/colored/dirt/cave,
+/area/lz_001/caves/crab)
 "mv" = (
 /obj/structure/interactive/lighting/fixture/floor/syndicate,
 /turf/simulated/floor/cave_dirt,
@@ -2813,6 +2868,14 @@
 "mA" = (
 /turf/simulated/floor/tile/dark,
 /area/lz_001/outpost/syndicate/desert)
+"mB" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/colored/dirt/cave,
+/area/lz_001/desert)
+"mC" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/colored/sand/desert,
+/area/lz_001/desert)
 "mD" = (
 /obj/structure/smooth/table/reinforced/dark,
 /obj/structure/interactive/lighting/fixture/tube/syndicate{
@@ -2823,6 +2886,22 @@
 "mE" = (
 /turf/simulated/floor/wood/dock,
 /area/lz_001/caves)
+"mF" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/cave_dirt,
+/area/lz_001/caves/desert_cave)
+"mG" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/colored/sand,
+/area/lz_001/caves/desert_cave)
+"mH" = (
+/obj/structure/interactive/supplies,
+/turf/simulated/floor/tile/dark,
+/area/lz_001/outpost/syndicate/desert)
+"mI" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/colored/grass,
+/area/lz_001/caves/knight)
 "mJ" = (
 /obj/structure/smooth/table/reinforced/dark,
 /obj/structure/interactive/lighting/fixture/tube/syndicate,
@@ -2834,16 +2913,40 @@
 	},
 /turf/simulated/floor/tile/dark,
 /area/lz_001/outpost/syndicate/desert)
+"mL" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/colored/dirt/cave,
+/area/lz_001/caves/lagoon)
+"mM" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/colored/sand/desert,
+/area/lz_001/desert)
+"mN" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/colored/dirt/cave,
+/area/lz_001/forest)
 "mO" = (
 /obj/structure/interactive/lighting/fixture/tube/syndicate{
 	dir = 8
 	},
 /turf/simulated/floor/tile/dark,
 /area/lz_001/outpost/syndicate/desert)
+"mP" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/colored/dirt,
+/area/lz_001/forest/village)
+"mQ" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/colored/dirt/snow,
+/area/lz_001/snow)
 "mR" = (
 /obj/structure/interactive/door/airlock/station/maintenance,
 /turf/simulated/floor/tile/dark,
 /area/lz_001/outpost/syndicate/desert)
+"mS" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/colored/snow,
+/area/lz_001/snow)
 "mT" = (
 /obj/structure/interactive/door/airlock/station/maintenance,
 /turf/simulated/floor/plating,
@@ -2860,6 +2963,10 @@
 	},
 /turf/simulated/floor/tile/dark,
 /area/lz_001/outpost/syndicate/desert)
+"mW" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/basalt,
+/area/lz_001/caves/lava)
 "mX" = (
 /obj/structure/smooth/table/reinforced/dark,
 /obj/structure/interactive/lighting/fixture/tube/syndicate{
@@ -2867,6 +2974,10 @@
 	},
 /turf/simulated/floor/tile/dark,
 /area/lz_001/outpost/syndicate/desert)
+"mY" = (
+/obj/marker/drop_pod_location,
+/turf/simulated/floor/cave_dirt,
+/area/lz_001/caves)
 "mZ" = (
 /obj/marker/generation/snow_dirt,
 /turf/unsimulated/generation/snow,
@@ -4014,8 +4125,8 @@ dt
 dt
 dt
 dt
+lP
 dZ
-dT
 dT
 dT
 dT
@@ -4271,8 +4382,8 @@ dC
 dC
 dC
 dt
+lO
 dZ
-dT
 dT
 dT
 dT
@@ -4528,8 +4639,8 @@ dC
 dC
 dS
 dt
+lO
 dZ
-dT
 dT
 dT
 dT
@@ -4785,8 +4896,8 @@ dC
 ez
 dC
 dt
+lO
 dZ
-dT
 dT
 dT
 dT
@@ -5042,8 +5153,8 @@ ex
 dC
 dC
 dt
+lO
 dZ
-dT
 dT
 dT
 dT
@@ -5299,8 +5410,8 @@ ez
 dC
 dC
 dL
+lO
 dZ
-dT
 dT
 dT
 dT
@@ -5556,8 +5667,8 @@ dC
 dC
 lb
 dt
+lO
 dZ
-dT
 dT
 dT
 dT
@@ -5813,8 +5924,8 @@ dL
 dt
 dt
 dt
+lO
 dZ
-dT
 dT
 dT
 dT
@@ -6956,17 +7067,17 @@ dT
 dT
 dT
 dT
-dT
-dT
-dT
-dT
-dT
-dT
-dT
-dT
-dT
-dT
-dT
+hh
+hh
+hh
+hh
+hh
+hh
+hh
+hh
+hh
+hh
+hh
 dT
 dT
 dT
@@ -7214,15 +7325,15 @@ dT
 dT
 dT
 hh
-hh
-hh
-hh
-hh
-hh
-hh
-hh
-hh
-hh
+lJ
+hp
+hp
+hp
+hp
+hp
+hp
+hp
+hp
 hh
 dT
 dT
@@ -7380,7 +7491,7 @@ eS
 fg
 fg
 fs
-mt
+fs
 fs
 fs
 fs
@@ -7638,7 +7749,7 @@ fg
 fg
 fg
 fs
-fs
+fn
 fs
 fs
 fs
@@ -8149,7 +8260,7 @@ eF
 eS
 eS
 eS
-fg
+lK
 fg
 fg
 fs
@@ -8249,9 +8360,9 @@ hp
 hp
 hp
 hg
+lJ
+hp
 jV
-hp
-hp
 hg
 dT
 dT
@@ -8381,7 +8492,7 @@ ca
 ca
 ca
 ca
-ce
+lQ
 ce
 eO
 eO
@@ -8506,9 +8617,9 @@ is
 hp
 jv
 hg
+hp
+hp
 jV
-hp
-hp
 hg
 dT
 dT
@@ -8895,7 +9006,7 @@ ca
 ca
 ca
 ca
-ca
+ce
 ce
 ce
 ce
@@ -10219,7 +10330,7 @@ eF
 eF
 eF
 eF
-bQ
+lN
 gB
 gB
 gB
@@ -10999,7 +11110,7 @@ gB
 cf
 cf
 cf
-cf
+mI
 cf
 cf
 cf
@@ -11963,7 +12074,7 @@ al
 al
 iT
 iT
-iT
+mW
 iT
 iT
 iT
@@ -15167,7 +15278,7 @@ dH
 dH
 fJ
 fJ
-fJ
+mL
 by
 fJ
 fJ
@@ -16982,7 +17093,7 @@ dT
 dT
 hh
 hh
-hp
+lJ
 hp
 hp
 hp
@@ -17366,7 +17477,7 @@ ay
 ay
 ay
 cS
-cW
+lR
 da
 da
 da
@@ -17623,7 +17734,7 @@ ay
 ay
 ay
 cS
-cW
+da
 da
 da
 da
@@ -17880,7 +17991,7 @@ ay
 ay
 ay
 cS
-cW
+da
 da
 da
 da
@@ -18849,7 +18960,7 @@ cj
 bX
 bX
 bX
-cj
+cW
 cj
 cj
 cj
@@ -19394,7 +19505,7 @@ bX
 bX
 bX
 bX
-cj
+cW
 cj
 cj
 cj
@@ -19605,7 +19716,7 @@ cj
 cj
 bX
 bX
-cj
+cW
 cj
 cj
 cj
@@ -19891,7 +20002,7 @@ cj
 gU
 cj
 bX
-cj
+cW
 gU
 cj
 cj
@@ -20371,19 +20482,19 @@ cj
 cj
 cj
 bX
-cj
-cj
-cj
-cj
-bX
-bX
-cj
+cW
 cj
 cj
 cj
 bX
 bX
 cj
+cj
+cj
+cj
+bX
+bX
+cW
 cj
 cj
 cj
@@ -20873,7 +20984,7 @@ bX
 bX
 bX
 bX
-cj
+cW
 cj
 cj
 cj
@@ -21679,7 +21790,7 @@ cj
 cj
 bX
 bX
-cj
+cW
 cj
 cj
 cj
@@ -22450,18 +22561,18 @@ cj
 cj
 cj
 bX
-cj
-cj
-cj
-cj
-cj
-bX
+cW
 cj
 cj
 cj
 cj
 bX
 cj
+cj
+cj
+cj
+bX
+cW
 cj
 gU
 cj
@@ -23203,7 +23314,7 @@ cj
 cj
 bX
 bX
-cj
+cW
 cj
 cj
 gU
@@ -23443,7 +23554,7 @@ bX
 bX
 bX
 bX
-cj
+cW
 cj
 cj
 cj
@@ -23964,7 +24075,7 @@ ck
 cj
 cj
 bX
-cj
+cW
 cj
 cj
 cj
@@ -23974,23 +24085,6 @@ cj
 cj
 cj
 bX
-cj
-cj
-cj
-cj
-cj
-cj
-bX
-bX
-cj
-cj
-cj
-cj
-cj
-cj
-cj
-cj
-cj
 cj
 cj
 cj
@@ -24006,9 +24100,26 @@ cj
 cj
 cj
 cj
+cj
+cj
+cj
+cj
+cj
+cj
+cj
+cj
 bX
 bX
 cj
+cj
+cj
+cj
+cj
+cj
+cj
+bX
+bX
+cW
 ck
 cj
 cj
@@ -24452,7 +24563,7 @@ kT
 kT
 kT
 bp
-ec
+lI
 ec
 ec
 ec
@@ -26787,7 +26898,7 @@ cj
 cj
 cj
 bX
-cj
+cW
 cj
 cj
 cj
@@ -27148,9 +27259,9 @@ cY
 ei
 cP
 cN
-ay
-ay
-ay
+lS
+fh
+fh
 ay
 ay
 ay
@@ -27405,8 +27516,8 @@ eb
 kl
 cP
 cN
-ay
-ay
+fh
+fh
 ay
 ay
 ay
@@ -27662,8 +27773,8 @@ cP
 cP
 cP
 cN
-ay
-ay
+fh
+fh
 ay
 ay
 ay
@@ -27919,7 +28030,7 @@ cP
 cO
 cN
 cN
-ay
+fh
 ay
 ay
 ay
@@ -28175,8 +28286,8 @@ dY
 cP
 cO
 cN
-ay
-ay
+fh
+fh
 ay
 ay
 ay
@@ -28432,7 +28543,7 @@ cP
 cP
 cN
 cN
-ay
+fh
 ay
 ay
 ay
@@ -30645,7 +30756,7 @@ ay
 ay
 cJ
 cJ
-cq
+lT
 cq
 cq
 iI
@@ -36528,7 +36639,7 @@ ce
 bY
 bY
 bY
-mE
+ly
 bY
 eD
 eD
@@ -37902,7 +38013,7 @@ ca
 ca
 ce
 ce
-ce
+mY
 ce
 ce
 ce
@@ -41980,7 +42091,7 @@ gV
 gV
 gV
 gV
-aw
+mS
 aw
 aw
 aw
@@ -46201,7 +46312,7 @@ eM
 eM
 eM
 lz
-eM
+mN
 ge
 eU
 eU
@@ -48611,7 +48722,7 @@ lp
 lp
 lp
 kJ
-ly
+lF
 lF
 lc
 lc
@@ -49610,7 +49721,7 @@ kC
 kC
 kC
 kC
-kC
+mM
 kC
 kC
 kC
@@ -50668,7 +50779,7 @@ kR
 md
 md
 mw
-mA
+mH
 mA
 kK
 mz
@@ -53206,7 +53317,7 @@ kv
 kC
 kC
 kX
-kC
+mC
 kC
 kC
 kX
@@ -54011,7 +54122,7 @@ mA
 mA
 mA
 mA
-mw
+mx
 mn
 mn
 kR
@@ -54268,7 +54379,7 @@ mA
 mA
 mA
 mA
-mw
+mx
 mn
 mn
 md
@@ -55298,7 +55409,7 @@ kK
 mA
 mA
 mw
-mn
+mF
 mn
 md
 kR
@@ -55911,7 +56022,7 @@ bz
 bz
 bz
 bz
-bz
+mQ
 bz
 bz
 aw
@@ -56014,7 +56125,7 @@ eK
 eK
 eK
 eK
-jT
+mu
 jT
 kd
 kd
@@ -56069,7 +56180,7 @@ mA
 mA
 mA
 mw
-mn
+mF
 md
 md
 kR
@@ -57480,7 +57591,7 @@ en
 en
 jJ
 ek
-bz
+lV
 bz
 dp
 dp
@@ -57495,7 +57606,7 @@ iu
 iu
 iu
 ff
-fw
+mt
 fw
 fe
 fe
@@ -58046,7 +58157,7 @@ fF
 fF
 fF
 fF
-fe
+mP
 fe
 eU
 ht
@@ -58341,7 +58452,7 @@ kr
 kr
 kr
 kr
-kv
+mB
 kC
 kC
 kC
@@ -59436,7 +59547,7 @@ bv
 gV
 gV
 aM
-gT
+lU
 gT
 dx
 bc
@@ -59968,7 +60079,7 @@ dp
 dp
 dp
 dp
-bz
+lV
 bz
 bz
 bz
@@ -60689,7 +60800,7 @@ md
 md
 kR
 kR
-md
+mG
 md
 md
 kR
@@ -60917,7 +61028,7 @@ kC
 kC
 kC
 kX
-kC
+mC
 kC
 kC
 kC
@@ -61040,7 +61151,7 @@ ca
 ca
 br
 ca
-ce
+lQ
 ce
 ce
 ca
@@ -61747,7 +61858,7 @@ gV
 gV
 gV
 gV
-bz
+mQ
 gV
 bz
 bz
@@ -64029,7 +64140,7 @@ kR
 kR
 kR
 kR
-mn
+mF
 mn
 mn
 mn
@@ -64064,7 +64175,7 @@ bt
 aL
 aL
 aL
-bz
+lV
 gV
 gV
 gV
@@ -64800,7 +64911,7 @@ kR
 kR
 kR
 kR
-mn
+mF
 mn
 mn
 mn
@@ -65349,7 +65460,7 @@ be
 bb
 bD
 aL
-bz
+lV
 gV
 gV
 gV

@@ -139,10 +139,11 @@
 	state = GAMEMODE_GEARING
 	round_time = 0
 	round_time_next = HORDE_DELAY_GEARING
+	SSshuttle.next_pod_launch = world.time + SECONDS_TO_DECISECONDS(60*10 + 10)
 	announce(
 		"Central Command Update",
 		"Prepare for Landfall",
-		"All landfall crew are ordered to gear up for planetside combat. Estimated time until shuttle functionality: 8 minutes.",
+		"All landfall crew are ordered to gear up for planetside combat. Estimated time until shuttle and drop pod functionality: 10 minutes.",
 		ANNOUNCEMENT_STATION,
 		'sound/voice/announcement/landfall_crew_8_minutes.ogg'
 	)
@@ -178,6 +179,7 @@
 	round_time_next = HORDE_DELAY_LAUNCHING
 	announce("Central Command Mission Update","Mission is a Go","Shuttles are prepped and ready to depart into the Area of Operations. All crew are cleared to launch.",ANNOUNCEMENT_STATION,'sound/voice/announcement/landfall_crew_0_minutes.ogg')
 	allow_launch = TRUE
+	SSshuttle.next_pod_launch = world.time + SECONDS_TO_DECISECONDS(10)
 	return TRUE
 
 /gamemode/horde/proc/on_launching()
@@ -240,6 +242,15 @@
 			L.ai.obstacles[k] = TRUE
 		tracked_enemies += L
 		points -= 0.1
+
+	for(var/k in tracked_enemies)
+		var/mob/living/L = k
+		if(!istype(L) || L.dead || L.qdeleting) //TODO: Remove these checks
+			log_error("Warning: [k] was invalid tracked enemy!")
+			tracked_enemies -= k
+			continue
+		if(L.ai && !L.ai.current_path)
+			L.ai.set_path(found_path)
 
 /gamemode/horde/proc/get_wave_frequency()
 

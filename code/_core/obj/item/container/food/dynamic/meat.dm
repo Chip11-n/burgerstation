@@ -18,6 +18,9 @@
 
 /obj/item/container/food/dynamic/meat/click_self(var/mob/caller,location,control,params)
 
+	INTERACT_CHECK
+	INTERACT_DELAY(5)
+
 	if(icon_state == "ground")
 		icon_state = "meatball"
 		caller.to_chat(span("notice","You reshape \the [src.name] into a meatball."))
@@ -205,6 +208,11 @@
 	reagents.add_reagent(/reagent/nutrition/meat/colossus,15)
 	reagents.add_reagent(/reagent/blood/ancient,5)
 	reagents.add_reagent(/reagent/nutrition/fat/ancient,5)
+	return ..()
+
+/obj/item/container/food/dynamic/meat/raw_monkey/Generate()
+	reagents.add_reagent(/reagent/nutrition/meat/monkey,15)
+	reagents.add_reagent(/reagent/nutrition/fat/monkey,5)
 	return ..()
 
 /obj/item/container/food/dynamic/meat/raw/Generate()

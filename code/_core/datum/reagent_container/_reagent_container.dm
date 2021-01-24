@@ -547,7 +547,7 @@
 		CRASH_SAFE("Tried to splash with no target!")
 		return FALSE
 
-	target = target.change_victim(caller)
+	target = target.change_victim(caller,owner)
 
 	target.on_splash(caller,src,splash_amount,silent,strength_mod)
 
@@ -561,7 +561,7 @@
 			var/reagent/R = REAGENT(r_id)
 			var/volume_to_splash = source.remove_reagent(R.type,source.stored_reagents[r_id] * (splash_amount/source.volume_current),FALSE,FALSE)
 			R.on_splash(source,caller,src,volume_to_splash,strength_mod)
-		if(!silent) caller?.visible_message(span("danger","\The [caller] splashes the contents of \the [source.owner.name] on \the [src.name]!"))
+		if(!silent) caller?.visible_message(span("danger","\The [caller] splashes the contents of \the [source.owner.name] on \the [src.name]!"),span("warning","You splash the contents of \the [source.owner.name] on \the [src.name]!"))
 		source.update_container()
 		return TRUE
 
@@ -616,7 +616,7 @@
 		if(caller && caller != consumer)
 			consumer.visible_message(span("warning","\The [caller.name] forces \the [consumer.name] to [consume_verb] \the [src.owner.name]!"),span("danger","\The [caller.name] forces you to [consume_verb] the [src.owner.name]!"))
 		else
-			consumer.visible_message(span("notice","\The [consumer.name] [consume_verb] \the [src.owner.name]."),span("notice","You [consume_verb] \the [src.owner.name]."))
+			consumer.visible_message(span("notice","\The [consumer.name] [consume_verb]s \the [src.owner.name]."),span("notice","You [consume_verb] \the [src.owner.name]."))
 
 		if(consume_sound) play(consume_sound,get_turf(consumer))
 

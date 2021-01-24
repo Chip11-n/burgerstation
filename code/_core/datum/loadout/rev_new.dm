@@ -111,13 +111,13 @@
 		/obj/item/clothing/feet/shoes/black_boots/left,
 		/obj/item/clothing/belt/storage/colored/black,
 		/obj/item/weapon/ranged/bullet/magazine/rifle/rpk,
+		/obj/item/storage/pouch/single/black,
+		/obj/item/storage/pouch/single/black,
+		/obj/item/magazine/lmg_545,
+		/obj/item/magazine/lmg_545,
+		/obj/item/magazine/lmg_545,
 		/obj/item/weapon/ranged/bullet/magazine/pistol/yarygin,
 		/obj/item/weapon/melee/energy/sword/red,
-		/obj/item/magazine/rifle_545/ap,
-		/obj/item/magazine/rifle_545/ap,
-		/obj/item/magazine/rifle_545/ap,
-		/obj/item/magazine/rifle_545/ap,
-		/obj/item/magazine/rifle_545/ap,
 		/obj/item/magazine/pistol_9mm,
 		/obj/item/magazine/pistol_9mm,
 		/obj/item/magazine/pistol_9mm
@@ -180,5 +180,6 @@
 		/obj/item/container/food/package/junkfood/jerky,
 		/obj/item/container/food/package/junkfood/chips,
 		/obj/item/container/beaker/can/grey_bull,
-		/obj/item/container/beaker/alcohol/vodka
+		/obj/item/container/beaker/alcohol/vodka,
+		/obj/item/weapon/melee/torch/flashlight/maglight
 	)

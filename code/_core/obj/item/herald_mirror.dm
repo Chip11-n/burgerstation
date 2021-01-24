@@ -15,6 +15,9 @@
 
 /obj/item/herald_mirror/click_self(var/mob/caller)
 
+	INTERACT_CHECK
+	INTERACT_DELAY(10)
+
 	if(!is_advanced(caller))
 		caller.to_chat(span("warning","You don't know how to use this..."))
 		return TRUE
@@ -34,6 +37,10 @@
 	return TRUE
 
 /obj/item/herald_mirror/proc/can_teleport(var/mob/living/advanced/A)
+
+	var/mob/caller = A //reeee shitcode
+
+	INTERACT_CHECK_NO_DELAY(src)
 
 	if(!A.can_move())
 		A.to_chat(span("warning","You can't use the mirror in your current state!"))

@@ -136,14 +136,15 @@
 
 /obj/item/magazine/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	INTERACT_CHECK
-
 	object = object.defer_click_on_object(location,control,params)
 
 	if(is_inventory(object) && !(is_dynamic_inventory(src.loc) || is_pocket(src.loc)) && length(stored_bullets))
+		INTERACT_CHECK
+		INTERACT_CHECK_OBJECT
+		INTERACT_DELAY(1)
 		var/obj/hud/inventory/I = object
 		var/obj/item/bullet_cartridge/B = stored_bullets[length(stored_bullets)]
-		if(I.add_held_object(B))
+		if(I.add_object(B))
 			B.update_sprite()
 			stored_bullets -= B
 			update_sprite()
@@ -154,6 +155,8 @@
 /obj/item/magazine/click_self(var/mob/caller)
 
 	if(length(stored_bullets))
+		INTERACT_CHECK
+		INTERACT_DELAY(1.5)
 		var/obj/item/bullet_cartridge/B = stored_bullets[length(stored_bullets)]
 		B.drop_item(get_turf(caller))
 		B.update_sprite()
@@ -175,6 +178,9 @@
 	object = object.defer_click_on_object(location,control,params)
 
 	if(is_bullet_gun(object) && !istype(src,/obj/item/magazine/clip))
+		INTERACT_CHECK
+		INTERACT_CHECK_OBJECT
+		INTERACT_DELAY(1)
 		var/obj/item/weapon/ranged/bullet/magazine/G = object
 		if(!weapon_whitelist[G.type])
 			if(caller) caller.to_chat(span("warning","You can't insert this type of magazine into \the [G]!"))

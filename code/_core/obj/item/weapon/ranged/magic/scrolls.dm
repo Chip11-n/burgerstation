@@ -38,6 +38,8 @@
 	return TRUE
 
 /obj/item/weapon/ranged/magic/scroll/click_self(var/mob/caller)
+	INTERACT_CHECK
+	INTERACT_DELAY(1)
 	open = !open
 	caller.to_chat(span("notice","You [open ? "unravel" : "roll up"] the scroll."))
 	update_sprite()
@@ -79,9 +81,13 @@
 
 /obj/item/weapon/ranged/magic/scroll/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	object = object.defer_click_on_object()
+	object = object.defer_click_on_object(location,control,params)
 
 	if(is_scroll(object))
+
+		INTERACT_CHECK
+		INTERACT_CHECK_OBJECT
+		INTERACT_DELAY(1)
 
 		if(scroll_count <= 0)
 			caller.to_chat(span("warning","This scroll is blank and void of magic!"))
@@ -116,10 +122,10 @@
 	return ..()
 
 /obj/item/weapon/ranged/magic/scroll/fireball
-	name = "scroll of fireball"
-	desc = "Shoots a fireball."
+	name = "scroll of true fireball"
+	desc = "Shoots an explosive fireball."
 
-	projectile = /obj/projectile/magic/fireball
+	projectile = /obj/projectile/magic/fireball/explosive
 
 	ranged_damage_type = /damagetype/ranged/magic/fireball
 
@@ -128,7 +134,7 @@
 
 	shoot_sounds = list('sound/weapons/magic/fireball.ogg')
 
-	value = 20
+	value = 15
 
 /obj/item/weapon/ranged/magic/scroll/fireball/Generate()
 	scroll_count = 5

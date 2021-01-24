@@ -92,21 +92,28 @@
 
 /obj/item/weapon/ranged/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params) //The src was clicked on by the object
 
-	var/atom/defer_object = object.defer_click_on_object(location,control,params)
+	object = object.defer_click_on_object(location,control,params)
 
-	if(istype(defer_object,/obj/item/attachment))
-		add_attachment(caller,defer_object)
+	if(istype(object,/obj/item/attachment))
+		INTERACT_CHECK
+		INTERACT_CHECK_OBJECT
+		INTERACT_DELAY(5)
+		add_attachment(caller,object)
 		return TRUE
 
-	else if(!use_loyalty_tag && is_item(defer_object))
-		var/obj/item/I = defer_object
+	else if(!use_loyalty_tag && is_item(object))
+		var/obj/item/I = object
 		if(I.flags_tool & FLAG_TOOL_MULTITOOL)
 			INTERACT_CHECK
+			INTERACT_CHECK_OBJECT
+			INTERACT_DELAY(5)
 			remove_attachment(caller)
 			return TRUE
 		if(I.flags_tool & FLAG_TOOL_SCREWDRIVER)
+			INTERACT_CHECK
+			INTERACT_CHECK_OBJECT
+			INTERACT_DELAY(5)
 			if(istype(firing_pin))
-				INTERACT_CHECK
 				firing_pin.drop_item(get_turf(src))
 				caller.visible_message(span("notice","\The [caller.name] removes a firing pin from \the [src.name]."),span("notice","You remove \the [firing_pin.name] from \the [src.name]."))
 				firing_pin = null
@@ -115,6 +122,8 @@
 			return TRUE
 		if(istype(I,/obj/item/firing_pin/))
 			INTERACT_CHECK
+			INTERACT_CHECK_OBJECT
+			INTERACT_DELAY(5)
 			if(istype(firing_pin))
 				caller.to_chat(span("warning","There is already a [firing_pin.name] installed in \the [src.name]! Remove it with a screwdriver first!"))
 			else
@@ -185,6 +194,8 @@
 	return . && heat_current > 0
 
 /obj/item/weapon/ranged/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
+
+	INTERACT_CHECK
 
 	if(wield_only && !wielded)
 		caller.to_chat(span("warning","You can only fire this when wielded! (CTRL+CLICK)"))
@@ -424,7 +435,7 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 
 	for(var/i=1,i<=bullet_count_to_use,i++)
 
-		var/list/local_xy_list = get_projectile_offset(xy_list[1],xy_list[2],i,base_spread) //Needs to be unique to each shot.
+		var/list/local_xy_list = get_projectile_offset(xy_list[1],xy_list[2],i,bullet_count_to_use,base_spread) //Needs to be unique to each shot.
 
 		var/new_x = local_xy_list[1]
 		var/new_y = local_xy_list[2]
@@ -474,9 +485,9 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 
 	return list(cos(new_angle),sin(new_angle))
 
-/atom/proc/get_projectile_offset(var/initial_offset_x,var/initial_offset_y,var/bullet_num,var/accuracy)
+/atom/proc/get_projectile_offset(var/initial_offset_x,var/initial_offset_y,var/bullet_num,var/bullet_num_max,var/accuracy)
 	var/new_angle = ATAN2(initial_offset_x,initial_offset_y)
-	new_angle += RAND_PRECISE(-accuracy,accuracy)*90
+	if(bullet_num_max > 1) new_angle += RAND_PRECISE(-accuracy,accuracy)*90
 	return list(cos(new_angle),sin(new_angle))
 
 /obj/item/weapon/ranged/proc/get_bullet_inaccuracy(var/mob/living/L,var/atom/target,var/obj/projectile/P,var/inaccuracy_modifier)

@@ -43,7 +43,9 @@
 	var/did_drop = FALSE
 	for(var/k in inventories)
 		var/obj/hud/inventory/I = k
-		if(length(I.drop_held_objects(T)))
+		if(I.worn)
+			continue
+		if(length(I.drop_objects(T)))
 			did_drop = TRUE
 	if(did_drop && is_advanced(loc))
 		var/mob/living/advanced/A = loc
@@ -55,6 +57,8 @@
 
 	if(is_living(attacker))
 		var/mob/living/L = attacker
+		if(L.attack_flags & CONTROL_MOD_KICK)
+			return /damagetype/unarmed/foot
 		switch(L.intent)
 			if(INTENT_HARM)
 				return /damagetype/unarmed/fists/
