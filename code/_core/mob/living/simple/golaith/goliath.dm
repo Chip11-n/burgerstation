@@ -43,10 +43,12 @@
 	iff_tag = "Goliath"
 	loyalty_tag = "Goliath"
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	blood_type = /reagent/blood/goliath
 	blood_volume = 750
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/goliath/post_death()
 	..()

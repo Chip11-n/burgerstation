@@ -18,8 +18,6 @@
 
 	view_punch = TILE_SIZE - 1
 
-
-
 	heat_per_shot = 0.1
 	heat_max = 0.1
 
@@ -39,13 +37,14 @@
 
 	ai_heat_sensitivity = 2
 
-	inaccuracy_modifer = 0.1
-
 	zoom_mul = 2
 
 	attachment_whitelist = list()
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/syndicate
+
+	inaccuracy_modifier = 0.1
+	movement_spread_base = 0.2
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/heavy_sniper/get_static_spread()
 	return 0
@@ -53,15 +52,3 @@
 /obj/item/weapon/ranged/bullet/magazine/rifle/heavy_sniper/get_skill_spread(var/mob/living/L)
 	if(!heat_current) return 0
 	return max(0,0.005 - (0.01 * L.get_skill_power(SKILL_RANGED)))
-
-/obj/item/weapon/ranged/bullet/magazine/rifle/heavy_sniper/get_bullet_inaccuracy(var/mob/living/L,var/atom/target,var/obj/projectile/P,var/inaccuracy_modifier)
-
-	var/distance = get_dist(L,target)
-
-	if(distance <= 3)
-		return TILE_SIZE*0.5 //No using snipers at close range.
-
-	if(distance <= VIEW_RANGE*0.5)
-		return max(0,1 - L.get_skill_power(SKILL_PRECISION)) * ((VIEW_RANGE*0.5)/get_dist(L,target)) * TILE_SIZE*0.5
-
-	return max(0,1 - L.get_skill_power(SKILL_PRECISION))*(0.1+0.9*(get_dist(L,target) - VIEW_RANGE*0.5)) * (L.client && L.client.is_zoomed ? 0.25 : 1)

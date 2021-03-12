@@ -6,7 +6,7 @@
 	icon_state = "inventory"
 	value = 200
 
-	shoot_delay = 2
+	shoot_delay = 2.5
 
 	automatic = TRUE
 
@@ -73,6 +73,9 @@
 	attachment_undermount_offset_y = 13 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/syndicate
+
+	inaccuracy_modifier = 1
+	movement_spread_base = 0.1
 
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/lmg/update_icon()

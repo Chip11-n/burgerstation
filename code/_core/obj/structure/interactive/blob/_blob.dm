@@ -27,9 +27,8 @@
 /obj/structure/interactive/blob/on_destruction(var/mob/caller,var/damage = FALSE)
 	. = ..()
 	qdel(src)
-	return .
 
-/obj/structure/interactive/blob/can_attack(var/atom/victim,var/atom/weapon,var/params,var/damagetype/damage_type)
+/obj/structure/interactive/blob/can_attack(var/atom/attacker,var/atom/victim,var/atom/weapon,var/params,var/damagetype/damage_type)
 
 	if(!health || health.health_current <= 0 || !color || color == "#FFFFFF")
 		return FALSE
@@ -50,7 +49,7 @@
 	. = FALSE
 
 	for(var/mob/living/L in range(1,src))
-		if(!src.can_attack(L,src,null,damage_type))
+		if(!src.can_attack(src,L,src,null,damage_type))
 			continue
 		if(!L.can_be_attacked(src,src,null,damage_type))
 			continue
@@ -82,7 +81,6 @@
 	if(damage_amount > 0 && get_dist(attacker,src) <= 1 && !CALLBACK_EXISTS("check_mobs_\ref[src]"))
 		CALLBACK("check_mobs_\ref[src]",10,src,.proc/check_mobs)
 
-	return .
 
 /obj/structure/interactive/blob/Cross(atom/movable/O)
 	if(istype(O,/mob/living/simple/blobbernaught))
@@ -106,7 +104,6 @@
 		linked_core = desired_owner
 		linked_core.linked_walls += src
 
-	return .
 
 /obj/structure/interactive/blob/PostInitialize()
 	. = ..()
@@ -120,7 +117,6 @@
 
 	CALLBACK("check_mobs_\ref[src]",10,src,.proc/check_mobs)
 
-	return .
 
 /obj/structure/interactive/blob/update_icon()
 
@@ -133,10 +129,9 @@
 		var/desired_state = "[initial(icon_state)]_[icon_mul]"
 		if(desired_state != icon_state)
 			if(icon_state != initial(icon_state))
-				play(pick('sound/effects/impacts/flesh_01.ogg','sound/effects/impacts/flesh_02.ogg','sound/effects/impacts/flesh_03.ogg'),T)
+				play_sound(pick('sound/effects/impacts/flesh_01.ogg','sound/effects/impacts/flesh_02.ogg','sound/effects/impacts/flesh_03.ogg'),T)
 			icon_state = desired_state
 
-	return .
 
 /obj/structure/interactive/blob/update_overlays()
 	. = ..()
@@ -145,4 +140,4 @@
 	I.plane = PLANE_LIGHTING
 	I.blend_mode = BLEND_MULTIPLY
 	add_overlay(I)
-	return .
+	

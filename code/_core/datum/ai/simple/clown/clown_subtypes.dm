@@ -51,7 +51,7 @@
 /ai/clown/mutant/
 	jokes = list()
 
-/ai/clown/mutant/New(var/mob/desired_owner)
+/ai/clown/mutant/New(var/desired_loc,var/mob/desired_owner)
 
 	. = ..()
 
@@ -77,8 +77,6 @@
 		var/object_two = pick(objects)
 		objects -= object_two
 		jokes += "What did the [object_one] say to the [object_two]? JOIN US."
-
-	return .
 
 /ai/clown/blob/
 	jokes = list(

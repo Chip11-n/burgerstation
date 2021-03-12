@@ -34,11 +34,10 @@
 	if(desired_owner)
 		desired_owner.linked_nodes += src
 
-	return .
 
 /obj/structure/interactive/blob/node/update_overlays()
 	. = ..()
 	var/image/I = new/image(icon,"node_overlay")
 	I.appearance_flags = KEEP_TOGETHER | RESET_COLOR
 	add_overlay(I)
-	return .
+	

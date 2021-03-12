@@ -2,7 +2,7 @@
 	name = "null rod"
 
 	attack_damage_base = list(
-		BLUNT = DAMAGE_SWORD*0.2*BASE_MELEE_MUL,
+		BLUNT = DAMAGE_SWORD*0.2,
 		HOLY = 0
 	)
 
@@ -29,7 +29,7 @@
 		SKILL_PRAYER = HOLY
 	)
 
-	bonus_experience = list(
+	bonus_experience_skill = list(
 		SKILL_MELEE = 25, //25%
 		SKILL_PRAYER = 25
 	)

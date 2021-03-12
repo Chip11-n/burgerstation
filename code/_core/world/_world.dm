@@ -16,14 +16,14 @@ var/global/world_state = STATE_STARTING
 	hub = "Exadv1.spacestation13"
 	hub_password = "kMZy3U5jJHSiBQjr"
 
-	cache_lifespan = 5
+	cache_lifespan = 7
 
 	turf = /turf/space
 	area = /area/
 
 	maxx = WORLD_SIZE
 	maxy = WORLD_SIZE
-	maxz = 3
+	maxz = 0
 
 	loop_checks = 1
 
@@ -40,17 +40,16 @@ var/global/world_state = STATE_STARTING
 	var/server_name = CONFIG("SERVER_NAME","Unofficial Burgerstation 13 Server")
 	var/server_link = CONFIG("SERVER_DISCORD","https://discord.gg/a2wHSqu")
 	var/github_name = "SS13 <b>FROM SCRATCH</b>"
-
-	var/minutes = FLOOR(world.time / 600, 1)
-	var/hours = FLOOR(world.time / 36000, 1)
-	if(minutes < 10)
-		minutes = "0[minutes]"
-	var/duration = "[hours]:[minutes]"
-
+	var/duration = get_clock_time(FLOOR(world.time/10,1),FORMAT_HOUR | FORMAT_MINUTE)
 	var/description = "Gamemode: <b>[SSgamemode.active_gamemode ? SSgamemode.active_gamemode.name : "Lobby" ]</b><br>Map: <b>[SSdmm_suite.map_name ? SSdmm_suite.map_name : "Loading..."]</b><br>Duration: <b>[duration]</b>"
 
 	//Format it.
 	status = "<b><a href='[server_link]'>[server_name]</a>\]</b> ([github_name])<br>[description]"
+
+	var/player_limit_config = CONFIG("PLAYER_LIMIT",0)
+	var/connected_players = length(all_clients)
+	if(player_limit_config > 0 && connected_players + 10 >= player_limit_config)
+		status = "[status]<br>[connected_players]/[player_limit_config] players."
 
 	return TRUE
 
@@ -105,8 +104,7 @@ var/global/world_state = STATE_STARTING
 
 /world/proc/save()
 	save_all_globals()
-	save_all_mechs()
-	save_all_globals()
+	//save_all_mechs()
 	for(var/k in all_players)
 		var/mob/living/advanced/player/P = k
 		if(P.dead)
@@ -117,7 +115,7 @@ var/global/world_state = STATE_STARTING
 		P.to_chat(span("notice","Your character was automatically saved."))
 		sleep(-1)
 	var/chosen_sound = pick(SSsound.round_end_sounds)
-	play(chosen_sound,all_mobs_with_clients)
+	play_sound_global(chosen_sound,all_mobs_with_clients)
 	sleep(100)
 	return TRUE
 
@@ -143,7 +141,7 @@ var/global/world_state = STATE_STARTING
 			nice_reason = "Syndicate Victory"
 			announce("Central Command Mission Update","Fission Mailed","Mission failed, we'll get them next time.")
 
-	play('sound/meme/apcdestroyed.ogg',all_mobs_with_clients)
+	play_sound_global('sound/meme/apcdestroyed.ogg',all_mobs_with_clients)
 
 	SSvote.create_vote(/vote/map)
 

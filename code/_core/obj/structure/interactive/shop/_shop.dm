@@ -33,7 +33,7 @@
 
 	if(!length(possible_items))
 		qdel(src)
-		return .
+		return
 
 	stored_item = pick(possible_items)
 	stored_item.drop_item(src)
@@ -43,7 +43,6 @@
 		var/obj/item/I = k
 		qdel(I)
 
-	return .
 
 /obj/structure/interactive/shop/PostInitialize()
 
@@ -64,7 +63,6 @@
 				log_error("Warning: Item of [stored_item] has a low value! Suspected no cost item.")
 			name = "[stored_item.name] - [stored_item_cost] credits"
 
-	return .
 
 
 /obj/structure/interactive/shop/update_overlays()
@@ -89,7 +87,6 @@
 	O.pixel_x = -2
 	O.pixel_y = -4
 	add_overlay(O)
-	return .
 
 /obj/structure/interactive/shop/update_icon()
 	icon = ICON_INVISIBLE
@@ -118,25 +115,24 @@
 	else
 		. += div("notice","This item is being sold for [stored_item_cost] credits.")
 
-	return .
 
 /obj/structure/interactive/shop/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
+
+	if(!is_player(caller) || !caller.client)
+		return ..()
+
+
 
 	INTERACT_CHECK
 	INTERACT_CHECK_OBJECT
 	INTERACT_DELAY(1)
 
-	if(!is_player(caller) || !caller.client)
-		return TRUE
-
 	var/mob/living/advanced/player/P = caller
-	var/atom/defer_object = object.defer_click_on_object(location,control,params)
+	var/obj/hud/inventory/I = object
 
-	if(!is_inventory(defer_object))
+	if(!is_inventory(object))
 		P.to_chat(span("notice","Your hand needs to be empty in order to buy this!"))
 		return TRUE
-
-	var/obj/hud/inventory/I = defer_object
 
 	if(stored_item_burgerbux_cost)
 		var/savedata/client/globals/globals = GLOBALDATA(caller.client.ckey)

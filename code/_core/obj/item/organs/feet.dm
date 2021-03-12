@@ -41,11 +41,10 @@
 	if(is_advanced(loc))
 		var/mob/living/advanced/A = loc
 		if(!A.horizontal && A.add_status_effect(STAGGER,5,5))
-			A.visible_message(span("warning","\The [A.name]'s [src.name] recoils in pain, throwing them off balance!"),span("danger","Your [src.name] recoils in pain, throwing you off balance!"))
+			A.visible_message(span("warning","\The [A.name]'s [src.name] recoils in pain!"),span("danger","Your [src.name] recoils in pain!"))
 			return TRUE
 
-	return .
-
+	
 /obj/item/organ/foot/get_footsteps(var/list/original_footsteps,var/enter=TRUE)
 
 	for(var/k in src.inventories)
@@ -259,6 +258,34 @@
 
 /obj/item/organ/foot/monkey/left
 	name = "left monkey foot"
+	id = BODY_FOOT_LEFT
+	icon_state = BODY_FOOT_LEFT
+
+	attach_flag = BODY_LEG_LEFT
+
+	inventories = list(/obj/hud/inventory/organs/left_foot)
+
+	hud_id = "body_foot_left"
+
+	target_bounds_x_min = 17
+	target_bounds_x_max = 22
+
+	target_bounds_y_min = 1
+	target_bounds_y_max = 3
+
+
+//Beefman
+/obj/item/organ/foot/goblin
+	name = "right goblin foot"
+
+	icon = 'icons/mob/living/advanced/species/goblin.dmi'
+
+	inventories = list(/obj/hud/inventory/organs/right_foot)
+
+	defense_rating = GOBLIN_ARMOR
+
+/obj/item/organ/foot/goblin/left
+	name = "left goblin foot"
 	id = BODY_FOOT_LEFT
 	icon_state = BODY_FOOT_LEFT
 

@@ -6,9 +6,9 @@
 	icon_state = "inventory"
 	value = 400
 
-	shoot_delay = 0.5
-	burst_delay = 5
-	max_bursts = 5
+	shoot_delay = 1
+	burst_delay = 6
+	max_bursts = 3
 
 	automatic = TRUE
 
@@ -69,6 +69,9 @@
 	firing_pin = /obj/item/firing_pin/electronic/iff/space_cop
 
 	dan_mode = TRUE
+
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.05
 
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/dmca/get_static_spread()

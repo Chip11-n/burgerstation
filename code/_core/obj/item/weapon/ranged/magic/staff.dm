@@ -3,16 +3,26 @@
 	var/total_charge = 1000
 	weight = 10
 
+/obj/item/weapon/ranged/magic/staff/Finalize()
+	cost_charge = CEILING(cost_charge,10)
+	total_charge = CEILING(total_charge,100)
+	return ..()
+
+/obj/item/weapon/ranged/magic/staff/get_examine_list(var/mob/examiner)
+
+	. = ..()
+
+	if(total_charge > initial(total_charge)*2)
+		. += span("warning","Overcharged: Uses twice as many charge as it is above capacity.")
+
 
 /obj/item/weapon/ranged/magic/staff/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEVAR("total_charge")
-	return .
 
 /obj/item/weapon/ranged/magic/staff/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADVAR("total_charge")
-	return .
 
 
 /obj/item/weapon/ranged/magic/staff/can_gun_shoot(var/mob/caller)
@@ -27,7 +37,10 @@
 	return ..() + div("notice","It has [get_ammo_count()] charges ([total_charge]) remaining.")
 
 /obj/item/weapon/ranged/magic/staff/handle_ammo(var/mob/caller,var/bullet_position=1)
-	total_charge -= cost_charge
+	var/charge_to_remove = cost_charge
+	if(total_charge > initial(total_charge)*2)
+		charge_to_remove *= 2
+	total_charge -= charge_to_remove
 	update_sprite()
 	return FALSE
 
@@ -38,11 +51,11 @@
 	name = "Wand of Fireballs"
 	desc = "Shoot fireballs!"
 	desc = "You can also use it to reheat soup in a pinch."
-	cost_charge = 100
-	total_charge = 2500
+	cost_charge = SOUL_SIZE_COMMON/10
+	total_charge = SOUL_SIZE_COMMON
 
-	projectile_speed = 16
-	shoot_delay = SECONDS_TO_DECISECONDS(2)
+	projectile_speed = TILE_SIZE*0.75 - 1
+	shoot_delay = 8
 
 	icon = 'icons/obj/item/weapons/ranged/magic/fire.dmi'
 
@@ -53,7 +66,7 @@
 
 	shoot_sounds = list('sound/weapons/magic/fireball.ogg')
 
-	shoot_delay = 10
+	shoot_delay = SPEED_CLUB*0.25
 
 	value = 1200
 
@@ -72,14 +85,14 @@
 	name = "Staff of Chaos"
 	desc = "Summon Chaos!"
 	desc_extended = "For when you need to summon a little chaos."
-	cost_charge = 250
-	total_charge = 1000
+	cost_charge = SOUL_SIZE_UNCOMMON/20
+	total_charge = SOUL_SIZE_UNCOMMON
 
-	shoot_delay = 15
+	shoot_delay = 8
 
-	projectile_speed = 4
+	projectile_speed = TILE_SIZE*0.25 - 1
 
-	bullet_count = 9
+	bullet_count = 5
 
 	icon = 'icons/obj/item/weapons/ranged/magic/chaos.dmi'
 
@@ -105,15 +118,16 @@
 	return 0
 
 
+
 /obj/item/weapon/ranged/magic/staff/basic
 
 	name = "Staff of Magic Missile"
 	desc = "ARCANE MISSILE!."
 	desc_extended = "Point the orb end at the enemy for best result."
-	cost_charge = 100
-	total_charge = 1000
+	cost_charge = SOUL_SIZE_COMMON/20
+	total_charge = SOUL_SIZE_COMMON
 
-	projectile_speed = 20
+	projectile_speed = TILE_SIZE - 1
 	bullet_count = 1
 
 	icon = 'icons/obj/item/weapons/ranged/magic/basic.dmi'
@@ -123,7 +137,7 @@
 
 	shoot_sounds = list('sound/weapons/magic/magic_missile.ogg')
 
-	shoot_delay = 10
+	shoot_delay = 8
 
 	value = 1000
 
@@ -152,10 +166,10 @@
 	name = "Staff of the Blackflame"
 	desc = "Draw unholy power to cast a flame that burns black!"
 	desc_extended = "You can also use it to reheat soup in a pinch."
-	cost_charge = 50
-	total_charge = 2000
+	cost_charge = SOUL_SIZE_UNCOMMON/10
+	total_charge = SOUL_SIZE_UNCOMMON
 
-	projectile_speed = 15
+	projectile_speed = TILE_SIZE - 1
 	bullet_count = 1
 	shoot_delay = 10
 

@@ -46,10 +46,20 @@
 
 	. = ..()
 
-	var/savedata/client/globals/G = GLOBALDATA(client.ckey)
-	if(!G) return .
-	if(!G.loaded_data["stored_experience"]) G.loaded_data["stored_experience"] = list()
-	G.loaded_data["stored_experience"][E.id] += added_xp
+	if(client) //Sometimes antags go afk.
+		var/savedata/client/globals/G = GLOBALDATA(client.ckey)
+		if(!G) return
+		if(!G.loaded_data["stored_experience"]) G.loaded_data["stored_experience"] = list()
+		G.loaded_data["stored_experience"][E.id] += added_xp
 
-	return .
+/mob/living/advanced/player/antagonist/adjust_currency(var/currency_to_add,var/tax=FALSE)
+
+	. = ..()
+
+	if(currency_to_add > 0 && client)
+		var/savedata/client/globals/G = GLOBALDATA(client.ckey)
+		if(!G) return
+		G.loaded_data["stored_currency"] += currency_to_add
+
+
 

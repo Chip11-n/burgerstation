@@ -116,7 +116,6 @@ var/global/list/stored_mechs_by_ckey = list()
 
 	if(battery) . += span("notice","It has \the [battery.name] inserted in the chassis. It has a charge rating of ([battery.charge_current]/[battery.charge_max]).")
 
-	return .
 
 
 /mob/living/vehicle/mech/modular/attach_equipment(var/mob/caller,var/obj/item/I)
@@ -137,7 +136,6 @@ var/global/list/stored_mechs_by_ckey = list()
 			stored_mechs_by_ckey[owner_ckey] = list()
 		stored_mechs_by_ckey[owner_ckey] += src
 
-	return .
 
 /mob/living/vehicle/mech/modular/proc/generate_name()
 	name = "Mech Unit [uppertext(copytext(owner_ckey,1,4))]-[uppertext(copytext(mech_id,1,4))]"
@@ -184,7 +182,6 @@ var/global/list/stored_mechs_by_ckey = list()
 	SAVEATOM("battery")
 
 
-	return .
 
 /mob/living/vehicle/mech/modular/proc/load_mech_data(var/mob/living/advanced/player/P,var/list/object_data)
 
@@ -237,7 +234,6 @@ var/global/list/stored_mechs_by_ckey = list()
 
 	update_sprite()
 
-	return .
 
 /mob/living/vehicle/mech/modular/can_attach_weapon(var/mob/caller,var/obj/item/I)
 
@@ -274,8 +270,6 @@ var/global/list/stored_mechs_by_ckey = list()
 		else if(right_hand)
 			return right_hand.click_on_object(caller,object,location,control,params)
 
-	//src.attack(caller,object,params)
-
 	return TRUE
 
 /mob/living/vehicle/mech/modular/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
@@ -283,19 +277,19 @@ var/global/list/stored_mechs_by_ckey = list()
 	if(caller && caller.ckey != owner_ckey)
 		return ..()
 
-	var/atom/A = object.defer_click_on_object(location,control,params)
+	DEFER_OBJECT
 
-	if(is_item(object) && is_living(caller))
+	if(is_item(defer_object) && is_living(caller))
 		var/mob/living/L = caller
 		if(L.intent == INTENT_HARM)
 			return ..()
 		if(length(passengers))
 			return ..()
-		var/obj/item/I = object
+		var/obj/item/I = defer_object
 		if(I.flags_tool & FLAG_TOOL_WRENCH)
 
 			INTERACT_CHECK
-			INTERACT_CHECK_OBJECT
+			INTERACT_CHECK_DEFER
 			INTERACT_DELAY(5)
 
 			var/list/valid_weapons = list()
@@ -364,11 +358,11 @@ var/global/list/stored_mechs_by_ckey = list()
 
 			return TRUE
 
-		if(istype(A,/obj/item/powercell/))
+		if(istype(I,/obj/item/powercell/))
 			INTERACT_CHECK
-			INTERACT_CHECK_OBJECT
+			INTERACT_CHECK_DEFER
 			INTERACT_DELAY(5)
-			var/obj/item/powercell/PC = A
+			var/obj/item/powercell/PC = I
 			if(battery)
 				caller?.visible_message(span("notice","\The [caller.name] replaces \the [battery.name] in \the [src.name] with \the [PC.name]."),span("notice","You replace \the [battery.name] in \the [src.name] with \the [PC.name]."))
 				battery.update_sprite()
@@ -380,9 +374,9 @@ var/global/list/stored_mechs_by_ckey = list()
 			battery = PC
 			return TRUE
 
-		if(istype(A,/obj/item/mech_part/))
+		if(istype(I,/obj/item/mech_part/))
 			INTERACT_CHECK
-			INTERACT_CHECK_OBJECT
+			INTERACT_CHECK_DEFER
 			INTERACT_DELAY(5)
 			. = FALSE
 			if(istype(I,/obj/item/mech_part/arms))
@@ -485,7 +479,6 @@ var/global/list/stored_mechs_by_ckey = list()
 
 	if(head) add_overlay(head)
 
-	return .
 
 /mob/living/vehicle/mech/modular/update_icon()
 
@@ -497,7 +490,6 @@ var/global/list/stored_mechs_by_ckey = list()
 		icon_state = "backbone"
 		set_dir(SOUTH)
 
-	return .
 
 /mob/living/vehicle/mech/modular/set_dir(var/desired_dir,var/force=FALSE)
 

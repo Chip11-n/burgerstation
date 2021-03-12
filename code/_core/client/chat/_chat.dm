@@ -22,19 +22,32 @@
 			var/obj/structure/interactive/telecomms/TC = k
 			TC.add_data(rustg_hash_string(RUSTG_HASH_SHA1,"\ref[speaker],\ref[source],[text_to_say]"),radio_data)
 
-	play('sound/items/radio.ogg',source)
+	play_sound('sound/items/radio.ogg',get_turf(source),range_max=VIEW_RANGE)
 
 	return TRUE
 
-/proc/use_ears(var/atom/speaker, var/atom/source, var/text_to_say, var/language_text_to_say, var/text_type, var/frequency, var/language = LANGUAGE_BASIC,var/talk_range=TALK_RANGE)
+/proc/use_ears(var/atom/speaker, var/atom/source, var/text_to_say, var/language_text_to_say, var/text_type, var/frequency, var/language = LANGUAGE_BASIC,var/talk_range=TALK_RANGE,var/talk_range_override=0)
 
 	var/turf/T1 = get_turf(source)
+
+	if(!T1)
+		log_error("Warning: Tried to use use_ears on [source], but the turf was null.")
+		return FALSE
+
+	if(!talk_range_override)
+		talk_range_override = talk_range
 
 	for(var/k in all_listeners)
 		CHECK_TICK(75,FPS_SERVER)
 		var/atom/A = k
+		if(!A)
+			all_listeners -= k
+			continue
 		var/turf/T2 = get_turf(A)
-		if(!within_range(T1,T2,talk_range))
+		if(!T2)
+			log_error("Warning: Tried to send a message to a listener [A.get_debug_name()], but it didn't have a valid turf.")
+			continue
+		if(!within_range(T1,T2,talk_range_override))
 			continue
 		A.on_listen(speaker,source,text_to_say,language_text_to_say,text_type,frequency,language,talk_range)
 
@@ -59,8 +72,10 @@
 				var/obj/item/device/radio/R = k
 				var/turf/T = get_turf(R)
 				if(T == source_turf)
-					R.on_listen(speaker,source,text_to_say,language_text_to_say,TEXT_TALK,R.frequency,language,talk_range)
-					if(speaker.is_player_controlled()) log_chat("RADIO [frequency_to_name(R.frequency)]: [speaker.get_log_name()]: [text_to_say]")
+					if(frequency == -1)
+						frequency = R.frequency
+					R.on_listen(speaker,source,text_to_say,language_text_to_say,TEXT_TALK,frequency,language,talk_range)
+					if(speaker.is_player_controlled()) log_chat("RADIO [frequency_to_name(frequency)]: [speaker.get_log_name()]: [text_to_say]")
 					break
 		if(TEXT_TALK)
 			use_ears(speaker,source,text_to_say,language_text_to_say,text_type,frequency,language,talk_range)

@@ -42,7 +42,6 @@
 			var/obj/item/bullet_cartridge/B = src.stored_bullets[i]
 			if(B) .["stored_bullets"][i] = B.type
 
-	return .
 
 /obj/item/weapon/ranged/bullet/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
@@ -63,7 +62,6 @@
 				FINALIZE(B)
 				src.stored_bullets[i] = B
 
-	return .
 
 
 /obj/item/weapon/ranged/bullet/get_examine_list(var/mob/examiner)
@@ -73,7 +71,6 @@
 	if(chambered_bullet)
 		. += div("notice","There is a bullet loaded in the chamber.")
 
-	return .
 
 /obj/item/weapon/ranged/bullet/Destroy()
 	QDEL_NULL(chambered_bullet)
@@ -91,10 +88,12 @@
 
 	var/obj/item/bullet_cartridge/B = chambered_bullet
 	var/jam_chance = B.jam_chance
+	if(quality <= 25)
+		jam_chance += 10
 	if(B.bullet_length != bullet_length_best)
-		jam_chance += 25
+		jam_chance += 10
 	if(B.bullet_diameter != bullet_diameter_best)
-		jam_chance += 50
+		jam_chance += 25
 
 	if(jammed)
 		if(jam_chance < 100) caller.to_chat(span("notice","You unjam \the [src.name]!"))
@@ -108,7 +107,8 @@
 		qdel(B)
 	else
 		if(B.is_spent && !ENABLE_BULLET_CASINGS)
-			if(B.drop_sound) play(B.drop_sound,src)
+			if(B.drop_sound)
+				play_sound(B.drop_sound,get_turf(src),range_max=VIEW_RANGE*0.25)
 			qdel(B)
 		else
 			B.drop_item(new_loc)
@@ -132,7 +132,8 @@
 		qdel(chambered_bullet)
 	else
 		if(bullet_to_remove.is_spent && !ENABLE_BULLET_CASINGS)
-			if(bullet_to_remove.drop_sound) play(bullet_to_remove.drop_sound,src)
+			if(bullet_to_remove.drop_sound)
+				play_sound(bullet_to_remove.drop_sound,get_turf(src),range_max=VIEW_RANGE*0.25)
 			qdel(bullet_to_remove)
 		else
 			bullet_to_remove.drop_item(new_loc)
@@ -177,7 +178,6 @@
 	if(chambered_bullet.qdeleting)
 		chambered_bullet = null
 
-	return .
 
 /obj/item/weapon/ranged/bullet/proc/spend_stored_bullet(var/mob/caller,var/bullet_position = 1)
 
@@ -205,7 +205,6 @@
 		stored_bullets = null
 
 	update_sprite()
-	return .
 
 /obj/item/weapon/ranged/bullet/get_ammo_count()
 	return chambered_bullet ? 1 : 0

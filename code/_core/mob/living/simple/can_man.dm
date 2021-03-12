@@ -12,9 +12,11 @@
 
 	ai = /ai/boss/can_man
 
+	boss_loot = /loot/lavaland/can_man
+
 	stun_angle = 0
 
-	health_base = 5000
+	health_base = 10000
 	stamina_base = 4000
 	mana_base = 100
 
@@ -56,7 +58,7 @@
 		FIRE = TRUE
 	)
 
-	mob_size = MOB_SIZE_BOSS
+	size = SIZE_BOSS
 
 	enable_medical_hud = FALSE
 	enable_security_hud = FALSE
@@ -76,9 +78,10 @@
 
 	movement_delay = DECISECONDS_TO_TICKS(6)
 
+	soul_size = SOUL_SIZE_RARE
+
 /mob/living/simple/can_man/post_death()
 	. = ..()
-	CREATE(/obj/structure/interactive/crate/necro/can_man,get_turf(src))
 	charge_steps = 0
 	charge_dir = 0
 	icon_state = "dead"
@@ -86,17 +89,15 @@
 
 /mob/living/simple/can_man/get_movement_delay()
 
-	. = ..()
-
 	if(charge_steps)
-		. = DECISECONDS_TO_TICKS(AI_TICK)
+		return 1 //Max
 
-	return .
+	return ..()
 
 /mob/living/simple/can_man/post_move(var/atom/old_loc)
 
 	if(charge_steps)
-		play('sound/effects/impacts/meteor_impact.ogg',get_turf(src))
+		play_sound('sound/effects/impacts/meteor_impact.ogg',get_turf(src))
 
 	return ..()
 

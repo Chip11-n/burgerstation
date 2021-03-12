@@ -8,6 +8,8 @@
 
 	var/expiry_time = -1
 
+	value = 200
+
 /obj/item/legion_core/Generate()
 	expiry_time = SECONDS_TO_DECISECONDS(600)
 	return ..()
@@ -31,7 +33,6 @@
 	if(expiry_time == -1)
 		. += div("warning","It has expired.")
 
-	return .
 
 /obj/item/legion_core/update_icon()
 

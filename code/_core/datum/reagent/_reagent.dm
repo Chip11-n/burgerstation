@@ -41,13 +41,16 @@
 	var/cooled_reagent_amount //Amount (units) to add per reagent tick.
 	var/cooled_reagent_mul //Percentage (0-1) of the total volume to add in reagents per tick.
 
-	var/lethal = FALSE //Used by loyalty tags, checks if this reagent is lethal or not. TODO: WIP
+	var/lethal = FALSE //Used by loyalty and charcoal checks if this reagent is lethal or not.
 
 	var/flags_reagent
 
 	var/addiction/addiction
 	var/addiction_strength = 1 //Percent chance to become addicted per unit.
 	var/addiction_threshold = 30 //The percent chance needs to be greater than this value to be considered addicted.
+
+	var/list/involved_in_recipes
+	var/has_temperature_recipe = FALSE
 
 /reagent/proc/on_add(var/reagent_container/container,var/amount_added=0,var/current_volume=0,var/mob/living/caller)
 	return amount_added
@@ -77,36 +80,36 @@
 /reagent/proc/on_remove_living(var/mob/living/L,var/reagent_container/container)
 	return TRUE
 
-/reagent/proc/metabolize(var/atom/originial_owner,var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/proc/metabolize(var/mob/living/living_owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 
 	var/container_flags_metabolism = container.flags_metabolism
 
 	var/total_metabolized = 0
 
 	if(starting_volume >= 0 && container_flags_metabolism & REAGENT_METABOLISM_BLOOD)
-		total_metabolized += on_metabolize_blood(owner,container,starting_volume,multiplier)
+		total_metabolized += on_metabolize_blood(living_owner,container,starting_volume,multiplier)
 
 	if(starting_volume >= 0 && container_flags_metabolism & REAGENT_METABOLISM_INGEST)
-		total_metabolized += on_metabolize_stomach(owner,container,starting_volume,multiplier)
+		total_metabolized += on_metabolize_stomach(living_owner,container,starting_volume,multiplier)
 
 	if(starting_volume >= 0 && container_flags_metabolism & REAGENT_METABOLISM_SKIN)
-		total_metabolized += on_metabolize_skin(owner,container,starting_volume,multiplier)
+		total_metabolized += on_metabolize_skin(living_owner,container,starting_volume,multiplier)
 
 	if(overdose_threshold && starting_volume >= overdose_threshold)
-		total_metabolized += on_overdose(originial_owner,owner,container,starting_volume,multiplier,total_metabolized)
+		total_metabolized += on_overdose(living_owner,container,starting_volume,multiplier,total_metabolized)
 
 	return total_metabolized
 
-/reagent/proc/on_metabolize_stomach(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/proc/on_metabolize_stomach(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 	return metabolism_stomach * DECISECONDS_TO_SECONDS(LIFE_TICK_SLOW)
 
-/reagent/proc/on_metabolize_blood(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/proc/on_metabolize_blood(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 	return metabolism_blood * DECISECONDS_TO_SECONDS(LIFE_TICK_SLOW)
 
-/reagent/proc/on_metabolize_skin(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/proc/on_metabolize_skin(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 	return metabolism_skin * DECISECONDS_TO_SECONDS(LIFE_TICK_SLOW)
 
-/reagent/proc/on_overdose(var/atom/original_owner,var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1,var/metabolism_amount=0)
+/reagent/proc/on_overdose(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1,var/metabolism_amount=0)
 	return metabolism_amount * DECISECONDS_TO_SECONDS(LIFE_TICK_SLOW)
 
 /reagent/proc/on_splash(var/reagent_container/container,var/mob/caller,var/atom/target,var/volume_to_splash,var/strength_mod=1)

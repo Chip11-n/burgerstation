@@ -7,7 +7,6 @@
 	plane = PLANE_FLOOR
 	layer = LAYER_FLOOR
 
-	appearance_flags = TILE_BOUND
 	mouse_over_pointer = MOUSE_INACTIVE_POINTER
 	collision_flags = FLAG_COLLISION_NONE
 
@@ -26,7 +25,7 @@
 
 	var/material_id
 
-	var/delay_modifier = 1 //Increase to make it harder to move on this turf. Decrease to make it easier.
+	var/move_delay_modifier = 1 //Increase to make it harder to move on this turf. Decrease to make it easier. Only applies to mobs that touch the floor.
 
 	var/world_spawn = FALSE
 
@@ -50,7 +49,7 @@
 
 	return TRUE
 
-/turf/proc/is_safe_teleport()
+/turf/proc/is_safe_teleport(var/check_contents=TRUE)
 	return !is_space()
 
 /turf/New(loc)
@@ -60,7 +59,6 @@
 	if(opacity)
 		has_opaque_atom = TRUE
 
-	return .
 
 /turf/Destroy()
 
@@ -69,14 +67,19 @@
 
 	return ..()
 
+/*
 /turf/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 	caller.face_atom(src)
 	return ..()
+*/
 
 /turf/change_victim(var/atom/attacker,var/atom/object)
 
-	for(var/atom/movable/v in contents)
-		if(ismob(v) && attacker != v)
+	for(var/k in contents)
+		var/atom/movable/v = k
+		if(attacker == v)
+			continue
+		if(ismob(v))
 			var/mob/M = v
 			if(M.mouse_opacity == 0)
 				continue
@@ -87,7 +90,9 @@
 	if(old_living)
 		for(var/k in old_living)
 			var/mob/living/L = k
-			if(L.mouse_opacity > 0 && !L.dead && L.move_delay > 0 && attacker != L)
+			if(attacker == L)
+				continue
+			if(L.mouse_opacity > 0 && !L.dead && L.move_delay > 0)
 				return L
 
 	return src
@@ -113,7 +118,6 @@
 	if(!enterer.qdeleting && is_living(enterer))
 		do_footstep(enterer,TRUE)
 
-	return .
 
 /turf/Exited(var/atom/movable/exiter,var/atom/new_loc)
 
@@ -125,7 +129,6 @@
 	if(!exiter.qdeleting && is_living(exiter))
 		do_footstep(exiter,FALSE)
 
-	return .
 
 /turf/can_be_attacked(var/atom/attacker,var/atom/weapon,var/params,var/damagetype/damage_type)
 	return istype(health)

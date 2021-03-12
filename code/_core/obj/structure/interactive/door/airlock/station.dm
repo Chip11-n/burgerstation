@@ -17,6 +17,12 @@
 	color = COLOR_COMMAND
 	fill_color = COLOR_COMMAND
 
+/obj/structure/interactive/door/airlock/station/chapel
+	name = "chapel airlock"
+	color = "#E1DFD2"
+	filler = "glass"
+	fill_color = "#FFFFFF"
+
 /obj/structure/interactive/door/airlock/station/command/no_access
 	no_access = TRUE
 
@@ -49,6 +55,12 @@
 	name = "maintenance airlock"
 	color = COLOR_METAL_DARK
 	fill_color = "#B69F3C"
+
+/obj/structure/interactive/door/airlock/station/maintenance/chapel
+	name = "maintenance airlock"
+	color = COLOR_METAL_DARK
+	fill_color = "#E1DFD2"
+
 
 /obj/structure/interactive/door/airlock/station/maintenance/no_access
 	no_access = TRUE
@@ -110,11 +122,37 @@
 	filler = "fill"
 	fill_color = COLOR_WHITE
 
+/obj/structure/interactive/door/airlock/station/botany
+	name = "botany airlock"
+	color = COLOR_GREEN
+	filler = "fill"
+	fill_color = COLOR_WHITE
+
+/obj/structure/interactive/door/airlock/station/botany/glass
+	filler = "glass"
+
 
 /obj/structure/interactive/door/airlock/station/general
 	name = "general airlock"
 	color = COLOR_METAL_DARK
 	fill_color = "#83A35D"
+
+
+/obj/structure/interactive/door/airlock/station/kitchen
+	name = "kitchen airlock"
+	color = COLOR_WHITE
+	fill_color = COLOR_WHITE
+
+/obj/structure/interactive/door/airlock/station/kitchen/glass
+	filler = "glass"
+
+/obj/structure/interactive/door/airlock/station/bar
+	name = "bar airlock"
+	color = COLOR_WHITE
+	fill_color = COLOR_WHITE
+
+/obj/structure/interactive/door/airlock/station/bar/glass
+	filler = "glass"
 
 /obj/structure/interactive/door/airlock/station/chemistry
 	name = "medical airlock"
@@ -122,6 +160,10 @@
 	filler = "glass"
 	fill_color = COLOR_WHITE
 
+/obj/structure/interactive/door/airlock/station/ntops
+	name = "ntops airlock"
+	color = COLOR_WHITE
+	filler = "glass"
 
 /obj/structure/interactive/door/airlock/station/glass
 	name = "public airlock"
@@ -145,3 +187,9 @@
 
 /obj/structure/interactive/door/airlock/station/bathroom/toilet
 	name = "toilet airlock"
+
+/obj/structure/interactive/door/airlock/wizard
+	color = COLOR_PURPLE
+
+/obj/structure/interactive/door/airlock/wizard/glass
+	filler = "glass"

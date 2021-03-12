@@ -3,6 +3,8 @@
 	desc = "What the fuck is this?"
 	var/label
 
+	appearance_flags = LONG_GLIDE | PIXEL_SCALE | TILE_BOUND
+
 	var/desc_extended = "Such a strange object. I bet not even the gods themselves know what this thing is. Who knows what mysteries it can hold?"
 
 	plane = PLANE_OBJ
@@ -26,6 +28,10 @@
 	var/attack_range = 1 //If it's a melee weapon, it needs a range.
 
 	var/reagent_container/reagents //The reagents object. If an object is supposed to hold liquid, give it a reagent_container datum.
+	//This applies to things like beakers and whatnot. This affects player-controlled transfers, and does not affect procs like add_reagent
+	var/allow_reagent_transfer_to = FALSE
+	var/allow_reagent_transfer_from = FALSE
+
 	var/health/health //The health object. If an object is supposed to take damage, give it a health datum.
 
 	var/corner_icons = FALSE
@@ -47,27 +53,9 @@
 
 	var/attack_next = -1
 
-	var/light_sprite_range = 0
-	var/light_sprite_alpha = 0
-
 	var/listener = FALSE //Setting this to true doesn't make it listen after it's been initialized.
 
 	var/dir_offset = TILE_SIZE
-
-/atom/proc/set_light_sprite(var/desired_range,var/desired_alpha)
-
-	var/update_overlays = FALSE
-
-	if(isnum(desired_range))
-		light_sprite_range = desired_range
-		update_overlays = TRUE
-
-	if(isnum(desired_alpha))
-		light_sprite_alpha = desired_alpha
-		update_overlays = TRUE
-
-	if(update_overlays)
-		update_sprite()
 
 /atom/proc/update_name(var/desired_name)
 	name = desired_name
@@ -153,7 +141,6 @@
 /atom/Finalize()
 	. = ..()
 	update_name(name) //Setup labels
-	return .
 
 /atom/New()
 
@@ -165,9 +152,7 @@
 
 	set_dir(dir,TRUE)
 
-	return .
-
-/atom/proc/defer_click_on_object(location,control,params)
+/atom/proc/defer_click_on_object(var/mob/caller,location,control,params)
 	return src
 
 /atom/proc/get_xp_multiplier() //How much XP should this object give for interacting with it.
@@ -196,8 +181,6 @@
 		var/turf/T2 = get_step(T,dir)
 		if(T2.is_space())
 			. |= dir
-
-	return .
 
 
 /atom/proc/get_best_touching_space(var/intercardinal = TRUE)

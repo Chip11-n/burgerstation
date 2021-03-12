@@ -40,7 +40,6 @@
 	I.layer = -100
 	I.color = base_color
 	underlays += I
-	return .
 
 /obj/structure/interactive/bed/sleeper/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
@@ -85,8 +84,7 @@
 
 /obj/structure/interactive/bed/sleeper/proc/open(var/mob/caller)
 	if(open_sound)
-		play(open_sound,src)
-		create_alert(VIEW_RANGE,src.loc,caller,ALERT_LEVEL_NOISE)
+		play_sound(open_sound,src.loc,range_max=VIEW_RANGE)
 	door_state = SLEEPER_OPENING
 	update_icon()
 	CALLBACK("on_open_\ref[src]",open_time,src,.proc/on_open,caller)
@@ -114,8 +112,7 @@
 	if(A && can_buckle(A,caller))
 		buckle(A,caller)
 	if(close_sound)
-		play(close_sound,src)
-		create_alert(VIEW_RANGE,src.loc,caller,ALERT_LEVEL_NOISE)
+		play_sound(close_sound,src.loc,range_max=VIEW_RANGE)
 	door_state = SLEEPER_CLOSING
 	update_icon()
 	CALLBACK("on_close_\ref[src]",close_time,src,.proc/on_close,caller)

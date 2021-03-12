@@ -27,6 +27,16 @@ var/global/list/obj/structure/interactive/drop_pod/all_drop_pods = list()
 
 	density = TRUE
 
+/obj/structure/interactive/drop_pod/post_move(var/atom/old_loc)
+
+	. = ..()
+
+	for(var/k in contents)
+		var/atom/movable/M = k
+		M.post_move(old_loc)
+
+
+
 /obj/structure/interactive/drop_pod/Cross(atom/movable/O)
 
 	if(state == POD_IDLE)
@@ -103,7 +113,7 @@ var/global/list/obj/structure/interactive/drop_pod/all_drop_pods = list()
 			icon_state = "none"
 			flick("drop_anim",src)
 			CALLBACK("set_state_\ref[src]",3,src,.proc/set_state,POD_LAUNCHED,desired_loc)
-			play('sound/machines/blastdoor.ogg',get_turf(src))
+			play_sound('sound/machines/blastdoor.ogg',get_turf(src))
 		if(POD_LAUNCHED)
 			icon_state = "none"
 			CALLBACK("set_state_\ref[src]",20,src,.proc/set_state,POD_LANDING,desired_loc)
@@ -113,14 +123,14 @@ var/global/list/obj/structure/interactive/drop_pod/all_drop_pods = list()
 			icon_state = "pod_air"
 			animate(src,pixel_z = 0,time=20)
 			CALLBACK("set_state_\ref[src]",20,src,.proc/set_state,POD_LANDED,desired_loc)
-			play('sound/machines/droppod_landing.ogg',get_turf(src))
+			play_sound('sound/machines/droppod_landing.ogg',get_turf(src))
 		if(POD_LANDED)
 			icon_state = "pod_closed"
 			flick("land_anim",src)
 			CALLBACK("set_state_\ref[src]",50,src,.proc/set_state,POD_OPENING,desired_loc)
-			explode(desired_loc,2,src,src)
+			explode(desired_loc,20,src,src,"NanoTrasen")
 		if(POD_OPENING)
-			play('sound/machines/droppod_land.ogg',get_turf(src))
+			play_sound('sound/machines/droppod_land.ogg',get_turf(src))
 			icon_state = "pod"
 			for(var/k in contents)
 				var/atom/movable/M = k

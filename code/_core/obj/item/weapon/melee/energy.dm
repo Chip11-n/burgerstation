@@ -15,7 +15,6 @@
 /obj/item/weapon/melee/energy/get_examine_details_list(var/mob/examiner)
 	. = ..()
 	if(enabled) . += span("notice","It is active.")
-	return .
 
 /obj/item/weapon/melee/energy/click_self(var/mob/caller)
 	INTERACT_CHECK
@@ -59,7 +58,6 @@
 /obj/item/weapon/melee/energy/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
 
-	object = object.defer_click_on_object(location,control,params)
 
 	if(is_item(object) && length(polymorphs))
 		var/obj/item/I = object
@@ -67,8 +65,8 @@
 
 			INTERACT_CHECK
 			INTERACT_CHECK_OBJECT
-			var/choice = input("What do you want to change the color of \the [src.name]?","Color Selection") as null|anything in polymorphs
 
+			var/choice = input("What do you want to change the color of \the [src.name]?","Color Selection") as null|anything in polymorphs
 			if(!choice)
 				caller.to_chat(span("notice","You decide not to change \the [src.name]'s color."))
 				return TRUE
@@ -123,10 +121,9 @@
 	if(.)
 		SPAM_CHECK(20)
 		if(enabled)
-			play('sound/weapons/energy/energy_on.ogg',src)
+			play_sound('sound/weapons/energy/energy_on.ogg',get_turf(src),range_max=VIEW_RANGE)
 		else
-			play('sound/weapons/energy/energy_off.ogg',src)
-	return .
+			play_sound('sound/weapons/energy/energy_off.ogg',get_turf(src),range_max=VIEW_RANGE)
 
 
 /obj/item/weapon/melee/energy/sword/blue
@@ -171,12 +168,11 @@
 
 	polymorphs = list(base = "#FFFFFF")
 
-	block_defense_rating = list(
-		BLADE = AP_GREATSWORD,
-		BLUNT = AP_GREATSWORD*0.25,
-		PIERCE = AP_GREATSWORD,
-		LASER = AP_GREATSWORD,
-		ARCANE = AP_GREATSWORD
+	block_defense = list(
+		ATTACK_TYPE_UNARMED = 0.25,
+		ATTACK_TYPE_MELEE = 0.5,
+		ATTACK_TYPE_RANGED = 0.9,
+		ATTACK_TYPE_MAGIC = 0
 	)
 
 	weight = 2
@@ -218,7 +214,22 @@
 		"blade" = "#FFFFFF"
 	)
 
+/obj/item/weapon/melee/energy/sword/katana/merc
+	polymorphs = list(
+		"base" = "#415252",
+		"core" = "#F9FDFE",
+		"blade" = "#BACADC"
+	)
+	size = SIZE_3
+	weight = 12
 
+/obj/item/weapon/melee/energy/sword/katana/merc/click_self(var/mob/caller)
+	return TRUE
+
+/obj/item/weapon/melee/energy/sword/katana/merc/Initialize()
+	enabled = TRUE
+	update_sprite()
+	. = ..()
 
 /obj/item/weapon/melee/energy/plightbringer
 	name = "\improper Plightbringer's Sword"
@@ -242,8 +253,7 @@
 	if(.)
 		SPAM_CHECK(20)
 		if(enabled)
-			play('sound/weapons/magic/ash.ogg',src)
+			play_sound('sound/weapons/magic/ash.ogg',get_turf(src),range_max=VIEW_RANGE)
 		else
-			play('sound/weapons/magic/ash.ogg',src)
+			play_sound('sound/weapons/magic/ash.ogg',get_turf(src),range_max=VIEW_RANGE)
 
-	return .

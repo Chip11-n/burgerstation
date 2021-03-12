@@ -21,12 +21,10 @@
 	. = ..()
 	start_thinking(src)
 	update_sprite()
-	return .
 
 /obj/structure/interactive/ore_storage/update_icon()
 	. = ..()
 	icon_state = "ore_storage"
-	return .
 
 /obj/structure/interactive/ore_storage/Cross(atom/movable/O)
 
@@ -38,7 +36,7 @@
 
 /obj/structure/interactive/ore_storage/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
-	object = object.defer_click_on_object(location,control,params)
+
 
 	INTERACT_CHECK
 	INTERACT_CHECK_OBJECT

@@ -35,7 +35,7 @@
 	//Now we move.
 	if(final_move_dir && move_delay <= 0 && is_valid_dir(final_move_dir))
 
-		var/final_movement_delay = get_movement_delay()
+		var/final_movement_delay = max(adjust_delay,get_movement_delay())
 		var/intercardinal = is_intercardinal_dir(final_move_dir)
 
 		if(intercardinal)
@@ -44,9 +44,9 @@
 		if(acceleration_mod > 0)
 			final_movement_delay *= 1 / (acceleration_mod + ((acceleration_value/100)*(1-acceleration_mod)))
 
-		if(isturf(loc))
+		if(isturf(loc) && (collision_flags & FLAG_COLLISION_WALKING))
 			var/turf/T = loc
-			final_movement_delay *= T.delay_modifier
+			final_movement_delay *= T.move_delay_modifier
 
 		move_delay = CEILING(max(final_movement_delay,move_delay + final_movement_delay), adjust_delay ? adjust_delay : 1) //Round to the nearest tick. Counting decimal ticks is dumb.
 
@@ -121,7 +121,7 @@
 	if(old_loc != loc)
 		post_move(old_loc)
 
-	return FALSE
+	return TRUE
 
 /atom/movable/proc/post_move(var/atom/old_loc)
 
@@ -133,6 +133,11 @@
 	for(thing in light_sources)
 		L = thing
 		L.source_atom.update_light()
+
+	if(isturf(src.loc))
+		for(var/k in light_sprite_sources)
+			var/obj/light_sprite/LS = k
+			LS.force_move(src.loc)
 
 	HOOK_CALL("post_move")
 	return TRUE

@@ -17,28 +17,23 @@
 /obj/item/powercell/get_battery()
 	return src
 
-/obj/item/powercell/get_value()
-
+/obj/item/powercell/get_base_value()
 	. = ..()
 	. += CEILING(charge_current*0.01,1)
 	. += CEILING(charge_max*0.003,1)
-	return .
 
 /obj/item/powercell/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEVAR("charge_current")
-	return .
 
 /obj/item/powercell/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADVAR("charge_current")
-	return .
 
 /obj/item/powercell/Generate()
 	charge_current = charge_max
 	. = ..()
 	update_sprite()
-	return .
 
 /obj/item/powercell/update_icon()
 
@@ -134,6 +129,6 @@
 /obj/item/powercell/recharging/think()
 	charge_current = min(charge_current + charge_max*0.001,charge_max)
 	return ..()
-	
+
 /obj/item/powercell/get_examine_list(var/mob/caller)
 	return ..() + div("notice","It has [charge_current] out of [charge_max] charge remaining.")

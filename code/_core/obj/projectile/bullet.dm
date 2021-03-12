@@ -9,12 +9,28 @@
 /obj/projectile/bullet/update_icon()
 	. = ..()
 	color = bullet_color
-	return .
 
 /obj/projectile/bullet/bolt
 	name = "crossbow bolt"
 	icon = 'icons/obj/projectiles/bolt.dmi'
 	icon_state = "bolt"
+	muzzleflash_effect = null
+
+/obj/projectile/bullet/arrow
+	name = "arrow"
+	icon = 'icons/obj/projectiles/arrow.dmi'
+	icon_state = "normal"
+	muzzleflash_effect = null
+
+/obj/projectile/bullet/arrow/ashen
+	name = "arrow"
+	icon = 'icons/obj/projectiles/arrow.dmi'
+	icon_state = "ashen"
+
+/obj/projectile/bullet/arrow/hardlight
+	name = "arrow"
+	icon = 'icons/obj/projectiles/arrow.dmi'
+	icon_state = "hardlight"
 
 /obj/projectile/bullet/tungsten
 	name = "tungsten bolt"
@@ -34,15 +50,9 @@
 	if(is_living(hit_atom))
 		var/mob/living/L = hit_atom
 		if(L.iff_tag == iff_tag)
-			var/list/params = list()
-			params[PARAM_ICON_X] = shoot_x
-			params[PARAM_ICON_Y] = shoot_y
-			var/atom/object_to_damage = hit_atom.get_object_to_damage(owner,src,params,FALSE,FALSE)
-			if(ismovable(object_to_damage))
-				var/atom/movable/M = object_to_damage
-				if(M.reagents)
-					M.reagents.add_reagent(reagent_to_add,volume_to_add,caller=owner)
-				return TRUE
+			if(L.reagents)
+				L.reagents.add_reagent(reagent_to_add,volume_to_add,caller=owner)
+			return TRUE
 
 	return ..()
 
@@ -55,9 +65,8 @@
 	. = ..()
 
 	if(.)
-		explode(get_turf(hit_atom),2,owner,src,iff_tag)
+		explode(get_turf(hit_atom),20,owner,weapon,iff_tag)
 
-	return .
 
 /obj/projectile/bullet/gyrojet
 	name = "gyrojet"
@@ -65,12 +74,8 @@
 	icon_state = "gyrojet"
 
 /obj/projectile/bullet/gyrojet/post_on_hit(var/atom/hit_atom)
+	explode(get_turf(hit_atom),10,owner,weapon,iff_tag)
 	. = ..()
-
-	if(.)
-		explode(get_turf(hit_atom),1,owner,src,iff_tag)
-
-	return .
 
 /obj/projectile/bullet/gyrojet/update_projectile(var/tick_rate=1)
 
@@ -91,7 +96,6 @@
 			on_hit(current_loc,TRUE)
 			return FALSE
 
-	return .
 
 
 /obj/projectile/bullet/rocket
@@ -103,6 +107,5 @@
 	. = ..()
 
 	if(.)
-		explode(get_turf(hit_atom),2,owner,src,iff_tag)
+		explode(get_turf(hit_atom),20,owner,src,iff_tag)
 
-	return .

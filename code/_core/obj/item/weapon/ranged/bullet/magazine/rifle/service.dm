@@ -1,5 +1,5 @@
 /obj/item/weapon/ranged/bullet/magazine/rifle/service
-	name = "\improper 7.62mm SOL-14"
+	name = "\improper 7.62mm SOL-14 Service Rifle"
 	desc = "HOORAH!."
 	desc_extended = "The SOL-14 is the battle rifle currently in service in the SolGov Army. It's occasionally seen in the hands of PMCs."
 	icon = 'icons/obj/item/weapons/ranged/rifle/762_service.dmi'
@@ -15,8 +15,6 @@
 	can_wield = TRUE
 
 	view_punch = 8
-
-
 
 	size = SIZE_4
 	weight = 15
@@ -67,6 +65,9 @@
 	attachment_undermount_offset_y = 19 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/deathsquad
+
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.04
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/service/get_static_spread()
 	if(!wielded) return 0.2

@@ -4,15 +4,13 @@
 
 	var/can_shoot_while_open = FALSE
 
-	inaccuracy_modifer = 0.5
+	movement_spread_base = 0.03
 
-	movement_spread_base = 0.02
-	movement_spread_mul = 0.05
+	inaccuracy_modifier = 0.5
 
 /obj/item/weapon/ranged/bullet/revolver/New(var/desired_loc)
 	. = ..()
 	stored_bullets = new/list(bullet_count_max)
-	return .
 
 /obj/item/weapon/ranged/bullet/revolver/get_ranged_damage_type()
 	return stored_bullets[current_chamber] ? stored_bullets[current_chamber].damage_type : damage_type
@@ -37,13 +35,15 @@
 
 	open = !open
 
+	var/turf/T = get_turf(src)
+
 	if(open)
-		eject_stored_bullets_spent(caller,get_turf(src),TRUE)
+		eject_stored_bullets_spent(caller,T,TRUE)
 		caller.to_chat(span("notice","You open \the [src]. It contains [get_ammo_count()] bullet\s."))
 	else
 		caller.to_chat(span("notice","You close \the [src]."))
 
-	play('sound/weapons/revolver_click2.ogg',src)
+	play_sound('sound/weapons/revolver_click2.ogg',T,range_max=VIEW_RANGE*0.25)
 
 	update_sprite()
 
@@ -66,7 +66,7 @@
 
 /obj/item/weapon/ranged/bullet/revolver/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	object = object.defer_click_on_object(location,control,params)
+
 
 	if(open && is_inventory(object) && src && is_inventory(src.loc)) //The revolver is in an inventory, and you clicked on it with your empty hands.
 

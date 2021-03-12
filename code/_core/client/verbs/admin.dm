@@ -55,12 +55,12 @@
 		src.to_chat(span("notice","You decide not to ban anyone."))
 		return TRUE
 
-	ban_raw(desired_ckey,desired_ban_duration,desired_ban_reason)
+	if(ban_raw(desired_ckey,desired_ban_duration,desired_ban_reason))
+		src.to_chat(span("notice","Ban successfully applied."))
+	else
+		src.to_chat(span("warning","There was an issue applying a ban."))
 
 	return TRUE
-
-
-
 
 /client/proc/ban_raw(var/target_ckey as text,var/ban_duration_minutes = -1 as num, var/ban_reason = "No reason given." as message)
 
@@ -75,8 +75,7 @@
 	if(!target_ckey)
 		return FALSE
 
-	SSban.add_ckey_ban(target_ckey,ckey,ban_reason,ban_duration_minutes == -1 ? -1 : world.realtime + ban_duration_minutes*60)
-	return TRUE
+	return SSban.add_ckey_ban(target_ckey,ckey,ban_reason,ban_duration_minutes == -1 ? -1 : world.realtime + ban_duration_minutes*60)
 
 /client/verb/get_clients()
 	set name = "Get Clients"
@@ -102,14 +101,17 @@
 	if(!desired_varable_value)
 		if(isnum(object.vars[desired_varable_key]))
 			desired_varable_value = input("Desired Number") as num|null
-
+			if(!isnum(desired_varable_value))
+				return FALSE
 		else if(istext(object.vars[desired_varable_key]))
-			desired_varable_value = input("Desired Number") as text|null
+			desired_varable_value = input("Desired Text") as text|null
+			if(!desired_varable_value)
+				return FALSE
 
 	if(desired_varable_value && istext(desired_varable_value))
 		desired_varable_value = sanitize(desired_varable_value)
 
-	if(object && is_datum(object) && desired_varable_key && desired_varable_value)
+	if(object && is_datum(object) && desired_varable_key)
 		object.vars[desired_varable_key] = desired_varable_value
 		var_edit(object)
 
@@ -171,3 +173,30 @@
 
 	to_chat(span("notice","You brought \the [choice.name] to you."))
 	log_admin("[src] brought [choice] to their location.")
+
+
+/client/verb/apply_fuckup()
+	set name = "Apply Fuckup (DANGER)"
+	set category = "Admin"
+
+	var/list/valid_fuckups = list()
+	for(var/k in SSfuckup.all_fuckups)
+		var/fuckup/FU = k
+		valid_fuckups[FU.name] = FU
+
+	valid_fuckups["Cancel"] = "Cancel"
+
+	var/fuckup_choice = input("What fuckup would you like to apply?","Fuckup","Cancel") as null|anything in valid_fuckups
+
+	if(!fuckup_choice || fuckup_choice == "Cancel")
+		return TRUE
+
+	var/confirm = input("Are you absolutely sure you wish to apply this fuckup? Type \"Confirm\" to confirm.") as null|text
+	if(confirm != "Confirm")
+		return TRUE
+
+	src.to_chat(span("notice","Applying [fuckup_choice] fuckup..."))
+
+	var/fuckup/FU = valid_fuckups[fuckup_choice]
+
+	SSfuckup.apply_fuckup(FU)

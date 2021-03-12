@@ -37,7 +37,7 @@
 /experience/proc/update_experience(var/desired_xp)
 	desired_xp = max(0,desired_xp)
 	experience = desired_xp
-	last_level = min(xp_to_level(experience),LEVEL_CAP)
+	last_level = min(xp_to_level(experience),100)
 	return TRUE
 
 /experience/proc/xp_to_level(var/xp) //Convert xp to level
@@ -56,6 +56,7 @@
 	if(!ENABLE_XP)
 		return FALSE
 	experience = level_to_xp(clamp(level,1,owner.max_level))
+	last_level = get_current_level()
 	return experience
 
 /experience/proc/get_current_level()

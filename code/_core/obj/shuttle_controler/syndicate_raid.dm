@@ -16,11 +16,10 @@
 	. = ..()
 
 	if(ending_transit_id == /area/transit/syndicate_raid/ship)
-		spook_station()
+		//spook_station()
 
 		var/area/A = get_area(src)
 
 		for(var/obj/marker/explosion_point/MP in A.contents)
-			explode(get_turf(MP),4,null,MP,"Syndicate")
+			explode(get_turf(MP),300,null,MP,"Syndicate")
 
-	return .

@@ -1,5 +1,5 @@
 /obj/item/proc/can_transfer_stacks_to(var/obj/item/I)
-	return istype(src,I) && I != src && I.item_count_max > 1
+	return (istype(I,src) || istype(src,I)) && I != src && I.item_count_max > 1
 
 //Credit goes to Unknown Person
 
@@ -17,7 +17,9 @@
 			"locs",
 			"parent_type",
 			"verbs",
-			"vars"
+			"vars",
+			"vis_locs",
+			"vis_contents"
 		)
 	)
 
@@ -29,7 +31,7 @@
 		try
 			N.vars[i] = A.vars[i]
 		catch()
-			log_error("Cannot write var [i]!")
+			log_error("copy() error: Cannot write var [i] for type [A.type]!")
 
 	N.loc = null
 
@@ -48,8 +50,6 @@
 	return I
 
 /obj/item/click_on_object(var/mob/caller,var/atom/object,location,control,params)
-
-	object = object.defer_click_on_object(location,control,params)
 
 	if(try_transfer_reagents(caller,object,location,control,params))
 		return TRUE

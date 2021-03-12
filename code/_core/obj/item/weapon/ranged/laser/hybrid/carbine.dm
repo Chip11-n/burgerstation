@@ -16,7 +16,7 @@
 	bullet_color = "#FF0000"
 
 	projectile_speed = TILE_SIZE - 1
-	shoot_delay = 1.25
+	shoot_delay = 2
 
 	automatic = TRUE
 	max_bursts = 3
@@ -35,6 +35,9 @@
 	weight = 14
 
 	value = 600
+
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.01
 
 
 /obj/item/weapon/ranged/energy/hybrid/carbine/update_icon()

@@ -76,7 +76,10 @@ dmm_suite
 		// Create all Atoms at map location, from model key
 		if ((coordZ+maxZFound-1) > world.maxz)
 			world.maxz = coordZ+maxZFound-1
+			//all_mobs_with_clients_by_z["[world.maxz]"] = list()
+			log_debug("Z levels increased to [world.maxz].")
 		for(var/posZ = 1 to gridLevels.len)
+			CHECK_TICK(50,FPS_SERVER)
 			var zGrid = gridLevels[posZ]
 			// Reverse Y coordinate
 			var /list/yReversed = text2list(zGrid, "\n")
@@ -106,25 +109,28 @@ dmm_suite
 				for(var/posY = 1 to yLines.len)
 					var yLine = yLines[posY]
 					for(var/posX = 1 to length(yLine)/key_len)
+						CHECK_TICK(50,FPS_SERVER)
 						var/turf/T = locate(posX + gridCoordX - 1, posY+gridCoordY - 1, gridCoordZ)
 						for(var/k in T)
+							CHECK_TICK(50,FPS_SERVER)
 							var/datum/x = k
 							if(istype(x, /obj) && overwrite & DMM_OVERWRITE_OBJS)
 								qdel(x)
 							else if(istype(x, /mob) && overwrite & DMM_OVERWRITE_MOBS)
 								qdel(x)
-							CHECK_TICK(50,FPS_SERVER)
+
 
 			for(var/posY = 1 to yLines.len)
 				var yLine = yLines[posY]
 				for(var/posX = 1 to length(yLine)/key_len)
+					CHECK_TICK(50,FPS_SERVER)
 					var keyPos = ((posX-1)*key_len)+1
 					var modelKey = copytext(yLine, keyPos, keyPos+key_len)
 					parse_grid(
 						grid_models[modelKey], posX + gridCoordX - 1, posY + gridCoordY - 1, gridCoordZ
 					)
-				sleep(-1)
-			sleep(-1)
+
+
 		//
 		return props
 
@@ -217,8 +223,22 @@ dmm_suite
 			// Handle Turfs & Movable Atoms
 			else
 				if(ispath(atomPath, /turf))
-					instance = new atomPath(location)
-					//instance = location.ReplaceWith(atomPath, keep_old_material = 0, handle_air = 0, handle_dir = 0)
+					if(ispath(atomPath, /turf/dmm_suite/no_wall))
+						if(is_simulated(location))
+							var/turf/simulated/S = location
+							if(S.density)
+								if(S.destruction_turf)
+									instance = new S.destruction_turf(location)
+								else
+									instance = new /turf/simulated/floor/cave_dirt(location)
+						else if(istype(location,/turf/unsimulated/generation))
+							var/turf/unsimulated/generation/G = location
+							G.no_wall = TRUE
+						else
+							instance = new /turf/simulated/floor/cave_dirt(location)
+					else
+						instance = new atomPath(location)
+						//instance = location.ReplaceWith(atomPath, keep_old_material = 0, handle_air = 0, handle_dir = 0)
 				else
 					if (atomPath)
 						instance = new atomPath(location)

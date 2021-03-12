@@ -23,7 +23,7 @@
 		ION = INFINITY
 	)
 
-	mob_size = MOB_SIZE_CRITTER
+	size = SIZE_CRITTER
 
 	movement_delay = DECISECONDS_TO_TICKS(2)
 
@@ -32,6 +32,9 @@
 
 	blood_type = /reagent/blood/insect
 	blood_volume = 50
+
+	soul_size = SOUL_SIZE_COMMON
+
 
 /mob/living/simple/glockroach/post_death()
 	..()

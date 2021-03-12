@@ -11,30 +11,16 @@
 	liquid = 0.5
 
 /reagent/toxin/New(var/desired_loc)
-
-	value *= 1+(damage_per_unit*2)
-
+	value *= 1+(damage_per_unit*3)
 	return ..()
 
-/reagent/toxin/on_metabolize_stomach(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
-
+/reagent/toxin/on_metabolize_stomach(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 	. = ..()
+	owner.tox_regen_buffer -= .*damage_per_unit*0.75
 
-	if(owner && owner.health)
-		owner.health.adjust_loss_smart(tox=.*damage_per_unit*0.75,robotic=FALSE)
-
-	return .
-
-/reagent/toxin/on_metabolize_blood(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
-
+/reagent/toxin/on_metabolize_blood(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 	. = ..()
-
-	if(owner && owner.health)
-		owner.health.adjust_loss_smart(tox=.*damage_per_unit,robotic=FALSE)
-
-	return .
-
-
+	owner.tox_regen_buffer -= .*damage_per_unit
 
 /reagent/toxin/angel_toxin
 	name = "angel toxin"
@@ -77,14 +63,14 @@
 	damage_per_unit = 1
 
 
-/reagent/toxin/zombie_toxin/on_metabolize_blood(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/toxin/zombie_toxin/on_metabolize_blood(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 
 	if(container.get_reagent_volume(/reagent/medicine/zombie_antidote) >= container.get_reagent_volume(src.type))
 		return 0
 
 	..()
 
-	return 0
+	return 0 //Cannot be removed via metabolism
 
 
 /reagent/toxin/sulfur_dioxide

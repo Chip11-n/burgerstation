@@ -31,6 +31,10 @@ var/global/list/mob/living/advanced/player/all_players = list()
 	var/list/attack_logs = list()
 
 	var/currency = 3000
+	var/revenue = 0
+	var/expenses = 0
+	var/partial_tax = 0 //Taxes you couldn't pay.
+	var/last_tax_payment = 0
 
 	var/insurance = INSURANCE_PAYOUT * 4 //How much insurance the user has. This amount is paid out in death, up to 8000 credits.
 	var/insurance_premiums = 0.05 //How much your insurance premiums are. This is taxed from your current amount each payday.
@@ -105,8 +109,6 @@ var/global/list/mob/living/advanced/player/all_players = list()
 	if(.)
 		client.screen += click_and_drag_icon
 
-	return .
-
 /mob/living/advanced/player/apply_mob_parts(var/teleport=TRUE,var/do_load=TRUE,var/update_blends=TRUE)
 
 	var/savedata/client/mob/mobdata = MOBDATA(ckey_last)
@@ -123,7 +125,6 @@ var/global/list/mob/living/advanced/player/all_players = list()
 /mob/living/advanced/player/Initialize()
 	. = ..()
 	all_players += src
-	return .
 
 /mob/living/advanced/player/setup_name()
 
@@ -162,7 +163,6 @@ var/global/list/mob/living/advanced/player/all_players = list()
 mob/living/advanced/player/on_life_client()
 	. = ..()
 	spam_protection_command = max(0,spam_protection_command-TICKS_TO_SECONDS(1))
-	return .
 
 /mob/living/advanced/player/post_move(var/atom/old_loc)
 
@@ -193,7 +193,28 @@ mob/living/advanced/player/on_life_client()
 				if(dist > VIEW_RANGE + ZOOM_RANGE)
 					continue
 				A.set_active(TRUE)
+			for(var/k in SSbossai.inactive_ai)
+				var/ai/A = k
+				if(!A.owner)
+					log_error("Warning! [A.get_debug_name()] had no owner!")
+					qdel(A)
+					continue
+				var/dist = get_dist(src,A.owner)
+				if(dist > VIEW_RANGE + ZOOM_RANGE)
+					continue
+				A.set_active(TRUE)
 			ai_steps = 0
 
+/mob/living/advanced/player/can_be_grabbed(var/atom/grabber,var/messages=TRUE)
+	// only prevent dead bodies from being grabbed if person grabbing is antag
+	// unfortunately due to code in datum/damagetype/unarmed/fists.dm, a GRAB! message will be displayed anyway
+	if(dead && istype(grabber, /mob/living/advanced/player/antagonist/))
+		if(istype(src, /mob/living/advanced/player/antagonist/))
+			return ..() // person being grabbed is also antag, allows revs and syndies to grab each other (maybe check IFF?)
 
-	return .
+		if(messages)
+			var/mob/living/grabberMob = grabber
+			grabberMob.to_chat(span("warning", "Ew! Why would I touch a disgusting [name]!"))
+
+		return FALSE
+	return ..()

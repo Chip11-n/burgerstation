@@ -7,38 +7,29 @@
 
 	var/obj/item/powercell/battery = /obj/item/powercell/
 
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.02
+
 /obj/item/weapon/ranged/energy/get_value()
-
 	. = ..()
-
 	if(battery) . += battery.get_value()
-
-	return .
-
 
 /obj/item/weapon/ranged/energy/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEATOM("battery")
-	return .
 
 /obj/item/weapon/ranged/energy/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADATOM("battery")
-	return .
 
 /obj/item/weapon/ranged/energy/Finalize()
-
 	. = ..()
-
 	if(!istype(battery))
 		battery = null
 
-	return .
-
-
 /obj/item/weapon/ranged/energy/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
-	object = object.defer_click_on_object(location,control,params)
+
 
 	if(istype(object,/obj/item/))
 

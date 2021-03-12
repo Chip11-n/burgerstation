@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/misc/gm94.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = SECONDS_TO_DECISECONDS(2)
+	shoot_delay = 20
 
 	automatic = FALSE
 
@@ -38,8 +38,6 @@
 
 	open = TRUE
 
-	inaccuracy_modifer = 1
-
 	attachment_whitelist = list(
 		/obj/item/attachment/sight/laser_sight = FALSE,
 		/obj/item/attachment/sight/quickfire_adapter = FALSE,
@@ -66,6 +64,9 @@
 	attachment_undermount_offset_y = 0 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
+
+	inaccuracy_modifier = 0.5
+	movement_spread_base = 0.1
 
 /obj/item/weapon/ranged/bullet/revolver/gm94/get_base_spread()
 	return 0.1

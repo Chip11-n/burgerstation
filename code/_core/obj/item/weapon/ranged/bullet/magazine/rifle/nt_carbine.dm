@@ -6,7 +6,7 @@
 	icon_state = "inventory"
 	value = 150
 
-	shoot_delay = 1.5
+	shoot_delay = 2
 
 	automatic = TRUE
 
@@ -65,6 +65,9 @@
 	attachment_undermount_offset_y = 16 - 16
 
 	dan_mode = TRUE
+
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.005
 
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/nt_carbine/get_static_spread()

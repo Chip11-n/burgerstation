@@ -72,7 +72,7 @@
 		/mob/living/advanced/npc/deathsquad/medium = 4,
 		/mob/living/advanced/npc/deathsquad/heavy = 1
 	)
-	hidden = FALSE
+	hidden = TRUE
 
 	enemies_to_spawn_base = 3
 	enemies_to_spawn_per_player = 0.25
@@ -112,6 +112,18 @@
 	)
 	hidden = FALSE
 
+/gamemode/horde/space_goblins
+	name = "Horde Mode (Space Goblins)"
+	desc = "Fight off an endless wave of Space Goblins while attempting to complete objectives."
+	enemy_types_to_spawn = list(
+		/mob/living/simple/goblin = 100,
+		/mob/living/advanced/npc/goblin/warrior = 20,
+		/mob/living/advanced/npc/goblin/mage = 10
+	)
+	hidden = FALSE
+
+	enemies_to_spawn_base = 10
+	enemies_to_spawn_per_player = 1.5
 
 /gamemode/horde/boss_rush
 	name = "Horde Mode (Boss Rush)"

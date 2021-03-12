@@ -6,7 +6,7 @@
 	icon_state = "inventory"
 	value = 150
 
-	shoot_delay = 1.5
+	shoot_delay = 2
 
 	automatic = TRUE
 
@@ -68,6 +68,10 @@
 	attachment_undermount_offset_y = 16 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/deathsquad
+
+	inaccuracy_modifier = 1
+	movement_spread_base = 0.005
+
 
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/civ_carbine/get_static_spread()

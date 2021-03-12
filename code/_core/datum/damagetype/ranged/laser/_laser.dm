@@ -6,8 +6,8 @@
 
 	falloff = VIEW_RANGE
 
-	damage_mod = 0.75
+	damage_mod = 1
 
-	bonus_experience = list(
+	bonus_experience_skill = list(
 		SKILL_RANGED = 50 //50%
 	)

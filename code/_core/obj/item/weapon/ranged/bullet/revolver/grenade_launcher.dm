@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/grenade_launcher.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 1.25
+	shoot_delay = 20
 
 	automatic = TRUE
 
@@ -35,8 +35,6 @@
 
 	open = TRUE
 
-	inaccuracy_modifer = 1
-
 	attachment_whitelist = list(
 		/obj/item/attachment/sight/laser_sight = FALSE,
 		/obj/item/attachment/sight/quickfire_adapter = FALSE,
@@ -63,6 +61,9 @@
 	attachment_undermount_offset_y = 0 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/nanotrasen
+
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.04
 
 /obj/item/weapon/ranged/bullet/revolver/grenade_launcher/get_base_spread()
 	return 0.1

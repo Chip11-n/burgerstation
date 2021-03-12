@@ -15,7 +15,6 @@
 /obj/structure/interactive/fax_machine/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
 
-	object = object.defer_click_on_object(location,control,params)
 
 	if(is_inventory(object))
 		INTERACT_CHECK
@@ -119,7 +118,8 @@
 			INITIALIZE(M)
 			GENERATE(M)
 			FINALIZE(M)
-			SC.add_to_crate(M)
+			M.force_move(SC)
+
 		SC.close()
 		SC.lock()
 		SC.owner_name = "[found_data["Requisitioner's Name"]]"

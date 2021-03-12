@@ -74,8 +74,7 @@
 
 				return FALSE
 
-	return .
-
+	
 /obj/hud/button/research/board/proc/add_points(var/points_to_add)
 	level = 1 + FLOOR(points/5,1)
 	time_left += (points_to_add)*10 //In Deciseconds
@@ -89,7 +88,7 @@
 		if(points_to_add > 2)
 			linked_text.alpha = 255
 			linked_text.maptext = "<center><font size=5>Good!</font></center>"
-			play('sound/ui/friendly.ogg',owner, sound_setting = SOUND_SETTING_UI)
+			play_sound_target('sound/ui/friendly.ogg',owner, sound_setting = SOUND_SETTING_UI)
 			spawn(20)
 				animate(linked_text,alpha=0,time = 10)
 
@@ -162,4 +161,4 @@
 	else
 		stop_thinking(src)
 
-	return .
+	

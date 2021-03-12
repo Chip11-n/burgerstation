@@ -2,6 +2,9 @@
 
 /mob/living/proc/dash(var/atom/dash_target,var/dash_direction=0x0,var/instances_left = 0)//Can either input dash target or dash direction.
 
+	if(horizontal)
+		return FALSE
+
 	if(!can_move())
 		return FALSE
 
@@ -37,8 +40,12 @@
 	if(!isturf(loc))
 		return FALSE
 
-	if(move_mod >= 3)
-		return FALSE
+	if(has_trait(/trait/block_runner))
+		if(move_delay < 0)
+			return FALSE
+	else
+		if(move_mod >= 3)
+			return FALSE
 
 	return TRUE
 

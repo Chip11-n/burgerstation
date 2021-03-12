@@ -140,13 +140,19 @@
 
 /ai/advanced/do_attack(var/atom/target,var/left_click=FALSE)
 
+	if(!target)
+		return FALSE
+
+	var/mob/living/advanced/A = owner
+
+	if(!A)
+		return FALSE
+
 	if(next_complex > world.time)
 		return FALSE
 
 	if(!handle_gunplay())
 		return FALSE
-
-	var/mob/living/advanced/A = owner
 
 	var/list/params = list(
 		PARAM_ICON_X = num2text(pick(target_distribution_x)),
@@ -159,65 +165,12 @@
 		"alt" = 0
 	)
 
-	var/atom/defer_left_click
-	var/atom/defer_right_click
-
-	if(A.left_hand) defer_left_click = A.left_hand.defer_click_on_object(null,null,params)
-	if(A.right_hand) defer_right_click = A.right_hand.defer_click_on_object(null,null,params)
-
-	var/list/possible_attacks = list()
-
-	if(defer_right_click && owner.can_attack(target,defer_right_click,params,null) && target.can_be_attacked(A,defer_right_click,params,null))
-		possible_attacks += defer_right_click
-
-	if(defer_left_click && owner.can_attack(target,defer_left_click,params,null) && target.can_be_attacked(A,defer_left_click,params,null))
-		possible_attacks += defer_left_click
-
-	if(!length(possible_attacks))
-		return FALSE
-
-	var/atom/W = pick(possible_attacks)
-	W.click_on_object(A,target,null,null,params)
+	if(left_click && A.right_hand)
+		A.right_hand.click_on_object(A,target,null,null,params)
+	else if(A.left_hand)
+		A.left_hand.click_on_object(A,target,null,null,params)
 
 	return TRUE
-
-
-
-/*
-/ai/advanced/can_attack(var/atom/target,var/left_click=FALSE)
-
-	ranged_attack_cooldown = max(0,ranged_attack_cooldown - 1)
-
-	var/mob/living/advanced/A = owner
-	if(!left_click)
-		if(A.left_item && is_ranged_gun(A.left_item) && !can_fire_gun(A.left_item,target))
-			return FALSE
-	else
-		if(A.right_item && is_ranged_gun(A.right_item) && !can_fire_gun(A.right_item,target))
-			return FALSE
-
-	return ..()
-
-/ai/advanced/proc/can_fire_gun(var/obj/item/weapon/ranged/R,var/atom/target)
-
-	if(ranged_attack_cooldown > 0)
-		return FALSE
-
-	var/distance_mod = get_dist(owner,target)
-	var/heat_limit = max(0,(1 - (distance_mod * 0.01)) * R.heat_max)
-
-	return R.heat_current <= heat_limit
-
-
-/ai/advanced/do_attack(var/atom/target,var/left_click=FALSE)
-
-	. = ..()
-
-	if(.)
-		ranged_attack_cooldown = pick(TRUE,FALSE,FALSE,FALSE,FALSE) ? rand(10,20) : 0
-
-	return .
-*/
 
 /ai/advanced/proc/find_best_weapon(var/atom/possible_target)
 
@@ -269,8 +222,6 @@
 	if(. && istype(W,/obj/item/weapon/melee/energy))
 		var/obj/item/weapon/melee/energy/E = W
 		if(!E.enabled) E.click_self(A)
-
-	return .
 
 /ai/advanced/proc/unequip_weapon(var/obj/item/weapon/W)
 	var/mob/living/advanced/A = owner
@@ -336,7 +287,11 @@
 
 	if(!checked_weapons && attack_distance_max == 1 && objective_attack && get_dist(owner,objective_attack) > 4)
 		var/obj/item/weapon/W = find_best_weapon(objective_attack)
-		if(is_ranged_gun(W))
+		if(W)
+			if(A.right_item == W)
+				return ..()
+			if(A.left_item == W)
+				return ..()
 			if(A.right_item) unequip_weapon(A.right_item)
 			if(A.left_item) unequip_weapon(A.left_item)
 			equip_weapon(W)

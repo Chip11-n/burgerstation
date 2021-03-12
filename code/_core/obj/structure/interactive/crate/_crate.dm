@@ -11,15 +11,11 @@
 	density = TRUE
 	layer = LAYER_OBJ_CRATE
 
-	var/list/crate_contents = list()
-
 	var/open = FALSE
 
 	initialize_type = INITIALIZE_LATE
 
 	bullet_block_chance = 50
-
-	var/max_mob_size = MOB_SIZE_HUMAN
 
 	var/collect_contents_on_initialize = TRUE
 
@@ -28,6 +24,19 @@
 	value = 300
 
 	can_rotate = FALSE
+
+	size = SIZE_LARGE
+
+	pixel_y = 8
+
+/obj/structure/interactive/crate/post_move(var/atom/old_loc)
+
+	. = ..()
+
+	for(var/k in contents)
+		var/atom/movable/M = k
+		M.post_move(old_loc)
+
 
 /obj/structure/interactive/crate/on_crush()
 
@@ -45,7 +54,6 @@
 		open(null)
 		return TRUE
 
-	return .
 
 /obj/structure/interactive/crate/on_damage_received(var/atom/atom_damaged,var/atom/attacker,var/atom/weapon,var/list/damage_table,var/damage_amount,var/critical_hit_multiplier,var/stealthy=FALSE)
 
@@ -103,10 +111,7 @@
 				continue
 			if(M.loc != src.loc)
 				continue
-			M.force_move(src)
-			M.pixel_x = initial(M.pixel_x)
-			M.pixel_y = initial(M.pixel_y)
-			crate_contents += M
+			M.Move(src)
 
 	update_sprite()
 
@@ -118,23 +123,29 @@
 /obj/structure/interactive/crate/proc/can_store(var/atom/movable/M)
 	if(M.anchored)
 		return FALSE
+	if(M.size > src.size)
+		return FALSE
+	if(!is_living(M) && !is_item(M))
+		return FALSE
+	if(istype(M, /mob/living/advanced/player/))
+		var/mob/living/advanced/player/playerCorpse = M
+		if(playerCorpse.dead)
+			visible_message(span("warning", "\The [playerCorpse.name] hilariously looses balance and falls out of the crate!"))
+			return FALSE
 	return TRUE
 
 /obj/structure/interactive/crate/proc/can_prevent_close(var/atom/movable/M)
 	if(is_living(M))
 		var/mob/living/L = M
-		if(!L.horizontal || L.mob_size > max_mob_size)
+		if(!L.horizontal || L.size > size)
 			return TRUE
 	return FALSE
 
-/obj/structure/interactive/crate/proc/add_to_crate(var/atom/movable/M)
-	M.force_move(src)
-	M.pixel_x = initial(M.pixel_x)
-	M.pixel_y = initial(M.pixel_y)
-	crate_contents += M
-	return TRUE
-
 /obj/structure/interactive/crate/proc/close(var/mob/caller)
+
+	if(!isturf(loc))
+		if(loc) caller?.to_chat(span("warning","\The [loc.name] is preventing \the [src.name] from being closed!"))
+		return FALSE
 
 	var/atom/blocking
 	for(var/k in loc.contents)
@@ -147,6 +158,7 @@
 		caller.to_chat(span("warning","\The [blocking.name] is preventing \the [src.name] from being closed!"))
 		return FALSE
 
+	var/total_size = 0
 	for(var/k in loc.contents)
 		var/atom/movable/M = k
 		CHECK_TICK(50,FPS_SERVER)
@@ -156,11 +168,14 @@
 			continue
 		if(!can_store(M))
 			continue
-		add_to_crate(M)
+		M.Move(src)
+		if(total_size + M.size > size)
+			break
+		total_size += M.size
 
 	open = FALSE
 
-	play('sound/effects/click.ogg',get_turf(src))
+	play_sound('sound/effects/click.ogg',get_turf(src),range_max=VIEW_RANGE)
 
 	update_sprite()
 
@@ -168,21 +183,24 @@
 
 /obj/structure/interactive/crate/proc/open(var/mob/caller)
 
+	if(!isturf(loc))
+		if(loc) caller?.to_chat(span("warning","\The [loc.name] is preventing \the [src.name] from being opened!"))
+		return FALSE
+
 	if(loot)
 		var/loot/L = LOOT(loot)
 		L.do_spawn(src.loc)
 		loot = null
 
-	for(var/k in crate_contents)
+	for(var/k in contents)
 		CHECK_TICK(50,FPS_SERVER)
 		var/atom/movable/M = k
-		crate_contents -= M
-		M.force_move(src.loc)
-		//animate(M,pixel_x = initial(M.pixel_x) + rand(-16,16),pixel_y = initial(M.pixel_y) + rand(-16,16),time = 4)
+		if(!M.force_move(src.loc))
+			log_error("Warning: [M.get_debug_name()] is stuck in a crate!")
 
 	open = TRUE
 
-	play('sound/effects/click.ogg',get_turf(src))
+	play_sound('sound/effects/click.ogg',get_turf(src),range_max=VIEW_RANGE)
 
 	update_sprite()
 

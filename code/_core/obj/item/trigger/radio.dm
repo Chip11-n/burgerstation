@@ -8,14 +8,14 @@ var/global/list/obj/item/device/radio/all_radios = list()
 	icon_state = "inventory"
 
 	var/frequency = RADIO_FREQ_COMMON //The broadcasting frequency of the radio.
-	var/list/listening_frequencies = list(
-		RADIO_FREQ_COMMON
+	var/list/listening_frequencies = list( // The frequencies this radio is allowed to talk on.
+		RADIO_FREQ_COMMON //Can always hear common, no matter what.
 	)
 
 	var/receiving = TRUE //Whether or not the radio can receive messages.
 	var/broadcasting = FALSE //Whether or not the radio can broadcast messages without having to press the button.
 
-	var/frequency_min = RADIO_FREQ_COMMON
+	var/frequency_min = RADIO_FREQ_ALPHA
 	var/frequency_max = RADIO_FREQ_MAX
 
 	var/spam_fix_time = 0
@@ -32,12 +32,10 @@ var/global/list/obj/item/device/radio/all_radios = list()
 /obj/item/device/radio/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEVAR("frequency")
-	return .
 
 /obj/item/device/radio/load_item_data_post(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADVAR("frequency")
-	return .
 
 /obj/item/device/radio/click_self(var/mob/caller,location,control,params)
 	INTERACT_CHECK
@@ -59,7 +57,7 @@ var/global/list/obj/item/device/radio/all_radios = list()
 	caller.to_chat(span("notice","You toggle the speaker <b>[receiving ? "on" : "off"]</b>."))
 	return TRUE
 
-/obj/item/device/radio/on_mouse_wheel(var/mob/caller,delta_x,delta_y,location,control,params)
+/obj/item/device/radio/mouse_wheel_on_object(var/mob/caller,delta_x,delta_y,location,control,params)
 
 	INTERACT_CHECK
 
@@ -129,7 +127,9 @@ list(
 		return FALSE
 	if(!broadcasting && !(frequency > 0)) //Dumb logic here, but it catches null as well as null (greater,less,equal) 0 is always 0.
 		return FALSE
-	use_radio(speaker,src,text,language_text,TEXT_RADIO,src.frequency,language,talk_range)
+	if(frequency < frequency_min || frequency > frequency_max)
+		return FALSE
+	use_radio(speaker,src,text,language_text,TEXT_RADIO,frequency,language,talk_range)
 	return ..()
 
 
@@ -139,14 +139,40 @@ list(
 	frequency_min = RADIO_FREQ_ALPHA - 20
 	frequency_max = RADIO_FREQ_SHIP + 20
 
+	broadcasting_range = 1
+
 	value = 15
 
+/obj/item/device/radio/mercenary
+	name = "\improper Mercenary Radio"
+
+	frequency_min = RADIO_FREQ_MERCENARY
+	frequency_max = RADIO_FREQ_COMMON
+
+	frequency = RADIO_FREQ_MERCENARY
+
+	listening_frequencies = list(
+		RADIO_FREQ_COMMON,
+		RADIO_FREQ_MERCENARY
+	)
+
+	broadcasting_range = 1
+
+	value = 300
+
 /obj/item/device/radio/syndicate
-	name = "\improper NanoTrasen Radio"
+	name = "\improper Syndicate Radio"
 
 	frequency_min = RADIO_FREQ_SYNDICATE
 	frequency_max = RADIO_FREQ_COMMON
 
 	frequency = RADIO_FREQ_SYNDICATE
 
-	value = 100
+	listening_frequencies = list(
+		RADIO_FREQ_COMMON,
+		RADIO_FREQ_SYNDICATE
+	)
+
+	broadcasting_range = 1
+
+	value = 300

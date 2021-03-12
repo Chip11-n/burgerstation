@@ -12,16 +12,6 @@
 
 	density = FALSE
 
-/turf/simulated/floor/is_safe_teleport()
-	if(collision_flags & FLAG_COLLISION_WALKING)
-		return FALSE
-
-	for(var/atom/movable/M in src.contents)
-		if(M.collision_flags & FLAG_COLLISION_WALKING)
-			return FALSE
-
-	return TRUE
-
 /turf/simulated/floor/can_be_attacked(var/atom/attacker,var/atom/weapon,var/params,var/damagetype/damage_type)
 
 	if(!damage_type || !damage_type.target_floors)
@@ -39,8 +29,7 @@
 		TR.desired_reagent = water_reagent
 		TR.update_container()
 
-	return .
-
+/*
 /turf/simulated/floor/update_sprite()
 
 	. = ..()
@@ -55,8 +44,8 @@
 			stored_water_overlay.blend_mode = BLEND_SUBTRACT
 
 		stored_water_overlay.color = reagents.color
+*/
 
-	return .
 
 /turf/simulated/floor/Exited(var/atom/movable/O,var/atom/new_loc)
 
@@ -65,7 +54,6 @@
 	if(O && stored_water_overlay)
 		O.overlays -= stored_water_overlay
 
-	return .
 
 
 /turf/simulated/floor/can_construct_on(var/mob/caller,var/obj/structure/structure_to_make)

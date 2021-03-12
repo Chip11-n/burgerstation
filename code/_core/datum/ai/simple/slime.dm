@@ -20,7 +20,7 @@
 	if(self.stored_slimes + S.stored_slimes > self.stored_slimes_max)
 		return FALSE
 
-	if(!S.can_attack(self,S,null,null))
+	if(!S.can_attack(S,self,S,null,null))
 		return FALSE
 
 	return TRUE
@@ -37,12 +37,10 @@
 			.[A] = TRUE
 
 	if(!length(.) && self.stored_slimes < self.stored_slimes_max)
-		for(var/mob/living/simple/slime/S in view(radius_find_enemy,owner))
+		for(var/mob/living/simple/slime/S in viewers(radius_find_enemy,owner))
 			CHECK_TICK(75,FPS_SERVER)
 			if(can_absorb_slime(S))
 				.[S] = TRUE
-
-	return .
 
 /ai/slime/do_attack(var/atom/atom_to_attack)
 

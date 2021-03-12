@@ -13,14 +13,18 @@
 	FINALIZE(stored_radio)
 	return ..()
 
+/obj/item/clothing/ears/headset/Destroy()
+	QDEL_NULL(stored_radio)
+	return ..()
+
 /obj/item/clothing/ears/headset/click_self(var/mob/caller,location,control,params)
 	return stored_radio.click_self(caller,location,control,params)
 
 /obj/item/clothing/ears/headset/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params)
 	return stored_radio.clicked_on_by_object(caller,object,location,control,params)
 
-/obj/item/clothing/ears/headset/on_mouse_wheel(var/mob/caller,delta_x,delta_y,location,control,params)
-	return stored_radio.on_mouse_wheel(caller,delta_x,delta_y,location,control,params)
+/obj/item/clothing/ears/headset/mouse_wheel_on_object(var/mob/caller,delta_x,delta_y,location,control,params)
+	return stored_radio.mouse_wheel_on_object(caller,delta_x,delta_y,location,control,params)
 
 /obj/item/clothing/ears/headset/trigger(var/mob/caller,var/atom/source,var/signal_freq,var/signal_code)
 	return stored_radio.trigger(caller,source,signal_freq,signal_code)
@@ -29,14 +33,15 @@
 /obj/item/clothing/ears/headset/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEATOM("stored_radio")
-	return .
 
 /obj/item/clothing/ears/headset/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADATOM("stored_radio")
-	return .
-
 
 /obj/item/clothing/ears/headset/syndicate
 	name = "syndicate headset"
 	stored_radio = /obj/item/device/radio/syndicate
+
+/obj/item/clothing/ears/headset/mercenary
+	name = "mercenary headset"
+	stored_radio = /obj/item/device/radio/mercenary

@@ -4,6 +4,8 @@
 	stamina_base = 50
 	mana_base = 50
 
+	var/rarity = RARITY_COMMON
+
 	var/list/experience/attribute/attributes
 	var/list/experience/skill/skills
 
@@ -16,8 +18,6 @@
 	var/enable_AI = FALSE
 	var/ai/ai
 	//var/id //Boss ID
-
-	var/boss_icon_state
 
 	var/iff_tag
 	var/loyalty_tag
@@ -82,6 +82,8 @@
 
 	var/boss = FALSE
 	var/boss_music
+	var/boss_icon_state
+	var/loot/boss_loot
 
 	//var/list/mob/living/advanced/player/linked_players
 
@@ -164,7 +166,7 @@
 
 	var/queue_delete_on_death = TRUE
 
-	var/mob_size = MOB_SIZE_ANIMAL //Size scale when calculating health as well as collision handling for things like crates and doors. See mob_size.dm for values
+	size = SIZE_ANIMAL //Size scale when calculating health as well as collision handling for things like crates and doors. See size.dm for values
 
 	var/max_level = 500 //Max level for attributes of the mob.
 
@@ -198,6 +200,8 @@
 	var/mob/living/minion //This object's minion.
 	var/mob/living/master //This object's master.
 	var/minion_remove_time = 0
+
+	var/obj/structure/totem/totem //This object's totem.
 
 	var/queue_health_update = FALSE //From automated processes like reagent and health updating. Should not be used for bullet impacts and whatnot.
 
@@ -238,9 +242,14 @@
 
 	var/list/addictions = list() //List of addictions.
 
+	var/soul_size = null
+
+	var/list/traits = list() //Assoc list. This is saved.
+	var/list/traits_by_category = list() //Assoc list. This isn't saved.
+
 /mob/living/on_crush() //What happens when this object is crushed by a larger object.
 	. = ..()
-	play(pick('sound/effects/impacts/flesh_01.ogg','sound/effects/impacts/flesh_02.ogg','sound/effects/impacts/flesh_03.ogg'),get_turf(src))
+	play_sound(pick('sound/effects/impacts/flesh_01.ogg','sound/effects/impacts/flesh_02.ogg','sound/effects/impacts/flesh_03.ogg'),get_turf(src))
 	visible_message(span("danger","\The [src.name] is violently crushed!"))
 	if(blood_type)
 		var/reagent/R = REAGENT(blood_type)
@@ -248,16 +257,10 @@
 			create_blood(/obj/effect/cleanable/blood/splatter,get_turf(src),R.color,rand(-32,32),rand(-32,32))
 	death()
 	if(!qdeleting) qdel(src)
-	return .
 
-/mob/living/get_value()
-
+/mob/living/get_base_value()
 	. = ..()
-
-	if(!dead)
-		. += value * 3
-
-	return .
+	if(!dead) . *= 3
 
 /mob/living/get_debug_name()
 	return "[dead ? "(DEAD)" : ""][src.name]([src.client ? src.client : "NO CKEY"])([src.type])<a href='?spectate=1;x=[x];y=[y];z=[z]'>([x],[y],[z])</a>"
@@ -265,16 +268,10 @@
 /mob/living/get_log_name()
 	return "[dead ? "(DEAD)" : ""][src.name]([src.client ? src.client : "NO CKEY"])([src.type])([x],[y],[z])"
 
-/mob/living/do_mouse_wheel(object,delta_x,delta_y,location,control,params)
-	if(object && is_atom(object))
-		var/atom/A = object
-		A.on_mouse_wheel(src,delta_x,delta_y,location,control,params)
-
-	return TRUE
-
 /mob/living/proc/dust()
 	new /obj/effect/temp/death(src.loc,30)
 	qdel(src)
+	return TRUE
 
 /mob/living/Destroy()
 
@@ -285,6 +282,10 @@
 	if(master)
 		master.minion = null
 		master = null
+
+	if(totem)
+		QDEL_NULL(totem)
+		totem = null
 
 	if(following)
 		following.followers -= src
@@ -388,11 +389,10 @@
 
 	all_living += src
 
-	return .
 
 /mob/living/Initialize()
 
-	if(ai) ai = new ai(src)
+	if(ai) ai = new ai(null,src)
 
 	if(boss)
 		SSbosses.tracked_bosses += src
@@ -429,7 +429,6 @@
 	shield_overlay.icon_state = "block"
 	shield_overlay.alpha = 0
 
-	return .
 
 /mob/living/PostInitialize()
 	. = ..()
@@ -441,16 +440,17 @@
 	set_loyalty_tag(loyalty_tag,TRUE)
 	set_iff_tag(iff_tag,TRUE)
 	setup_name()
-	return .
 
 /mob/living/Finalize()
 	. = ..()
 	if(boss)
-		for(var/mob/living/advanced/player/P in view(src,VIEW_RANGE))
+		for(var/mob/living/advanced/player/P in viewers(VIEW_RANGE,src))
 			for(var/obj/hud/button/boss_health/B in P.buttons)
 				B.target_bosses |= src
 				B.update_stats()
-	return .
+	if(dead)
+		dead = FALSE //I know this feels like shitcode but *dab
+		death()
 
 /mob/living/proc/setup_name()
 	if(boss)
@@ -512,16 +512,28 @@
 		add_status_effect(STAGGER,magnitude,magnitude, source = epicenter)
 
 	if(health)
-		for(var/i=1,i<=clamp(2+(magnitude),1,5),i++)
-			var/list/params = list()
-			params[PARAM_ICON_X] = rand(0,32)
-			params[PARAM_ICON_Y] = rand(0,32)
-			var/atom/object_to_damage = src.get_object_to_damage(owner,source,params,FALSE,TRUE)
-			var/damagetype/D = all_damage_types[/damagetype/explosion/]
-			D.hit(source,src,source,object_to_damage,owner,magnitude)
+		do_explosion_damage(owner,source,epicenter,magnitude,desired_loyalty)
 
 	return TRUE
 
+/mob/living/proc/do_explosion_damage(var/atom/owner,var/atom/source,var/atom/epicenter,var/magnitude,var/desired_loyalty)
+	var/list/params = list()
+	params[PARAM_ICON_X] = 16
+	params[PARAM_ICON_Y] = 16
+	var/atom/object_to_damage = src.get_object_to_damage(owner,source,params,FALSE,TRUE)
+	var/damagetype/D = all_damage_types[/damagetype/explosion/]
+	D.hit(source,src,source,object_to_damage,owner,magnitude)
+	return TRUE
+
+/mob/living/advanced/do_explosion_damage(var/atom/owner,var/atom/source,var/atom/epicenter,var/magnitude,var/desired_loyalty)
+	for(var/i=1,i<=5,i++)
+		var/list/params = list()
+		params[PARAM_ICON_X] = rand(0,32)
+		params[PARAM_ICON_Y] = rand(0,32)
+		var/atom/object_to_damage = src.get_object_to_damage(owner,source,params,FALSE,TRUE)
+		var/damagetype/D = all_damage_types[/damagetype/explosion/]
+		D.hit(source,src,source,object_to_damage,owner,magnitude*(1/5))
+	return TRUE
 
 /mob/living/proc/draw_blood(var/mob/caller,var/atom/needle,var/amount=0,var/messages = TRUE)
 
@@ -537,14 +549,3 @@
 		caller?.visible_message(span("notice","\The [caller.name] draws some blood from \the [src.name]."),span("notice","You drew [amount_added]u of blood from \the [src.name]."))
 
 	return amount_added
-
-
-/mob/living/set_dir(var/desired_dir,var/force=FALSE)
-
-	if(client && client.is_zoomed)
-		return ..(client.is_zoomed,force)
-
-	if(attack_flags & CONTROL_MOD_BLOCK)
-		return FALSE
-
-	return ..()

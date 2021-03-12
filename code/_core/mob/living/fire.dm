@@ -20,6 +20,9 @@
 /mob/living/proc/adjust_fire_stacks(var/added_fire_stacks = 10)
 	if(!added_fire_stacks)
 		return FALSE
+	if(added_fire_stacks > 0)
+		var/trait/flamability/F = get_trait_by_category(/trait/flamability)
+		if(F) added_fire_stacks *= F.fire_stack_multiplier
 	fire_stacks = clamp(fire_stacks + added_fire_stacks,MIN_FIRE_STACKS,MAX_FIRE_STACKS)
 	if(fire_stacks <= 0)
 		extinguish()
@@ -37,7 +40,7 @@
 		return FALSE
 
 	on_fire = TRUE
-	play('sound/weapons/magic/fireball.ogg',get_turf(src))
+	play_sound('sound/weapons/magic/fireball.ogg',get_turf(src),range_max=VIEW_RANGE)
 
 	if(added_fire_stacks) adjust_fire_stacks(added_fire_stacks)
 

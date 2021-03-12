@@ -16,19 +16,18 @@
 /obj/item/supply_remote/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEVAR("charges")
-	return .
 
 /obj/item/supply_remote/load_item_data_post(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADVAR("charges")
-	return .
 
-/obj/item/supply_remote/get_value()
-	return  charges ? charges * value : 10
+/obj/item/supply_remote/get_base_value()
+	. = ..()
+	. *= (1 + charges)
 
 /obj/item/supply_remote/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	if(is_inventory(object))
+	if(object.plane >= PLANE_HUD)
 		return ..()
 
 	INTERACT_CHECK
@@ -42,13 +41,17 @@
 
 	var/turf/T = get_turf(object)
 
+	if(T.z != Z_LEVEL_MISSION)
+		caller.to_chat(span("warning","This can only be used on the planet!"))
+		return TRUE
+
 	var/obj/structure/interactive/crate/closet/supply_pod/SP = new supply_pod_type(T)
 	for(var/k in stored_object_types)
 		var/atom/movable/M = new k(T)
 		INITIALIZE(M)
 		GENERATE(M)
 		FINALIZE(M)
-		SP.add_to_crate(M)
+		M.force_move(SP)
 
 	INITIALIZE(SP)
 	FINALIZE(SP)
@@ -65,6 +68,16 @@
 	)
 	value = 1000
 
+/obj/item/supply_remote/ammo
+	name = "drop pod remote - Ammo Restocker"
+	desc_extended = "A special remote designed to drop things into the battlefield. This one drops an ammo restocker."
+	stored_object_types = list(
+		/obj/structure/interactive/restocker/ammo
+	)
+	value = 3000
+	value_burgerbux = 1
+
+/*
 /obj/item/supply_remote/mech/
 	value = 1000
 
@@ -82,6 +95,7 @@
 	name = "drop pod remote - Durand Combat Mech"
 	stored_object_types = list(/mob/living/vehicle/mech/durand)
 	value = 5000
+*/
 
 /obj/item/supply_remote/crates/
 	value = 2000

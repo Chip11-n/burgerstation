@@ -35,7 +35,7 @@
 		/obj/item/container/food/dynamic/meat/raw_bear/
 	)
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	var/armored = FALSE
 
@@ -45,6 +45,8 @@
 	blood_type = /reagent/blood/bear
 	blood_volume = 1000
 
+	soul_size = SOUL_SIZE_COMMON
+
 /mob/living/simple/bear/update_overlays()
 	. = ..()
 
@@ -52,12 +54,9 @@
 		var/image/I = new/image(initial(icon),"armor")
 		add_overlay(I)
 
-	return .
-
 /mob/living/simple/bear/PostInitialize()
 	. = ..()
 	update_sprite()
-	return .
 
 /mob/living/simple/bear/post_death()
 	. = ..()

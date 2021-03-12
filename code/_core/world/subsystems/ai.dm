@@ -1,13 +1,15 @@
 SUBSYSTEM_DEF(ai)
 	name = "AI Subsystem"
 	desc = "Controls the AI of mobs."
-	tick_rate = DECISECONDS_TO_TICKS(1) //Needs to be fast to handle mob movement.
+	tick_rate = DECISECONDS_TO_TICKS(AI_TICK) //Needs to be fast to handle mob movement.
 	priority = SS_ORDER_PRELOAD
-	cpu_usage_max = 80
-	tick_usage_max = 80
+	cpu_usage_max = 85
+	tick_usage_max = 85
 
 	var/list/active_ai = list()
 	var/list/inactive_ai = list()
+
+	var/list/path_stuck_ai = list()
 
 	use_time_dialation = FALSE
 
@@ -23,13 +25,16 @@ SUBSYSTEM_DEF(ai)
 
 	return ..()
 
-
 /subsystem/ai/on_life()
 
 	for(var/k in active_ai)
 		var/ai/AI = k
 		CHECK_TICK(tick_usage_max,FPS_SERVER)
-		if(AI && !AI.owner)
+		if(!AI)
+			log_error("Invalid AI detected. Removing...")
+			active_ai -= k
+			continue
+		if(!AI.owner)
 			log_error("WARING! AI of type [AI.type] didn't have an owner!")
 			qdel(AI)
 			continue

@@ -11,13 +11,15 @@
 
 #define RADIO_FREQ_CENTCOMM 1337
 
-#define RADIO_FREQ_SYNDICATE 1213
-
 
 
 
 //In use.
-#define RADIO_FREQ_MIN 110.1
+#define RADIO_FREQ_MIN 1101
+
+#define RADIO_FREQ_MERCENARY 1107
+
+#define RADIO_FREQ_SYNDICATE 1213
 
 #define RADIO_FREQ_ALPHA    1451
 #define RADIO_FREQ_BRAVO    1453
@@ -47,4 +49,8 @@
 			return "Common"
 		if(RADIO_FREQ_SHIP)
 			return "ShipComm"
+		if(RADIO_FREQ_SYNDICATE)
+			return "Syndicate"
+		if(RADIO_FREQ_MERCENARY)
+			return "Mercenary"
 	return "Unknown"

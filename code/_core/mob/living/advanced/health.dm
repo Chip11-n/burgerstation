@@ -16,17 +16,13 @@
 	return ..()
 
 
-/mob/living/advanced/update_health_element_icons(var/health=FALSE,var/stamina=FALSE,var/mana=FALSE,var/update_body=FALSE)
+/mob/living/advanced/update_health_element_icons(var/health=FALSE,var/stamina=FALSE,var/mana=FALSE)
 
 	. = ..()
 
-	if(update_body && health && health_elements && health_elements["body"])
+	if(. && health && length(health_elements) && health_elements["body"])
 		var/obj/hud/button/health/body/B = health_elements["body"]
 		B.update_stats()
-
-	return .
-
-
 
 /mob/living/advanced/on_damage_received(var/atom/atom_damaged,var/atom/attacker,var/atom/weapon,var/list/damage_table,var/damage_amount,var/critical_hit_multiplier,var/stealthy=FALSE)
 
@@ -39,4 +35,4 @@
 
 	HOOK_CALL("on_damage_received") //For hulking and whatnot.
 
-	return .
+	

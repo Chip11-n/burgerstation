@@ -12,7 +12,6 @@
 	. = ..()
 	var/image/I = new/image(icon,locked ? "secure_red" : "secure_green")
 	add_overlay(I)
-	return .
 
 
 /obj/structure/interactive/crate/secure/open(var/mob/caller)
@@ -68,13 +67,12 @@
 		. += div("warning","This secure crate will charge [credits_required] credits onec unlocked.")
 
 	var/list/contents_to_display = list()
-	for(var/k in crate_contents)
-		var/atom/A = k
-		contents_to_display += A.name
+	for(var/k in contents)
+		var/atom/movable/M = k
+		contents_to_display += M.name
 
 	. += div("notice","It contains: [english_list(contents_to_display)].")
 
-	return .
 
 /obj/structure/interactive/crate/secure/cargo/lock(var/mob/caller)
 
@@ -123,4 +121,3 @@
 		src.do_say("Transaction complete.")
 		credits_required = null
 
-	return .

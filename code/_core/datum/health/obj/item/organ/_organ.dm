@@ -14,11 +14,7 @@
 
 	. = ..()
 
-	health_max = O.health_base * ( 1 + A.get_attribute_power(ATTRIBUTE_VITALITY)*A.mob_size)
-
-	//A.update_health_element_icons(TRUE,TRUE,TRUE,TRUE) TODO: CHECK IF THIS IS NEEDED
-
-	return .
+	health_max = O.health_base * ( 1 + A.get_attribute_power(ATTRIBUTE_VITALITY)*A.size)
 
 /health/obj/item/organ/update_health(var/atom/attacker,var/damage_dealt=0,var/update_hud=TRUE,var/check_death=TRUE)
 
@@ -26,11 +22,9 @@
 
 	if(. && owner.initialized)
 
-		if(!health_max)
-			return .
+		if(!health_max)	return
 
-		if(!is_organ(owner))
-			return .
+		if(!is_organ(owner)) return
 
 		var/obj/item/organ/O = owner
 
@@ -50,10 +44,9 @@
 
 			if(should_update)
 				A.update_overlay_tracked("\ref[O]")
+				A.queue_health_update = TRUE
 
-	return .
-
-/health/obj/item/organ/adjust_loss_smart(var/brute,var/burn,var/tox,var/oxy,var/fatigue,var/pain,var/rad,var/sanity,var/update=TRUE,var/organic=TRUE,var/robotic=TRUE)
+/health/obj/item/organ/adjust_loss_smart(var/brute,var/burn,var/tox,var/oxy,var/fatigue,var/pain,var/rad,var/sanity,var/mental,var/update=TRUE,var/organic=TRUE,var/robotic=TRUE)
 
 	if(src.organic && !organic)
 		return 0
@@ -61,7 +54,7 @@
 	if(!src.organic && !robotic) // I know these are technically called twice but it's to prevent the below snowflake code from running.
 		return 0
 
-	if(tox || oxy || fatigue || sanity) //These types should be dealt to the owner.
+	if(tox || oxy || fatigue || sanity || mental) //These types should be dealt to the owner.
 		if(owner.loc && is_advanced(owner.loc))
 			var/mob/living/advanced/A = owner.loc
 			if(A.health)
@@ -70,6 +63,7 @@
 					oxy=oxy,
 					fatigue=fatigue,
 					sanity=sanity,
+					mental=mental,
 					update=update,
 					organic=organic,
 					robotic=robotic
@@ -79,14 +73,16 @@
 		oxy = 0
 		fatigue = 0
 		sanity = 0
+		mental = 0
 
-	. += ..(brute,burn,tox,oxy,fatigue,pain,rad,sanity,update,organic,robotic)
+	. += ..()
 
-	if(. && update && is_advanced(owner.loc))
-		var/mob/living/advanced/A = owner.loc
-		A.queue_health_update = TRUE
-
-	return .
+	if(. && update && is_organ(owner))
+		var/obj/item/organ/O = owner
+		if(O.health) O.health.update_health()
+		if(is_advanced(owner.loc))
+			var/mob/living/advanced/A = owner.loc
+			A.queue_health_update = TRUE
 
 /health/obj/item/organ/synthetic
 	resistance = list(PAIN=0,TOX=0)

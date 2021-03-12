@@ -1,5 +1,6 @@
 /obj/item/clothing/back/storage/backpack/poly
 	icon = 'icons/obj/item/clothing/back/backpack/poly.dmi'
+	dyeable = TRUE
 	polymorphs = list(
 		"body" = COLOR_WHITE,
 		"straps" = COLOR_WHITE,
@@ -33,4 +34,18 @@
 		"body" = COLOR_WHITE,
 		"straps" = COLOR_SCIENCE,
 		"buckles" = COLOR_SILVER
+	)
+
+/obj/item/clothing/back/storage/backpack/poly/ntops
+	polymorphs = list(
+		"body" = COLOR_WHITE,
+		"straps" = COLOR_BLACK,
+		"buckles" = COLOR_SILVER
+	)
+
+/obj/item/clothing/back/storage/backpack/poly/chaplain
+	polymorphs = list(
+		"body" = COLOR_BLACK,
+		"straps" = COLOR_BLOOD,
+		"buckles" = COLOR_GOLD
 	)

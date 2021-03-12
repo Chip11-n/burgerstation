@@ -1,11 +1,11 @@
 /obj/item/weapon/ranged/bullet/revolver/nagant
-	name = "\improper 7.62x38mmR Nagant Revolver"
+	name = "\improper 7.62x39mmR Nagant Revolver"
 	desc = "A dusty old revolver."
 	desc_extended = "The Nagant is difficult to use, but it pays off in durability and reliability."
 	icon = 'icons/obj/item/weapons/ranged/revolver/762.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 2
+	shoot_delay = 1.5
 
 	automatic = FALSE
 
@@ -24,7 +24,7 @@
 
 
 	bullet_length_min = 36
-	bullet_length_best = 38
+	bullet_length_best = 39
 	bullet_length_max = 40
 
 	bullet_diameter_min = 7.6
@@ -40,8 +40,6 @@
 	open = TRUE //Starts open.
 
 	can_shoot_while_open = TRUE
-
-	inaccuracy_modifer = 0.25
 
 	attachment_whitelist = list(
 		/obj/item/attachment/barrel/charger = TRUE, /obj/item/attachment/barrel/charger/advanced = TRUE,
@@ -76,6 +74,9 @@
 	attachment_undermount_offset_y = 19 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
+
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.04
 
 /obj/item/weapon/ranged/bullet/revolver/nagant/get_static_spread()
 	return 0

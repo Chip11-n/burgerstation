@@ -20,9 +20,9 @@
 	loyalty_tag = "Alien"
 	iff_tag = "Alien"
 
-	movement_delay = DECISECONDS_TO_TICKS(AI_TICK*0.5)
+	movement_delay = 1
 
-	mob_size = MOB_SIZE_HUMAN
+	size = SIZE_HUMAN
 
 	var/next_talk = 0
 	var/leaping = FALSE
@@ -31,6 +31,8 @@
 	var/can_spit = FALSE
 
 	var/death_sounds = TRUE
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/xeno/get_emote_sound(var/emote_id)
 
@@ -82,14 +84,12 @@
 				)
 				sound_to_play = pick(valid_sounds)
 
-		if(sound_to_play) play(sound_to_play,get_turf(src))
+		if(sound_to_play)
+			play_sound(sound_to_play,get_turf(src),range_max=VIEW_RANGE)
 
 		next_talk = world.time + SECONDS_TO_DECISECONDS(rand(5,12))
 
-	return .
-
-
-/mob/living/simple/xeno/attack(var/atom/attacker,var/atom/victim,var/list/params,var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE) //The src attacks the victim, with the blamed taking responsibility
+/mob/living/simple/xeno/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1) //The src attacks the victim, with the blamed taking responsibility
 
 	. = ..()
 
@@ -100,9 +100,8 @@
 			'sound/voice/xeno/screech3.ogg',
 			'sound/voice/xeno/screech4.ogg'
 		)
-		play(pick(valid_sounds),get_turf(src))
+		play_sound(pick(valid_sounds),get_turf(src),range_max=VIEW_RANGE)
 		next_talk = world.time + SECONDS_TO_DECISECONDS(rand(5,12))
-	return .
 
 /mob/living/simple/xeno/on_damage_received(var/atom/atom_damaged,var/atom/attacker,var/atom/weapon,var/list/damage_table,var/damage_amount,var/critical_hit_multiplier,var/stealthy=FALSE)
 
@@ -113,10 +112,7 @@
 			'sound/voice/xeno/hurt1.ogg',
 			'sound/voice/xeno/hurt2.ogg'
 		)
-		play(pick(valid_sounds),get_turf(src))
-
-	return .
-
+		play_sound(pick(valid_sounds),get_turf(src),range_max=VIEW_RANGE)
 
 /mob/living/simple/xeno/post_death()
 
@@ -127,12 +123,9 @@
 			'sound/voice/xeno/death1.ogg',
 			'sound/voice/xeno/death2.ogg'
 		)
-		play(pick(valid_sounds),get_turf(src))
+		play_sound(pick(valid_sounds),get_turf(src),range_max=VIEW_RANGE)
 
 	update_sprite()
-
-	return .
-
 
 /mob/living/simple/xeno/Cross(atom/movable/O)
 
@@ -157,20 +150,17 @@
 	if(!.)
 		leaping = FALSE
 		update_sprite()
-		return .
+		return
 
 	var/obj/projectile/P = .
 	P.rotate_projectile = FALSE
 	P.set_dir(get_dir(thrower,desired_target))
 
-	return P
-
 /mob/living/simple/xeno/on_thrown(var/atom/owner,var/atom/hit_atom,var/atom/hit_wall) //What happens after the person is thrown and it hits an object.
 
 	. = ..()
 
-	if(!can_leap)
-		return .
+	if(!can_leap) return
 
 	if(is_living(hit_atom))
 		var/mob/living/L = hit_atom
@@ -182,13 +172,10 @@
 	leaping = FALSE
 	update_sprite()
 
-	return .
-
 /mob/living/simple/xeno/post_move(var/old_loc)
 	. = ..()
 	if(.)
 		update_icon()
-	return .
 
 /mob/living/simple/xeno/update_icon()
 

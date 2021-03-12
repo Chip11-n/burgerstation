@@ -3,7 +3,6 @@
 	var/list/macros = QWERTY_MACROS
 
 	var/list/radio_keys = list(
-		";" = RADIO_FREQ_COMMON,
 		"g" = RADIO_FREQ_COMMON,
 		"s" = RADIO_FREQ_SHIP,
 		"a" = RADIO_FREQ_ALPHA,
@@ -13,7 +12,9 @@
 		"c" = RADIO_FREQ_CHARLIE,
 		"3" = RADIO_FREQ_CHARLIE,
 		"4" = RADIO_FREQ_DELTA,
-		"d" = RADIO_FREQ_DELTA
+		"d" = RADIO_FREQ_DELTA,
+		"t" = RADIO_FREQ_SYNDICATE,
+		"m" = RADIO_FREQ_MERCENARY
 	)
 
 	var/list/language_keys = list(
@@ -86,6 +87,7 @@
 			owner.mob.attack_flags |= CONTROL_MOD_DROP
 		if("hold")
 			owner.mob.attack_flags |= CONTROL_MOD_BLOCK
+			owner.is_zoomed = 0x0
 			if(is_living(owner.mob))
 				var/mob/living/L = owner.mob
 				L.handle_blocking()
@@ -104,7 +106,7 @@
 		if("kick")
 			owner.mob.attack_flags |= CONTROL_MOD_KICK
 		if("zoom")
-			if(owner.is_zoomed)
+			if((owner.mob.attack_flags & CONTROL_MOD_BLOCK) || owner.is_zoomed)
 				owner.is_zoomed = 0x0
 			else
 				owner.is_zoomed = owner.mob.dir

@@ -35,16 +35,18 @@
 
 	var/left_click_chance = 90
 
+	var/night_vision = 0.25 //What level of darkness the mob can see in.
+
 	var/timeout_threshold = 600 //Amount of deciseconds of inactivty is required to ignore players. Set to 0 to disable.
 
 	var/frustration_attack = 0
-	var/frustration_attack_threshold = 4 //Above this means they'll try to find a new target.
+	var/frustration_attack_threshold = SECONDS_TO_TICKS(6) //Above this means they'll try to find a new target. THIS IS MEASURED IN TICKS.
 
 	var/frustration_move = 0
-	var/frustration_move_threshold = 4 //Above this means they'll try to alter their movement.
+	var/frustration_move_threshold = 5 //Above this means they'll try to alter their movement. THIS IS MEASURED IN MOVEMENT FAILURES.
 
 	var/frustration_path = 0
-	var/frustration_path_threshold = 10 //Above this means they'll try to find a new path.
+	var/frustration_path_threshold = 20 //Above this means they'll try to find a new path. THIS IS MEASURED IN MOVEMENT FAILURES.
 
 	var/turf/path_start_turf
 	var/turf/path_end_turf
@@ -67,7 +69,7 @@
 	var/true_sight = FALSE //Set to true if it can see invisible enemies.
 	var/use_cone_vision = TRUE //Set to true if it can only see things in a cone. Set to false if it can see in a 360 degree view. Note that this only applies to when the NPC is not in alert.
 	var/alert_level = ALERT_LEVEL_NONE //Alert level system
-	var/alert_time = 600 //Deciseconds
+	var/alert_time = SECONDS_TO_TICKS(8) //In ticks
 	var/sidestep_next = FALSE
 	var/should_investigate_alert = TRUE
 
@@ -134,6 +136,8 @@
 	SSai.active_ai -= src
 	SSai.inactive_ai -= src
 
+	SSai.path_stuck_ai -= src
+
 	SSbossai.active_ai -= src
 	SSbossai.inactive_ai -= src
 
@@ -161,7 +165,7 @@
 
 	return TRUE
 
-/ai/New(var/mob/living/desired_owner)
+/ai/New(var/desired_loc,var/mob/living/desired_owner) //Byond assumes the first variable is always the loc so desired_loc needs to be in there. This makes me cry.
 
 	owner = desired_owner
 
@@ -178,4 +182,3 @@
 /ai/PostInitialize()
 	. = ..()
 	set_active(active,TRUE)
-	return .

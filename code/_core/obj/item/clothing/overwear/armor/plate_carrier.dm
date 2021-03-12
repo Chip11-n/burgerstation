@@ -23,22 +23,10 @@
 /obj/item/clothing/overwear/armor/plate_carrier/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVELISTATOM("installed_plate_carriers")
-	return .
 
 /obj/item/clothing/overwear/armor/plate_carrier/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADLISTATOM("installed_plate_carriers")
-	return .
-
-/obj/item/clothing/overwear/armor/plate_carrier/get_weight()
-
-	. = ..()
-
-	for(var/k in installed_plate_carriers)
-		var/obj/item/armor_plate/P = k
-		. += P.weight
-
-	return .
 
 /obj/item/clothing/overwear/armor/plate_carrier/get_defense_rating()
 
@@ -51,7 +39,6 @@
 		for(var/damagetype in P.armor_base)
 			.[damagetype] += P.armor_base[damagetype] > 0 ? P.armor_base[damagetype] * power_mul : P.armor_base[damagetype]
 
-	return .
 
 /obj/item/clothing/overwear/armor/plate_carrier/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
 
@@ -81,7 +68,7 @@
 		INTERACT_DELAY(1)
 		var/mob/living/advanced/A = caller
 		var/obj/item/armor_plate/P = input(A,"What armor plates do you wish to remove?","Plate Carrier Removal") as null|anything in installed_plate_carriers
-		if(P && P in installed_plate_carriers)
+		if(P && (P in installed_plate_carriers))
 			A.visible_message(span("notice","\The [caller.name] removes \the [P.name] from \the [src.name]."),span("notice","You remove \the [P.name] from \the [src.name]."))
 			P.drop_item(get_turf(src))
 			installed_plate_carriers -= P

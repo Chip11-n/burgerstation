@@ -6,7 +6,7 @@
 	icon_state = "inventory"
 
 	projectile_speed = 31
-	shoot_delay = 6
+	shoot_delay = 4
 
 	automatic = TRUE
 
@@ -70,6 +70,9 @@
 	attachment_undermount_offset_y = 21 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/deathsquad
+
+	inaccuracy_modifier = 0.5
+	movement_spread_base = 0.01
 
 /obj/item/weapon/ranged/bullet/revolver/deckhard/get_static_spread()
 	return 0

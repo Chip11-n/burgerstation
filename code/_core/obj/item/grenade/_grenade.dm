@@ -3,6 +3,8 @@
 	desc = "Activate, then throw."
 	desc_extended = "With good grenades being expensive and hard to come by, civilians often use homemade grenades filled with various chemicals, with varying degrees of success."
 
+	can_rename = TRUE
+
 	icon = 'icons/obj/item/grenade.dmi'
 	icon_state = "chem"
 
@@ -21,6 +23,14 @@
 
 	weight = 1
 
+/obj/item/grenade/save_item_data(var/save_inventory = TRUE)
+	. = ..()
+	SAVEVAR("open")
+	
+/obj/item/grenade/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
+	. = ..()
+	LOADVAR("open")
+	
 /obj/item/grenade/Destroy()
 
 	QDEL_NULL(stored_trigger)
@@ -44,8 +54,7 @@
 			var/obj/item/container/beaker/B = k
 			.["stored_containers"] += list(B.save_item_data(save_inventory))
 
-	return .
-
+	
 /obj/item/grenade/load_item_data_post(var/mob/living/advanced/player/P,var/list/object_data)
 
 	. = ..()
@@ -56,30 +65,28 @@
 		for(var/k in object_data["stored_containers"])
 			stored_containers += load_and_create(P,k,src)
 
-	return .
-
+	
 /obj/item/grenade/act_explode(var/atom/owner,var/atom/source,var/atom/epicenter,var/magnitude,var/desired_loyalty)
 
 	if(alpha == 0)
 		return FALSE
 
+	alpha = 0
+	mouse_opacity = 0
+	queue_delete_immune = FALSE
+	queue_delete(src,60)
+
 	if(source == src)
-		alpha = 0
-		mouse_opacity = 0
-		queue_delete_immune = FALSE
-		queue_delete(src,60)
 		if(!isturf(src.loc)) drop_item(get_turf(src))
 		if(stored_trigger) stored_trigger.active = FALSE
 	else
 		trigger(owner,source,-1,-1)
 
-	return .
-
+	
 /obj/item/grenade/New(var/desired_loc)
 	. = ..()
 	update_sprite()
-	return .
-
+	
 /obj/item/grenade/Generate()
 
 	. = ..()
@@ -97,8 +104,7 @@
 
 	update_sprite()
 
-	return .
-
+	
 /obj/item/grenade/update_icon()
 
 	if(length(stored_containers) && stored_trigger)
@@ -128,18 +134,56 @@
 
 /obj/item/grenade/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	object = object.defer_click_on_object(location,control,params)
-
-	if(!open)
-		return ..()
-
-	if(is_inventory(object))
-		var/obj/hud/inventory/I = object
-
-		if(length(stored_containers))
+	if(is_item(object))
+		var/obj/item/I = object
+		if(I.flags_tool & FLAG_TOOL_SCREWDRIVER)
 			INTERACT_CHECK
 			INTERACT_CHECK_OBJECT
 			INTERACT_DELAY(5)
+			open = !open
+			caller.to_chat(span("notice","You [open ? "unscrew" : "screw"] the screws on \the [src.name], securing it."))
+			return TRUE
+		else if(is_beaker(object))
+			INTERACT_CHECK
+			INTERACT_CHECK_OBJECT
+			INTERACT_DELAY(5)
+			if(!open)
+				caller.to_chat(span("warning","\The [src.name] needs to be unscrewed with a screwdriver before you add containers!"))
+				return TRUE
+			if(length(stored_containers) >= max_containers)
+				caller.to_chat(span("warning","You can't fit any more contains in \the [src.name]!"))
+				return TRUE
+			var/obj/item/container/beaker/B = object
+			B.drop_item(src)
+			stored_containers += B
+			caller.visible_message(span("notice","\The [caller.name] fits \the [object.name] into \the [src.name]."),span("notice","You fit \the [object.name] inside \the [src.name]."))
+			update_sprite()
+			return TRUE
+		else if(is_trigger(object))
+			INTERACT_CHECK
+			INTERACT_CHECK_OBJECT
+			INTERACT_DELAY(5)
+			if(!open)
+				caller.to_chat(span("warning","\The [src.name] needs to be unscrewed with a screwdriver before you add trigger devices!"))
+				return TRUE
+			if(stored_trigger)
+				caller.to_chat(span("warning","There is already a [stored_trigger.name] inside \the [src.name]!"))
+				return TRUE
+			var/obj/item/device/T = object
+			T.drop_item(src)
+			stored_trigger = T
+			caller.visible_message(span("notice","\The [caller.name] fits \the [object.name] into \the [src.name]."),span("notice","You fit \the [object.name] inside \the [src.name]."))
+			update_sprite()
+			return TRUE
+	else if(is_inventory(object))
+		INTERACT_CHECK
+		INTERACT_CHECK_OBJECT
+		INTERACT_DELAY(5)
+		if(!open)
+			caller.to_chat(span("warning","\The [src.name] needs to be unscrewed with a screwdriver before you remove its contents!"))
+			return TRUE
+		var/obj/hud/inventory/I = object
+		if(length(stored_containers))
 			var/obj/item/container/beaker/selected_beaker = stored_containers[length(stored_containers)]
 			if(I.add_object(selected_beaker))
 				caller.visible_message(span("notice","\The [caller.name] removes \the [selected_beaker.name] from \the [src.name]."),span("notice","You remove \the [selected_beaker.name] from \the [src.name]."))
@@ -147,46 +191,15 @@
 				update_sprite()
 			else
 				caller.to_chat(span("warning","You need an empty hand in ordet to remove \the [selected_beaker.name]!"))
-			return TRUE
-
-		if(stored_trigger)
-			INTERACT_CHECK
-			INTERACT_CHECK_OBJECT
-			INTERACT_DELAY(5)
+		else if(stored_trigger)
 			if(I.add_object(stored_trigger))
-				caller.to_chat(span("notice","\The [caller.name] removes \the [stored_trigger.name] from \the [src.name]."),span("notice","You remove \the [stored_trigger.name] from \the [src.name]."))
+				caller.visible_message(span("notice","\The [caller.name] removes \the [stored_trigger.name] from \the [src.name]."),span("notice","You remove \the [stored_trigger.name] from \the [src.name]."))
 				stored_trigger = null
 				update_sprite()
 			else
 				caller.to_chat(span("warning","You need an empty hand in ordet to remove \the [stored_trigger.name]!"))
-			return TRUE
-
-	else if(is_beaker(object))
-		INTERACT_CHECK
-		INTERACT_CHECK_OBJECT
-		INTERACT_DELAY(5)
-		if(length(stored_containers) >= max_containers)
-			caller.to_chat(span("warning","You can't fit \the [object.name] in!"))
-			return TRUE
-		var/obj/item/container/beaker/B = object
-		B.drop_item(src)
-		stored_containers += B
-		caller.to_chat(span("notice","\The [caller.name] fits \the [object.name] into \the [src.name]."),span("notice","You fit \the [object.name] inside \the [src.name]."))
-		update_sprite()
-		return TRUE
-
-	else if(is_trigger(object))
-		INTERACT_CHECK
-		INTERACT_CHECK_OBJECT
-		INTERACT_DELAY(5)
-		if(stored_trigger)
-			caller.to_chat(span("warning","There is already a [stored_trigger.name] inside \the [src.name]!"))
-			return TRUE
-		var/obj/item/device/T = object
-		T.drop_item(src)
-		stored_trigger = T
-		caller.visible_message(span("notice","\The [caller.name] fits \the [object.name] into \the [src.name]."),span("notice","You fit \the [object.name] inside \the [src.name]."))
-		update_sprite()
+		else
+			caller.to_chat(span("warning","There is nothing to remove from \the [src.name]!"))
 		return TRUE
 
 	return ..()
@@ -229,6 +242,16 @@
 	desc_extended = "A prebuilt timed explosive grenade. The labeling indicates that the fuse is set to 3 seconds."
 
 /obj/item/grenade/timed/explosive/Generate()
-	stored_containers += new /obj/item/container/beaker/large/grenade_water(src)
-	stored_containers += new /obj/item/container/beaker/large/grenade_potassium(src)
+	stored_containers += new /obj/item/container/beaker/water(src)
+	stored_containers += new /obj/item/container/beaker/potassium(src)
+	return ..()
+
+/obj/item/grenade/timed/explosive/large
+	name = "timed large explosive grenade"
+	desc = "Kaboom!"
+	desc_extended = "A prebuilt timed explosive grenade. The labeling indicates that the fuse is set to 3 seconds. This one has a larger payload."
+
+/obj/item/grenade/timed/explosive/large/Generate()
+	stored_containers += new /obj/item/container/beaker/large/water(src)
+	stored_containers += new /obj/item/container/beaker/large/potassium(src)
 	return ..()

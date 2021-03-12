@@ -4,9 +4,9 @@
 	desc_extended = "The 20g Saiga is an insanely powerful semiautomatic AK-based shotgun, nicknamed \"Saiga\" because it's Saiga. <br> The description designer wasn't very original, it seems."
 	icon = 'icons/obj/item/weapons/ranged/shotgun/saiga.dmi'
 	icon_state = "inventory"
-	value = 420
+	value = 550
 
-	shoot_delay = 1
+	shoot_delay = 3
 
 	automatic = FALSE
 
@@ -19,17 +19,16 @@
 	size = SIZE_4
 	weight = 12
 
-
 	heat_per_shot = 0.05
 	heat_max = 0.4
 
-	bullet_length_min = 73
-	bullet_length_best = 75
-	bullet_length_max = 78
+	bullet_length_min = 17
+	bullet_length_best = 17.5
+	bullet_length_max = 18
 
-	bullet_diameter_min = 21
-	bullet_diameter_best = 23
-	bullet_diameter_max = 25
+	bullet_diameter_min = 17
+	bullet_diameter_best = 17.5
+	bullet_diameter_max = 18
 
 	value = 300
 
@@ -69,6 +68,9 @@
 	attachment_undermount_offset_y = 12 - 13
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
+
+	inaccuracy_modifier = 1.5
+	movement_spread_base = 0.04
 
 /obj/item/weapon/ranged/bullet/magazine/shotgun/saiga_20/get_base_spread()
 	return 0.2

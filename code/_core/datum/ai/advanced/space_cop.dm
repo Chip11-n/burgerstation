@@ -17,7 +17,7 @@ var/global/list/space_cop_tag_shitlist = list()
 
 	var/event/space_cop/tracked_event
 
-/ai/advanced/space_cop/handle_objectives(var/tick_rate=AI_TICK)
+/ai/advanced/space_cop/handle_objectives(var/tick_rate)
 
 	if(!roam && !located_chair_turf && !length(current_path))
 		if(tracked_event && tracked_event.recalling && tracked_event.associated_shuttle_controller && get_dist(owner,tracked_event.associated_shuttle_controller) <= VIEW_RANGE)
@@ -54,9 +54,6 @@ var/global/list/space_cop_tag_shitlist = list()
 		var/mob/living/L = attacker
 		if(L.loyalty_tag && L.loyalty_tag != owner.loyalty_tag && !space_cop_tag_shitlist[L.loyalty_tag])
 			space_cop_tag_shitlist[L.loyalty_tag] = TRUE
-
-	return .
-
 
 /ai/advanced/space_cop/is_enemy(var/atom/A,var/safety_check=TRUE)
 	if(is_living(A))

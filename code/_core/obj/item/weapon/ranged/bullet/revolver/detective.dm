@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/revolver/38.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 3
+	shoot_delay = 2
 
 	automatic = FALSE
 
@@ -65,6 +65,9 @@
 
 	attachment_undermount_offset_x = 26 - 16
 	attachment_undermount_offset_y = 17 - 16
+
+	inaccuracy_modifier = 0.5
+	movement_spread_base = 0.02
 
 /obj/item/weapon/ranged/bullet/revolver/detective/get_static_spread()
 	return 0

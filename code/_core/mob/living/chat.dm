@@ -2,7 +2,8 @@
 
 	if(dead)
 		if(!client) return FALSE
-		return ..(text_to_say,should_sanitize,TEXT_GHOST,talk_range)
+		talk_type_to_use = TEXT_GHOST
+		return ..()
 
 	start_typing()
 
@@ -12,9 +13,6 @@
 
 	if(.)
 		do_type(TALK_TYPE_EXCLAIMATION)
-
-	return .
-
 
 /mob/living/proc/do_type(var/type_type)
 	talk_duration = SECONDS_TO_DECISECONDS(4)

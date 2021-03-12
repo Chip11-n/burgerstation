@@ -36,8 +36,7 @@
 					footstep_sound = pick(F.footstep_sounds)
 
 			if(footstep_sound)
-				play(footstep_sound,all_mobs_with_clients - src, T, volume = footstep_volume, sound_setting = SOUND_SETTING_FOOTSTEPS, pitch = 1 + RAND_PRECISE(-F.variation_pitch,F.variation_pitch))
-				if(src.client) play(footstep_sound,src,volume = footstep_volume, sound_setting = SOUND_SETTING_FOOTSTEPS, pitch= 1 + RAND_PRECISE(-F.variation_pitch,F.variation_pitch))
+				play_sound(footstep_sound, get_turf(src), volume = footstep_volume, sound_setting = SOUND_SETTING_FOOTSTEPS, pitch = 1 + RAND_PRECISE(-F.variation_pitch,F.variation_pitch),range_max=VIEW_RANGE)
 
 	return TRUE
 
@@ -50,7 +49,7 @@
 	if(attack_flags & CONTROL_MOD_BLOCK || (client && client.is_zoomed))
 		Dir = 0x0
 
-	. = ..(NewLoc,Dir,step_x,step_y)
+	. = ..()
 
 	if(ai)
 		ai.on_move(.,NewLoc,Dir)
@@ -58,24 +57,23 @@
 	if(stand)
 		stand.on_move(.,NewLoc,Dir)
 
-	return .
-
 /mob/living/post_move(var/atom/old_loc)
 
 	. = ..()
 
+	var/turf/current_loc_as_turf = get_turf(src)
 	if(chat_overlay)
 		chat_overlay.glide_size = src.glide_size
-		chat_overlay.force_move(src.loc)
+		chat_overlay.force_move(current_loc_as_turf)
 	if(alert_overlay)
 		alert_overlay.glide_size = src.glide_size
-		alert_overlay.force_move(src.loc)
+		alert_overlay.force_move(current_loc_as_turf)
 	if(fire_overlay)
 		fire_overlay.glide_size = src.glide_size
-		fire_overlay.force_move(src.loc)
+		fire_overlay.force_move(current_loc_as_turf)
 	if(shield_overlay)
 		shield_overlay.glide_size = src.glide_size
-		shield_overlay.force_move(src.loc)
+		shield_overlay.force_move(current_loc_as_turf)
 
 	if(is_sneaking)
 		on_sneak()
@@ -93,9 +91,6 @@
 
 	handle_tabled()
 
-	return .
-
-
 /mob/living/Bump(atom/Obstacle)
 	if(ai) ai.Bump(Obstacle)
 	return ..()
@@ -106,7 +101,7 @@
 	if(dead)
 		return FALSE
 
-	if(has_status_effects(PARALYZE,SLEEP,STAGGER,STUN))
+	if(has_status_effects(PARALYZE,SLEEP,STAGGER,STUN,PARRIED))
 		return FALSE
 
 	if(buckled_object && !buckled_object.unbuckle(src))
@@ -148,8 +143,6 @@
 		if(has_status_effect(CONFUSED))
 			move_dir = turn(move_dir,180)
 
-	return .
-
 /mob/living/get_stance_movement_mul()
 
 	if(horizontal)
@@ -173,9 +166,11 @@
 	if(intoxication)
 		. += intoxication*0.003
 
+	var/trait/speed/S = get_trait_by_category(/trait/speed/)
+	if(S) . *= S.move_delay_mul
 
-	return .
-
+	if(horizontal)
+		. = max(.,SECONDS_TO_TICKS(1))
 
 /mob/living/proc/toggle_sneak(var/on = TRUE)
 
@@ -206,14 +201,14 @@
 
 /mob/living/Cross(atom/movable/O)
 
-	if(is_living(O))
+	if(O.density && is_living(O))
 		var/mob/living/L = O
 		if(L.loyalty_tag == src.loyalty_tag)
 			if(!src.ai || L.is_moving || !L.ai)
 				return ..()
 		if(L.horizontal || src.horizontal)
 			return ..()
-		if(L.mob_size >= mob_size && L.mob_size >= MOB_SIZE_ANIMAL)
+		if(L.size >= size && L.size >= SIZE_ANIMAL)
 			return FALSE
 
 	return ..()

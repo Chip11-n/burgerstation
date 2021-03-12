@@ -4,10 +4,12 @@
 	iff_tag = "Cult"
 	loyalty_tag = "Cult"
 
-	mob_size = MOB_SIZE_HUMAN
+	size = SIZE_HUMAN
 
 	blood_type = /reagent/blood/unholy
 	blood_volume = BLOOD_VOLUME_DEFAULT
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/cult/cultist
 	name = "blood cult peon"
@@ -45,12 +47,11 @@
 /mob/living/simple/cult/cultist/post_death()
 	. = ..()
 	icon_state = "[initial(icon_state)]_dead"
-	return .
 
 /mob/living/simple/cult/construct
 	stun_angle = 0
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	blood_type = /reagent/blood/unholy
 	blood_volume = 1000
@@ -60,7 +61,6 @@
 /mob/living/simple/cult/construct/post_death()
 	. = ..()
 	icon_state = "construct_dead"
-	return .
 
 /mob/living/simple/cult/construct/behemoth
 	name = "blood cult behemoth"

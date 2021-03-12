@@ -14,7 +14,7 @@
 /atom/proc/should_cleave(var/atom/attacker,var/atom/victim,var/list/params)
 	return FALSE
 
-/atom/proc/attack(var/atom/attacker,var/atom/victim,var/list/params,var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE) //The src attacks the victim, with the blamed taking responsibility
+/atom/proc/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1) //The src attacks the victim, with the blamed taking responsibility
 
 	if(!attacker)
 		attacker = src
@@ -26,26 +26,16 @@
 		params = list()
 
 	if(!victim)
-		CRASH_SAFE("Tried attacking without a victim!")
+		CRASH_SAFE("[src.get_debug_name()] tried attacking without a victim!")
 		return FALSE
 
 	if(qdeleting)
-		CRASH("[src.get_debug_name()] tried attacking, but it was deleting!")
+		CRASH_SAFE("[src.get_debug_name()] tried attacking, but it was deleting!")
 		return FALSE
 
 	if(attacker.qdeleting)
-		CRASH("[attacker.get_debug_name()] tried attacking with [src.get_debug_name()], but it was deleting!")
+		CRASH_SAFE("[attacker.get_debug_name()] tried attacking with [src.get_debug_name()], but it was deleting!")
 		return FALSE
-
-	/* GOTTA TEST THIS
-	if(invisibility >= 101 || alpha == 0)
-		log_error("Warning: [src.get_debug_name()] tried attacking, but it was invisible!")
-		return FALSE
-
-	if(attacker.invisibility >= 101 || attacker.alpha == 0)
-		log_error("Warning: [attacker.get_debug_name()] tried attacking with [src.get_debug_name()], but it was invisible!")
-		return FALSE
-	*/
 
 	var/atom/changed_target = victim.change_victim(attacker,src)
 	if(changed_target)
@@ -133,7 +123,7 @@
 
 	var/list/hit_objects = list()
 	for(var/atom/v in victims)
-		var/can_attack = attacker.can_attack(v,object_to_damage_with,params,DT)
+		var/can_attack = attacker.can_attack(attacker,v,object_to_damage_with,params,DT)
 		var/can_be_attacked = v.can_be_attacked(attacker,object_to_damage_with,params,DT)
 		if(can_attack && can_be_attacked)
 			var/atom/hit_object = v.get_object_to_damage(attacker,object_to_damage_with,params,precise,precise)
@@ -142,7 +132,7 @@
 				if(victim == v && DT.cqc_tag && is_advanced(attacker)) //Only check CQC on the first victim.
 					var/mob/living/advanced/A = attacker
 					A.add_cqc(DT.cqc_tag)
-					var/damagetype/DT2 = A.check_cqc(v,object_to_damage_with,hit_object,blamed)
+					var/damagetype/DT2 = A.check_cqc(v,object_to_damage_with,hit_object,blamed,DT)
 					if(DT2) DT = DT2
 				continue
 			//No hit object means we missed.
@@ -151,14 +141,13 @@
 			if(can_attack && can_be_attacked) break //Just means we don't have a hitobject.
 		victims -= v //Needs to be here.
 
-	var/object_attack_delay = DT.get_attack_delay(attacker)
-
-	if(attacker != object_to_damage_with)
-		object_to_damage_with.attack_next = world.time + object_attack_delay
-
-	attacker.attack_next = world.time + object_attack_delay*0.5
-
-	DT.swing(attacker,victims,object_to_damage_with,hit_objects,attacker)
+	var/swing_result = DT.swing(attacker,victims,object_to_damage_with,hit_objects,attacker)
+	if(swing_result)
+		if(attacker != object_to_damage_with)
+			object_to_damage_with.attack_next = world.time + swing_result
+		attacker.attack_next = world.time + swing_result*0.5
+	else
+		attacker.attack_next = world.time + 1
 
 	return TRUE
 
@@ -171,7 +160,7 @@
 /atom/proc/get_object_to_damage_with(var/atom/attacker,var/atom/victim,params) //Which object should the attacker damage with?
 	return src
 
-/atom/proc/can_attack(var/atom/victim,var/atom/weapon,var/params,var/damagetype/damage_type)
+/atom/proc/can_attack(var/atom/attacker,var/atom/victim,var/atom/weapon,var/params,var/damagetype/damage_type)
 
 	if(attack_next > world.time)
 		return FALSE

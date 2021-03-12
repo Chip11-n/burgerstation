@@ -35,6 +35,13 @@
 
 	has_pain = TRUE
 
+	block_defense = list(
+		ATTACK_TYPE_UNARMED = 1,
+		ATTACK_TYPE_MELEE = 0.25,
+		ATTACK_TYPE_RANGED = 0,
+		ATTACK_TYPE_MAGIC = 0
+	)
+
 /obj/item/organ/hand/on_pain()
 
 	. = ..()
@@ -61,6 +68,8 @@
 			return /damagetype/unarmed/foot
 		switch(L.intent)
 			if(INTENT_HARM)
+				var/trait/unarmed/U = L.get_trait_by_category(/trait/unarmed/)
+				if(U) return U.damage_type
 				return /damagetype/unarmed/fists/
 			if(INTENT_DISARM)
 				return /damagetype/unarmed/fists/disarm
@@ -365,6 +374,37 @@
 
 /obj/item/organ/hand/zombie/left
 	name = "left zombie hand"
+	id = BODY_HAND_LEFT
+	icon_state = BODY_HAND_LEFT
+	inventories = list(
+		/obj/hud/inventory/organs/left_hand_worn,
+		/obj/hud/inventory/organs/left_hand_held
+	)
+
+	attach_flag = BODY_ARM_LEFT
+
+	hud_id = "body_hand_left"
+
+	target_bounds_x_min = 21
+	target_bounds_x_max = 24
+
+	target_bounds_y_min = 11
+	target_bounds_y_max = 14
+
+
+//Goblin
+/obj/item/organ/hand/goblin
+	name = "right goblin hand"
+	icon = 'icons/mob/living/advanced/species/goblin.dmi'
+	inventories = list(
+		/obj/hud/inventory/organs/right_hand_worn,
+		/obj/hud/inventory/organs/right_hand_held
+	)
+
+	defense_rating = GOBLIN_ARMOR
+
+/obj/item/organ/hand/goblin/left
+	name = "left goblin hand"
 	id = BODY_HAND_LEFT
 	icon_state = BODY_HAND_LEFT
 	inventories = list(

@@ -17,7 +17,7 @@
 	pixel_x = -32
 	pixel_y = -12
 
-	health_base = 2500
+	health_base = 4000
 	stamina_base = 5000
 	mana_base = 100
 
@@ -65,7 +65,7 @@
 		/obj/item/soapstone/orange
 	)
 
-	mob_size = MOB_SIZE_BOSS
+	size = SIZE_BOSS
 
 	damage_type = /damagetype/npc/slime
 
@@ -78,6 +78,8 @@
 	stun_angle = 0
 
 	blood_type = null
+
+	soul_size = SOUL_SIZE_RARE
 
 /mob/living/simple/slime_king/on_damage_received(var/atom/atom_damaged,var/atom/attacker,var/atom/weapon,var/list/damage_table,var/damage_amount,var/critical_hit_multiplier,var/stealthy=FALSE)
 
@@ -93,17 +95,14 @@
 			xvel = pick(-1,1)
 			yvel = pick(-1,1)
 
-		attacker = attacker.defer_click_on_object()
+		var/atom/defer_attacker = attacker.defer_click_on_object()
 
-		S.throw_self(src,attacker,16,16,xvel*10,yvel*10)
+		S.throw_self(src,defer_attacker,16,16,xvel*10,yvel*10)
 		S.color = rgb(rand(0,255),rand(0,255),rand(0,255))
 		S.alpha = rand(50,200)
 		S.slime_color = S.color
 		INITIALIZE(S)
 		FINALIZE(S)
-
-	return .
-
 
 /mob/living/simple/slime_king/post_death()
 	..()

@@ -33,7 +33,7 @@
 		ION = INFINITY
 	)
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	iff_tag = "Cow"
 	loyalty_tag = "Cow"
@@ -43,6 +43,8 @@
 
 	blood_type = /reagent/blood/cow
 	blood_volume = 500
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/bull/post_death()
 	..()

@@ -25,8 +25,13 @@
 	//Name
 	real_name = loaded_data["name"]
 	sex = loaded_data["sex"]
+	rarity = loaded_data["rarity"] ? loaded_data["rarity"] : RARITY_COMMON
 	gender = loaded_data["gender"]
 	currency = loaded_data["currency"]
+	revenue = loaded_data["revenue"] ? loaded_data["revenue"] : 0
+	expenses = loaded_data["expenses"] ? loaded_data["expenses"] : 0
+	partial_tax = loaded_data["partial_tax"] ? loaded_data["partial_tax"] : 0
+	last_tax_payment = loaded_data["last_tax_payment"] ? loaded_data["last_tax_payment"] : world.realtime
 	species = loaded_data["species"]
 	nutrition = isnum(loaded_data["nutrition"]) ? loaded_data["nutrition"] : initial(nutrition)*0.5
 	hydration = isnum(loaded_data["hydration"]) ? loaded_data["hydration"] : initial(hydration)*0.5
@@ -48,6 +53,11 @@
 			to_chat(span("notice","You were paid <b>[insurance_to_pay] credits</b> in insurance. You have <b>[insurance] credits</b> left in your insurance pool."))
 			adjust_currency(insurance_to_pay)
 			update_premiums()
+
+	if(loaded_data["traits"])
+		for(var/k in loaded_data["traits"])
+			k = text2path(k)
+			if(k) src.add_trait(k,FALSE)
 
 	if(loaded_data["known_languages"])
 		known_languages |= loaded_data["known_languages"]
@@ -134,6 +144,16 @@
 	.["id"] = save_id
 	.["dead"] = died
 	.["blood_type"] = blood_type
+	.["revenue"] = revenue
+	.["expenses"] = expenses
+	.["last_tax_payment"] = last_tax_payment
+	.["partial_tax"] = partial_tax
+	.["rarity"] = rarity
+
+	if(length(traits))
+		.["traits"] = list()
+		for(var/k in traits)
+			.["traits"] |= k
 
 	if(M && M.loaded_data)
 		.["stored_mechs"] = M.loaded_data["stored_mechs"] //I hate that I have to do this.

@@ -12,7 +12,6 @@
 	value = 2
 
 
-
 /reagent/lube/on_splash(var/reagent_container/container,var/mob/caller,var/atom/target,var/volume_to_splash,var/strength_mod=1)
 
 	. = ..()
@@ -20,9 +19,6 @@
 	if(. && is_simulated(target))
 		var/turf/simulated/S = target
 		S.add_wet(volume_to_splash*100*strength_mod)
-
-	return .
-
 
 /reagent/carbon //Found while mining carbon ore deposits. Or burning food.
 	name = "Carbon"
@@ -49,17 +45,24 @@
 
 	liquid = -0.25
 
-/reagent/iron/on_metabolize_stomach(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+	overdose_threshold = 40
+
+/reagent/iron/on_metabolize_blood(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 
 	. = ..()
 
-	if(is_living(owner))
-		var/mob/living/L = owner
-		if(L.blood_type && ispath(L.blood_type,/reagent/blood))
-			L.blood_volume = clamp(L.blood_volume + .*2,0,L.blood_volume_max)
-			L.queue_health_update = TRUE
+	if(owner.blood_type)
+		owner.blood_volume = clamp(owner.blood_volume + .*4,0,owner.blood_volume_max)
+		owner.queue_health_update = TRUE
+		owner.tox_regen_buffer -= . * 0.5
 
-	return .
+/reagent/iron/on_metabolize_stomach(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+
+	. = ..()
+
+	if(owner.blood_type)
+		owner.blood_volume = clamp(owner.blood_volume + .*2,0,owner.blood_volume_max)
+		owner.queue_health_update = TRUE
 
 /reagent/steel
 	name = "Steel"
@@ -129,9 +132,11 @@
 
 	flavor = "bananas"
 
-	flavor_strength = 2
+	flavor_strength = 6
 
 	liquid = -0.25
+
+	value = 4
 
 /reagent/salt
 	name = "ionized table salt"
@@ -144,13 +149,9 @@
 
 	liquid = -0.9
 
-/reagent/salt/on_metabolize_stomach(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
-
+/reagent/salt/on_metabolize_stomach(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 	. = ..()
-
-	var/mob/living/L = owner
-	L.add_hydration(.*-10)
-
+	owner.add_hydration(.*-5)
 
 /reagent/salt/sodium_chloride
 	name = "sodium chloride"
@@ -215,7 +216,7 @@
 
 /reagent/space_cleaner
 	name = "space cleaner"
-	desc = "Foodsafe! Cleans 10 times faster that regular water! BLAM! Space Cleaner!"
+	desc = "Cleans 10 times faster that regular water! BLAM! Space Cleaner!"
 	color = "#66E1FF"
 	alpha = 150
 
@@ -224,23 +225,17 @@
 
 	liquid = 0.4
 
-/reagent/space_cleaner/on_metabolize_stomach(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/space_cleaner/on_metabolize_stomach(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 
 	. = ..()
 
-	if(owner && owner.health)
-		owner.health.adjust_loss_smart(tox=.*2,robotic=FALSE)
+	owner.tox_regen_buffer += .*1
 
-	return .
-
-/reagent/space_cleaner/on_metabolize_blood(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/space_cleaner/on_metabolize_blood(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 
 	. = ..()
 
-	if(owner && owner.health)
-		owner.health.adjust_loss_smart(tox=.*4,robotic=FALSE)
-
-	return .
+	owner.tox_regen_buffer += .*2
 
 /reagent/space_cleaner/on_splash(var/reagent_container/container,var/mob/caller,var/atom/target,var/volume_to_splash,var/strength_mod=1)
 
@@ -254,9 +249,6 @@
 				break
 			qdel(C)
 			cleaning_power -= 10
-
-	return .
-
 
 /reagent/phenol
 	name = "Phenol"

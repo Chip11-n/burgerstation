@@ -9,6 +9,8 @@
 	transit_bluespace = /area/transit/dropship/alpha/bluespace
 	transit_end = /area/transit/dropship/alpha/landing
 
+	status_id = "alpha"
+
 /obj/shuttle_controller/bravo
 	name = "bravo shuttle controler"
 	desc = "Controls the bravo shuttle."
@@ -17,6 +19,8 @@
 	transit_bluespace = /area/transit/dropship/bravo/bluespace
 	transit_end = /area/transit/dropship/bravo/landing
 
+	status_id = "bravo"
+
 /obj/shuttle_controller/charlie
 	name = "charlie shuttle controler"
 	desc = "Controls the charlie shuttle."
@@ -24,6 +28,8 @@
 	transit_start = /area/transit/dropship/charlie/station
 	transit_bluespace = /area/transit/dropship/charlie/bluespace
 	transit_end = /area/transit/dropship/charlie/landing
+
+	status_id = "charlie"
 
 /obj/shuttle_controller/charlie/transit(var/starting_transit_id,var/ending_transit_id)
 
@@ -42,7 +48,6 @@
 			start_thinking(OS)
 			OS.update_sprite()
 
-	return .
 
 /obj/shuttle_controller/delta
 	name = "delta shuttle controler"
@@ -51,6 +56,8 @@
 	transit_start = /area/transit/dropship/delta/station
 	transit_bluespace = /area/transit/dropship/delta/bluespace
 	transit_end = /area/transit/dropship/delta/landing
+
+	status_id = "delta"
 
 /*
 /obj/shuttle_controller/delta/transit(var/starting_transit_id,var/ending_transit_id)

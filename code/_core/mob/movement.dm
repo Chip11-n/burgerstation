@@ -38,7 +38,7 @@
 
 	switch(move_mod)
 		if(1)
-			.return walk_delay_mul
+			return walk_delay_mul
 		if(2)
 			return jog_delay_mul
 		if(3)
@@ -55,7 +55,6 @@
 	if(health && health.health_max)
 		. *= 2 - (health.health_current/health.health_max)
 
-	return .
 
 /mob/Move(NewLoc,Dir=0,step_x=0,step_y=0)
 
@@ -75,8 +74,6 @@
 		if(loc != old_loc)
 			post_move(old_loc)
 
-	return .
-
 
 /mob/proc/update_rs_chat()
 	for(var/k in stored_chat_text)
@@ -85,7 +82,10 @@
 		CT.force_move(src.loc)
 
 
-/mob/post_move(var/atom/old_loc)
+/mob/proc/update_parallax()
+
+	if(!ckey_last)
+		return FALSE
 
 	var/turf/T = get_turf(src.loc)
 
@@ -95,6 +95,33 @@
 		var/desired_y = FLOOR(-(T.y - (WORLD_SIZE*0.5)) * P.ratio,1)
 		P.screen_loc = "CENTER-7:[desired_x],CENTER-7:[desired_y]"
 
+	return TRUE
+
+/mob/proc/update_z_position()
+
+	if(!ckey_last)
+		return FALSE
+
+	var/turf/T = get_turf(src)
+
+	if((!T || last_z != T.z))
+		if(last_z && all_mobs_with_clients_by_z["[last_z]"])
+			all_mobs_with_clients_by_z["[last_z]"] -= src
+		if(T && T.z)
+			last_z = T.z
+			if(!all_mobs_with_clients_by_z["[last_z]"])
+				all_mobs_with_clients_by_z["[last_z]"] = list()
+			all_mobs_with_clients_by_z["[last_z]"] |= src
+		else
+			last_z = 0
+
+	return TRUE
+
+
+/mob/post_move(var/atom/old_loc)
+
+	update_parallax()
+
 	. = ..()
 
 	if(client)
@@ -102,4 +129,16 @@
 
 	update_rs_chat()
 
-	return .
+	update_z_position()
+
+
+/mob/set_dir(var/desired_dir,var/force=FALSE)
+
+	if(client && client.is_zoomed)
+		desired_dir = client.is_zoomed
+		return ..()
+
+	if(attack_flags & CONTROL_MOD_BLOCK)
+		return FALSE
+
+	. = ..()

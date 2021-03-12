@@ -31,7 +31,7 @@
 		PAIN = INFINITY
 	)
 
-	mob_size = MOB_SIZE_GIANT
+	size = SIZE_GIANT
 
 	blood_type = /reagent/blood/ancient
 	blood_volume = 1000
@@ -40,3 +40,5 @@
 		/obj/item/container/food/dynamic/meat/raw_goliath,
 		/obj/item/container/food/dynamic/meat/raw_goliath
 	)
+
+	soul_size = SOUL_SIZE_UNCOMMON

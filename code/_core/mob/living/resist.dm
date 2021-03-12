@@ -12,7 +12,7 @@
 		if(messages) to_chat(span("warning","You're too exhausted to resist!"))
 		return FALSE
 
-	if(has_status_effects(PARALYZE,SLEEP,STAGGER,FATIGUE,STUN))
+	if(has_status_effects(PARALYZE,SLEEP,PARRIED,FATIGUE,STUN))
 		if(messages) to_chat(span("warning","You can't resist in this state!"))
 		return FALSE
 
@@ -91,6 +91,9 @@
 
 		var/counter_to_add = src.get_attribute_power(ATTRIBUTE_STRENGTH)*10*(client ? 3 : 1)
 
+		var/trait/handcuffs/H = get_trait_by_category(/trait/handcuffs/)
+		if(H) counter_to_add *= H.handcuff_escape_multiplier
+
 		if(stored_handcuffs && stored_handcuffs.strength)
 			counter_to_add *= (1/stored_handcuffs.strength)
 
@@ -123,4 +126,3 @@
 				)
 
 
-	return .

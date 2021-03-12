@@ -22,6 +22,18 @@
 
 	liquid = 0.3
 
+/reagent/nutrition/mustard
+	name = "mustard paste"
+	desc = "Nutrition and flavor from mustard seeds."
+	color = "#EAC300"
+
+	nutrition_amount = 6
+	nutrition_quality_amount = 2
+
+	flavor = "mustard"
+
+	liquid = 0.1
+
 /reagent/nutrition/pineapple
 	name = "pineapple"
 	desc = "Nutrition and flavor from a pineapple."
@@ -40,9 +52,21 @@
 	color = "#658268"
 
 	nutrition_amount = 8
-	nutrition_quality_amount = 4
+	nutrition_quality_amount = 8
 
 	flavor = "cabbage"
+
+	liquid = 0
+
+/reagent/nutrition/lettuce
+	name = "lettuce"
+	desc = "Nutrition and flavor from lettuce."
+	color = "#5AAF36"
+
+	nutrition_amount = 6
+	nutrition_quality_amount = 5
+
+	flavor = "lettuce"
 
 	liquid = 0
 
@@ -115,7 +139,7 @@
 	processed_reagent = /reagent/medicine/painkiller/opium
 
 
-/reagent/nutrition/poppy_seed/raw/on_metabolize_stomach(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/nutrition/poppy_seed/raw/on_metabolize_stomach(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 
 	. = ..()
 
@@ -123,10 +147,7 @@
 		. *= 0.5
 		container.add_reagent(processed_reagent,.)
 
-	return .
-
-
-/reagent/nutrition/poppy_seed/raw/on_metabolize_blood(var/atom/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+/reagent/nutrition/poppy_seed/raw/on_metabolize_blood(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
 
 	. = ..()
 
@@ -134,6 +155,15 @@
 		. *= 0.5
 		container.add_reagent(processed_reagent,.)
 
-	return .
+/reagent/nutrition/lipolicide
+	name = "lipolicide"
+	desc = "Plant-based nutrition-eating germs."
+	color = "#511500"
 
+	nutrition_amount = -5
+	nutrition_quality_amount = 0
+
+	flavor = "hunger"
+
+	liquid = -0.1
 

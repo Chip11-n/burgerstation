@@ -30,7 +30,7 @@
 		PAIN = INFINITY
 	)
 
-	mob_size = MOB_SIZE_ANIMAL
+	size = SIZE_ANIMAL
 
 	movement_delay = DECISECONDS_TO_TICKS(2)
 
@@ -38,6 +38,8 @@
 	iff_tag = "Ghost"
 
 	blood_type = null
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/halloween_spirit/blue
 	icon_state = "blue"

@@ -4,13 +4,15 @@
 		/obj/item/paper/book/enchanting/stagger = 4,
 		/obj/item/paper/book/enchanting/stun = 2,
 		/obj/item/paper/book/enchanting/disarm = 3,
-		/obj/item/paper/book/enchanting/blood_leech = 1
+		/obj/item/paper/book/enchanting/blood_leech = 1,
+		/obj/item/paper/book/enchanting/soul_trap = 5
 	)
 	loot_count = 1
 
 
 /loot/magic/soulgem
 	loot_table = list(
+		/obj/item/soulgem = 27,
 		/obj/item/soulgem/common = 27,
 		/obj/item/soulgem/uncommon = 9,
 		/obj/item/soulgem/rare = 3,
@@ -44,5 +46,19 @@
 		/obj/item/weapon/ranged/magic/tome/lightning = 1,
 		/obj/item/weapon/ranged/magic/tome/missile = 1,
 		/obj/item/weapon/ranged/magic/tome/shock = 1
+	)
+	loot_count = 1
+
+/loot/magic/totem
+	loot_table = list(
+		/obj/item/weapon/ranged/magic/tome/summon/totem/health_heal,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/health_deal,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/stamina_heal,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/stamina_deal,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/mana_heal,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/mana_deal,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/sacred_flame,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/repelling,
+		/obj/item/weapon/ranged/magic/tome/summon/totem/attracting
 	)
 	loot_count = 1

@@ -129,7 +129,7 @@
 	for(var/k in all_players)
 		valid_targets += k
 
-	for(var/mob/living/L in view(src.mob,VIEW_RANGE))
+	for(var/mob/living/L in view(VIEW_RANGE,src.mob))
 		valid_targets |= L
 
 	var/mob/living/L = input("What do you wish to crush?","Crush Target") as null|anything in valid_targets
@@ -141,7 +141,7 @@
 	if(confirm != "Yes") return FALSE
 
 	var/turf/T = get_turf(L)
-	play('sound/meme/cbt.ogg',T)
+	play_sound('sound/meme/cbt.ogg',T)
 	CALLBACK("\ref[L]_smite",15,L,/mob/living/proc/smite)
 
 	log_admin("[L.get_debug_name()] was smited by [src.get_debug_name()].")
@@ -151,7 +151,7 @@
 	set name = "Give Dosh"
 	set category = "GameMaster"
 
-	var/mob/living/advanced/player/P = input("Who do you want to give money to?") in all_players as mob|null
+	var/mob/living/advanced/player/P = input("Who do you want to give money to?") as null|mob in all_players
 
 	if(!P)
 		return FALSE
@@ -222,19 +222,27 @@
 
 	to_chat(span("notice","Your [chosen_skill] is now [L.get_skill_level(chosen_skill)]."))
 
-/client/verb/rejuvenate_player()
-	set name = "Rejuvenate Player"
+/client/verb/rejuvenate()
+	set name = "Rejuvenate"
 	set category = "GameMaster"
 
-	var/mob/living/advanced/player/P = input("Who do you want to rejuvenate?","Player Rejuvenation") in all_players as mob|null
+	var/list/valid_players = list()
 
-	if(!P)
-		return FALSE
+	for(var/mob/living/L in all_mobs_with_clients)
+		if(!L.ckey)
+			continue
+		valid_players[L.get_debug_name()] = L
 
-	P.resurrect()
-	to_chat(span("notice","You rejuvenated [P.name]."))
+	var/choice = input("Who do you want to rejuvenate?","Player Rejuvenation") as null|mob in valid_players
 
-	log_admin("[src.get_debug_name()] rejuvenated [P.get_debug_name()].")
+	var/mob/living/L = valid_players[choice]
+
+	if(!L) return FALSE
+
+	L.resurrect()
+	to_chat(span("notice","You rejuvenated [L.name]."))
+
+	log_admin("[src.get_debug_name()] rejuvenated [L.get_debug_name()].")
 
 /client/verb/force_round_end()
 	set name = "Force Round End (DANGER)"
@@ -301,7 +309,7 @@
 			if(L.client)
 				valid_hearers += L
 				L.client.queued_shakes += 10
-		play('sound/effects/explosion/explosion_far.ogg',valid_hearers)
+		play_sound_global('sound/effects/explosion/explosion_far.ogg',valid_hearers)
 		for(var/obj/structure/interactive/lighting/T in A.contents)
 			CHECK_TICK(75,FPS_SERVER)
 			T.on_destruction(null,TRUE)
@@ -352,7 +360,7 @@
 	set name = "Add Language"
 	set category = "GameMaster"
 
-	var/mob/living/advanced/player/P = input("Who do you want to add a language to?","Add Language") in all_players as mob|null
+	var/mob/living/advanced/player/P = input("Who do you want to add a language to?","Add Language") as null|mob in all_players
 
 	if(!P)
 		return FALSE
@@ -379,7 +387,7 @@
 	set name = "Remove Language"
 	set category = "GameMaster"
 
-	var/mob/living/advanced/player/P = input("Who do you want to remove a language from?","Remove Language") in all_players as mob|null
+	var/mob/living/advanced/player/P = input("Who do you want to remove a language from?","Remove Language") as null|mob in all_players
 
 	if(!P)
 		return FALSE
@@ -390,7 +398,7 @@
 		var/language/L = SSlanguage.all_languages[k]
 		valid_languages += L
 
-	var/language/L = input("What language do you wish to remvoe from \the [P.name]?","Remove Language") as null|anything in valid_languages
+	var/language/L = input("What language do you wish to remove from \the [P.name]?","Remove Language") as null|anything in valid_languages
 
 	if(!L)
 		return FALSE
@@ -400,3 +408,74 @@
 	log_admin("[src.get_debug_name()] removed the language [L.get_debug_name()] to [P.get_debug_name()].")
 
 	return TRUE
+
+
+/client/verb/add_trait()
+	set name = "Add Trait"
+	set category = "GameMaster"
+
+	var/mob/living/advanced/player/P = input("Who do you want to add a trait to?","Add Trait") as null|mob in all_players
+
+	if(!P)
+		return FALSE
+
+	var/list/valid_traits = list()
+
+	for(var/k in SStraits.all_traits)
+		var/trait/T = SStraits.all_traits[k]
+		valid_traits += T
+
+	var/trait/T = input("What trait do you wish to add to \the [P.name]?","Add Trait") as null|anything in valid_traits
+
+	if(!T)
+		return FALSE
+
+	P.add_trait(T.type)
+
+	log_admin("[src.get_debug_name()] added the trait [T.get_debug_name()] to [P.get_debug_name()].")
+
+	return TRUE
+
+
+/client/verb/remove_trait()
+	set name = "Remove Trait"
+	set category = "GameMaster"
+
+	var/mob/living/advanced/player/P = input("Who do you want to remove a trait from?","Remove Trait") as null|mob in all_players
+
+	if(!P)
+		return FALSE
+
+	var/list/valid_traits = list()
+
+	for(var/k in P.traits)
+		var/trait/T = SStraits.all_traits[k]
+		valid_traits += T
+
+	var/trait/T = input("What trait do you wish to remove from \the [P.name]?","Remove Trait") as null|anything in valid_traits
+
+	if(!T)
+		return FALSE
+
+	P.remove_trait(T.type)
+
+	log_admin("[src.get_debug_name()] removed the trait [T.get_debug_name()] to [P.get_debug_name()].")
+
+	return TRUE
+
+/client/verb/create_explosion()
+	set name = "Create Explosion"
+	set category = "GameMaster"
+
+	var/turf/T = get_turf(mob)
+
+	var/desired_strength = input("What do you wish the explosion strength to be? Max: 10000","Explosion Strength",40) as num|null
+
+	if(!desired_strength || desired_strength <= 0)
+		return FALSE
+
+	desired_strength = min(desired_strength,10000)
+
+	log_admin("[src.get_debug_name()] created a [desired_strength] strength explosion at [T.get_debug_name()].")
+
+	explode(T,desired_strength,mob,mob,"Admin")

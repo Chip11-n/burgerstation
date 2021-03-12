@@ -6,6 +6,8 @@
 
 	weight = 0
 
+	can_rename = TRUE
+
 	color = "#FFFFFF"
 
 	icon_state = "inventory"
@@ -28,6 +30,7 @@
 		HOLY = 0,
 		DARK = 0,
 		FATIGUE = 0,
+		SANITY = 0,
 		ION = 0,
 		PAIN = 0
 	)
@@ -77,20 +80,17 @@
 /obj/item/clothing/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	if(length(polymorphs)) .["polymorphs"] = polymorphs
-	return .
-
+	
 /obj/item/clothing/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	if(object_data["polymorphs"]) polymorphs = object_data["polymorphs"]
-	return .
-
+	
 /obj/item/clothing/New(var/desired_loc)
 	additional_clothing_stored = list()
 	weight = calculate_weight()
 	. = ..()
 	initialize_blends()
-	return .
-
+	
 /obj/item/clothing/Destroy()
 	additional_clothing_stored.Cut()
 	return ..()
@@ -100,11 +100,11 @@
 	for(var/k in additional_clothing)
 		var/obj/item/C = new k(src)
 		C.should_save = FALSE
-		C.color = color
 		C.size = 0
-		C.additional_blends = additional_blends
 		C.additional_clothing_parent = src
 		additional_clothing_stored += C
+
+	sync_additional_clothing()
 
 	return ..()
 
@@ -129,7 +129,6 @@
 /obj/item/clothing/on_drop(var/obj/hud/inventory/old_inventory,var/atom/new_loc,var/silent=FALSE)
 	. = ..()
 	remove_additonal_clothing()
-	return .
-
+	
 /obj/item/clothing/proc/get_footsteps(var/list/original_footsteps,var/enter=TRUE)
 	return original_footsteps

@@ -19,12 +19,14 @@
 	iff_tag = "Bat"
 	loyalty_tag = "Bat"
 
-	mob_size = MOB_SIZE_CRITTER
+	size = SIZE_CRITTER
 
 	blood_type = /reagent/blood/bat
 	blood_volume = 100
 
+	soul_size = SOUL_SIZE_COMMON
+
 /mob/living/simple/bat/post_death()
 	. = ..()
 	icon_state = "dead"
-	return .
+	

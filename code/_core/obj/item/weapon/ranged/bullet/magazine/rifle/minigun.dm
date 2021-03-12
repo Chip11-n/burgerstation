@@ -1,12 +1,12 @@
 /obj/item/weapon/ranged/bullet/magazine/rifle/minigun
-	name = "\improper 5.56mm Gatling Gun"
+	name = "\improper 4.6mm Gatling Gun"
 	desc = "It costs 10,000 credits to fire this weapon for 12 seconds."
 	desc_extended = ""
 	icon = 'icons/obj/item/weapons/ranged/rifle/minigun.dmi'
 	icon_state = "inventory"
 	value = 3000
 
-	shoot_delay = 1 //Oh god oh fuck
+	shoot_delay = 1.25 //Oh god oh fuck
 
 	automatic = TRUE
 
@@ -48,10 +48,13 @@
 
 	dan_mode = TRUE
 
+	inaccuracy_modifier = 1.25
+	movement_spread_base = 0.3
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/minigun/get_static_spread()
 	if(!wielded)
 		return 0.5
-	return 0.1
+	return 0.02
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/minigun/get_skill_spread(var/mob/living/L)
 	if(!heat_current) return 0
@@ -60,4 +63,3 @@
 /obj/item/weapon/ranged/bullet/magazine/rifle/minigun/get_shoot_delay(var/mob/caller,var/atom/target,location,params)
 	. = ..()
 	. += (heat_max - heat_current)*10
-	return .

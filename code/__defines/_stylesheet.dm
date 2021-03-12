@@ -83,19 +83,31 @@ body {
 	font-weight: bold;
 }
 .common{
-	color: black;
+	color: [COLOR_COMMON];
 }
 .uncommon{
-	color: blue;
+	color: [COLOR_UNCOMMON];
 }
 .rare{
-	color: yellow;
+	color: [COLOR_RARE];
 }
 .mythical{
-	color: purple;
+	color: [COLOR_MYTHICAL];
 }
 .legendary{
-	color: gold;
+	color: [COLOR_LEGENDARY];
+}
+.bad{
+	color: red;
+}
+.good{
+	color: green;
+}
+.positive{
+	color: green;
+}
+.negative{
+	color: red;
 }
 .examine_title{
 	font-size: 200%;

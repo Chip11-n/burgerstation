@@ -126,7 +126,6 @@
 /obj/hud/inventory/New(var/desired_loc)
 	. = ..()
 	update_sprite()
-	return .
 
 /obj/hud/inventory/can_be_attacked(var/atom/attacker,var/atom/weapon,var/params,var/damagetype/damage_type)
 	return FALSE
@@ -151,7 +150,6 @@
 	else
 		color = initial(color)
 
-	return .
 
 /obj/hud/inventory/proc/update_held_icon(var/obj/item/item_to_update)
 
@@ -159,16 +157,17 @@
 	if(!owner || !is_advanced(owner) || !item_to_update)
 		return FALSE
 
+	if(!item_to_update.dan_mode && !item_to_update.enable_held_icon_states)
+		return FALSE
+
 	var/mob/living/advanced/A = owner
 
 	var/icon/desired_icon = initial(item_to_update.icon)
 	var/desired_icon_state = null
-	var/desired_pixel_x = 0
-	var/desired_pixel_y = 0
+	var/desired_pixel_x = item_to_update.held_pixel_x
+	var/desired_pixel_y = item_to_update.held_pixel_y
 	var/desired_layer = LAYER_MOB_HELD
 	var/matrix/desired_transform = matrix()
-
-	var/list/states = icon_states(initial(item_to_update.icon))
 
 	if(item_to_update.dan_mode && (id == BODY_HAND_LEFT || id == BODY_HAND_RIGHT || id == BODY_TORSO_OB) )
 		if(id == BODY_TORSO_OB)
@@ -260,15 +259,11 @@
 		var/icon/I = ICON_INVISIBLE
 		for(var/polymorph_name in item_to_update.polymorphs)
 			var/polymorph_color = item_to_update.polymorphs[polymorph_name]
-			if(!("[desired_icon_state]_[polymorph_name]" in states))
-				continue
 			var/icon/I2 = new /icon(desired_icon,"[desired_icon_state]_[polymorph_name]")
 			I2.Blend(polymorph_color,ICON_MULTIPLY)
 			I.Blend(I2,ICON_OVERLAY)
 		desired_icon_state = null
 		desired_icon = I
-	else if(!(desired_icon_state in states))
-		return FALSE
 
 	if(!A.overlays_assoc["\ref[item_to_update]"])
 		A.add_overlay_tracked(
@@ -368,7 +363,10 @@
 	vis_contents |= I
 
 	if(I.loc != src) //Something went wrong.
-		owner.to_chat(span("danger","Inventory glitch detected. Please report this bug on discord. Error Code: 01"))
+		if(!owner)
+			usr.to_chat(span("danger","Inventory glitch detected. Please report this bug on discord. Error Code: 01"))
+		else
+			owner.to_chat(span("danger","Inventory glitch detected. Please report this bug on discord. Error Code: 01"))
 		I.drop_item(get_turf(src))
 
 	return TRUE
@@ -416,23 +414,11 @@
 		I.delete_on_drop = TRUE
 		remove_object(I,owner.loc)
 
-
-/obj/hud/inventory/proc/get_weight()
-
-	. = 0
-
-	for(var/k in contents)
-		var/obj/item/I = k
-		. += I.get_weight()
-
-	return .
-
 /obj/hud/inventory/proc/remove_object(var/obj/item/I,var/turf/drop_loc,var/pixel_x_offset=0,var/pixel_y_offset=0,var/silent=FALSE) //Removes the object from both worn and held objects, just in case.
 
 	I.force_move(drop_loc ? drop_loc : get_turf(src.loc)) //THIS SHOULD NOT BE ON DROP
 	I.pixel_x = pixel_x_offset
 	I.pixel_y = pixel_y_offset
-	I.on_drop(src,drop_loc,silent)
 
 	update_stats()
 
@@ -445,7 +431,7 @@
 		else
 			A.remove_overlay("\ref[I]")
 
-	if(owner)
+	if(owner && !owner.qdeleting)
 		I.set_dir(owner.dir)
 		if(is_advanced(owner))
 			var/mob/living/advanced/A = owner
@@ -456,6 +442,8 @@
 			A.update_items(should_update_eyes = worn, should_update_protection = worn, should_update_clothes = worn)
 
 	vis_contents -= I
+
+	I.on_drop(src,drop_loc,silent)
 
 	return I
 

@@ -16,9 +16,16 @@
 /obj/decal/poster/nanotrasen/PostInitialize() //Random positive poster.
 	. = ..()
 	icon_state = "poster[rand(1,35)]_legit"
-	return .
 
 /obj/decal/poster/syndicate/PostInitialize() //Random negative poster.
 	. = ..()
 	icon_state = "poster[rand(1,44)]"
-	return .
+
+/obj/decal/poster/painting
+	name = "painting"
+	desc = "Wow."
+	desc_extended = "A randomized painting to liven up the area."
+
+/obj/decal/poster/painting/PostInitialize() //Random painting poster.
+	. = ..()
+	icon_state = "painting[rand(1,14)]"

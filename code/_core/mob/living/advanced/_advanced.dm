@@ -13,9 +13,6 @@
 	var/sex = MALE
 	gender = MALE
 
-	var/weight = 0 //Weight of worn items.
-	var/weight_max = 1 //Maxinmum weight of worn items.
-
 	var/draw_inventory = TRUE
 	var/list/obj/hud/inventory/inventory //List of inventory items
 	var/list/obj/item/worn_objects //List of worn items. For use in an easy read-only list.
@@ -70,7 +67,7 @@
 
 	var/list/known_cqc = list()
 
-	mob_size = MOB_SIZE_HUMAN
+	size = SIZE_HUMAN
 
 	max_level = 100 //Max level for skills and attributes of the mob.
 
@@ -134,15 +131,13 @@
 
 /mob/living/advanced/Finalize()
 
-	if(blood_type == /reagent/blood || species != "human") //Uninitialized blood.
-		var/species/S = SPECIES(species)
+	var/species/S = SPECIES(species)
+	if(!(blood_type in S.valid_blood_types))
 		blood_type = S.generate_blood_type()
 
 	. = ..()
 
 	update_items(force=TRUE)
-
-	return .
 
 /mob/living/advanced/on_crush()
 	if(driving)
@@ -191,8 +186,6 @@
 		see_invisible = max(G.see_invisible,see_invisible)
 		see_in_dark = max(see_in_dark,G.see_in_dark)
 
-	return .
-
 /mob/living/advanced/set_dir(var/desired_dir,var/force=FALSE)
 
 	if(driving)
@@ -211,10 +204,7 @@
 		if(holster && holster_item && holster_item.dan_mode)
 			holster.update_held_icon(holster_item)
 
-	return .
-
-
-/mob/living/advanced/proc/update_items(var/force=FALSE,var/should_update_weight=TRUE,var/should_update_slowdown=TRUE,var/should_update_eyes=TRUE,var/should_update_protection=TRUE,var/should_update_clothes=TRUE) //Sent when an item needs to update.
+/mob/living/advanced/proc/update_items(var/force=FALSE,var/should_update_slowdown=TRUE,var/should_update_eyes=TRUE,var/should_update_protection=TRUE,var/should_update_clothes=TRUE) //Sent when an item needs to update.
 
 	if(qdeleting) //Bandaid fix.
 		return FALSE
@@ -222,8 +212,6 @@
 	if(!force && !finalized)
 		return FALSE //Don't want to call this too much during initializations.
 
-	if(should_update_weight)
-		update_weight()
 	if(should_update_slowdown)
 		update_slowdown()
 	if(should_update_eyes)
@@ -235,21 +223,6 @@
 
 	return TRUE
 
-
-
-/mob/living/advanced/proc/update_weight()
-
-	. = 0
-
-	for(var/obj/hud/inventory/organs/I in inventory)
-		. += I.get_weight()
-
-	weight = .
-
-	weight_max = CEILING(200 + get_attribute_power(ATTRIBUTE_ENDURANCE)*300,5) //Skyrim levels of memes.
-
-	return .
-
 /mob/living/advanced/proc/update_slowdown()
 
 	. = 1
@@ -260,8 +233,6 @@
 	. = FLOOR(.,0.01)
 
 	slowdown_mul = .
-
-	return .
 
 /mob/living/advanced/New(loc,desired_client,desired_level_multiplier)
 
@@ -279,8 +250,6 @@
 	tracked_hidden_organs = list()
 
 	. = ..()
-
-	return .
 
 /mob/living/advanced/proc/drop_all_items(var/atom/drop_location = get_turf(src), var/exclude_soulbound=FALSE,var/exclude_containers=TRUE)
 
@@ -311,8 +280,7 @@ mob/living/advanced/Login()
 	restore_inventory()
 	restore_health_elements()
 	restore_local_machines()
-	update_health_element_icons(TRUE,TRUE,TRUE,TRUE)
-	return .
+	update_health_element_icons(TRUE,TRUE,TRUE)
 
 /mob/living/advanced/proc/restore_local_machines()
 	for(var/k in local_machines)
@@ -337,24 +305,18 @@ mob/living/advanced/Login()
 	if(S && S.health)
 		health = S.health
 
-	return .
-
 /mob/living/advanced/PostInitialize()
 
 	. = ..()
 
 	if(client)
-		update_health_element_icons(TRUE,TRUE,TRUE,TRUE)
+		update_health_element_icons(TRUE,TRUE,TRUE)
 		add_species_buttons()
 		add_species_health_elements()
-
-	return .
-
 
 /mob/living/advanced/Finalize()
 	. = ..()
 	update_items()
-	return .
 
 /mob/living/advanced/setup_name()
 
@@ -527,12 +489,5 @@ mob/living/advanced/Login()
 	var/species/S = SPECIES(species)
 	if(!S)
 		return text
-	return ..(S.mod_speech(src,text))
-
-
-
-/mob/living/advanced/can_use_controls()
-	if(handcuffed)
-		return FALSE
-
+	text = S.mod_speech(src,text)
 	return ..()

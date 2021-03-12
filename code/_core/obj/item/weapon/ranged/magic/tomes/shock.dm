@@ -3,7 +3,7 @@
 	desc = "Sprays an enemy with shock."
 	desc_extended = "Costs mana to use."
 	cost_mana = 2
-	shoot_delay = 1
+	shoot_delay = 4
 
 	automatic = TRUE
 
@@ -11,7 +11,7 @@
 
 	projectile = /obj/projectile/magic/lightning
 
-	ranged_damage_type = /damagetype/ranged/magic/lightning
+	ranged_damage_type = /damagetype/ranged/magic/shock
 
 	shoot_sounds = list('sound/effects/zzzt.ogg')
 

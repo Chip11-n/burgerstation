@@ -29,7 +29,8 @@
 		/obj/item/disk/rcd/metal_wall,
 		/obj/item/matter_cartridge,
 		/obj/item/cell_charger,
-		/obj/item/powercell/industrial
+		/obj/item/powercell/industrial,
+		/obj/item/flare
 	)
 
 /obj/structure/interactive/vending/engineering/wardrobe
@@ -53,5 +54,7 @@
 		/obj/item/clothing/head/hat/skimask/black,
 		/obj/item/clothing/mask/gas/poly/engineering,
 		/obj/item/clothing/head/light/hardhat,
-		/obj/item/clothing/overwear/coat/vest/colored/brown
+		/obj/item/clothing/overwear/coat/vest/colored/brown,
+		/obj/item/clothing/glasses/material,
+		/obj/item/clothing/glasses/meson
 	)

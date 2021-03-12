@@ -27,6 +27,23 @@
 /status_effect/proc/on_effect_life(var/mob/living/owner,var/magnitude,var/duration)
 	return TRUE
 
+/status_effect/soul_trap
+	name = "Soul Trap"
+	desc = "You've been soul trapped!"
+	id = SOULTRAP
+	minimum = 10
+	maximum = 600
+
+	affects_dead = FALSE
+
+/status_effect/soul_trap/can_add_status_effect(var/atom/attacker,var/mob/living/victim)
+
+	if(victim.is_player_controlled())
+		return FALSE
+
+	return ..()
+
+
 /status_effect/stun
 	name = "Stunned"
 	desc = "You're stunned!"
@@ -70,22 +87,20 @@
 	if(owner.ignite(magnitude) && !initial_fire)
 		owner.visible_message(span("danger","\The [owner.name] is set on fire!"),span("danger","You're set on fire!"))
 
-	return .
-
-/status_effect/staggered
-	name = "Staggered"
-	desc = "You're staggered!"
-	id = STAGGER
+/status_effect/parried
+	name = "Parried"
+	desc = "You're parried!"
+	id = PARRIED
 	minimum = 1
 	maximum = 10
 
 	affects_dead = FALSE
 
-/status_effect/staggered/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
+/status_effect/parried/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
 
 	. = ..()
 
-	if(source)
+	if(source && !owner.horizontal)
 		var/desired_move_dir = get_dir(source,owner)
 		var/old_dir = owner.dir
 		var/result = owner.Move(get_step(owner,desired_move_dir))
@@ -99,7 +114,28 @@
 				owner.add_status_effect(STUN,stun_time,stun_time)
 				animate(owner,pixel_x = 0, pixel_y = 0,time = max(0,stun_time - 1))
 
-	return .
+/status_effect/staggered
+	name = "Staggered"
+	desc = "You're staggered!"
+	id = STAGGER
+	minimum = 1
+	maximum = 10
+
+	affects_dead = FALSE
+
+/status_effect/staggered/can_add_status_effect(var/atom/attacker,var/mob/living/victim)
+
+	if(victim.horizontal)
+		return FALSE
+
+	return ..()
+
+/status_effect/staggered/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
+
+	. = ..()
+
+	if(source)
+		owner.move_delay = max(owner.move_delay,duration)
 
 /status_effect/slip
 	name = "Slipped"
@@ -112,13 +148,12 @@
 
 /status_effect/slip/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
 	. = ..()
-	play('sound/effects/slip.ogg',get_turf(owner))
+	play_sound('sound/effects/slip.ogg',get_turf(owner),range_max=VIEW_RANGE)
 	owner.add_status_effect(STUN,30,30,source = source,stealthy = TRUE)
 	var/throw_dir = owner.move_dir
 	var/list/throw_offset = direction_to_pixel_offset(throw_dir)
 	var/vel_magnitude = clamp(magnitude * 0.5,TILE_SIZE*0.5,TILE_SIZE-1)
 	owner.throw_self(owner,null,16,16,throw_offset[1]*vel_magnitude,throw_offset[2]*vel_magnitude, steps_allowed = clamp(CEILING(magnitude/20,1),1,6))
-	return .
 
 /status_effect/confused
 	name = "Confused"
@@ -162,6 +197,7 @@
 
 /status_effect/stamcrit/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
 	owner.remove_status_effect(ADRENALINE)
+	owner.stamina_regen_delay = max(owner.stamina_regen_delay,owner.is_player_controlled() ? SECONDS_TO_DECISECONDS(4) : SECONDS_TO_DECISECONDS(10))
 	return ..()
 
 /status_effect/energized
@@ -172,13 +208,10 @@
 	maximum = 3 * 60 * 10 //5 minutes.
 
 /status_effect/energized/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
-
 	. = ..()
-
 	if(owner.health) owner.health.update_health(check_death=FALSE)
 	owner.remove_status_effect(STAMCRIT)
-
-	return .
+	owner.stamina_regen_delay = 0
 
 /status_effect/resting
 	name = "Resting"
@@ -205,7 +238,7 @@
 	else
 		stealthy = TRUE
 
-	return ..(owner,source,magnitude,duration,stealthy)
+	return ..()
 
 /status_effect/grab
 	name = "Grab"
@@ -256,4 +289,32 @@
 /status_effect/druggy/on_effect_removed(var/mob/living/owner,var/magnitude,var/duration)
 	if(owner && owner.client)
 		owner.remove_color_mod("druggy")
+	return TRUE
+
+
+/status_effect/stressed
+	name = "Stressed"
+	desc = "You're stressed!"
+	id = STRESSED
+	minimum = 10
+	maximum = 30
+
+	affects_dead = FALSE
+
+/status_effect/stressed/on_effect_life(var/mob/living/owner,var/magnitude,var/duration)
+
+	if(owner && owner.client)
+		var/list/desired_color_mod = list(
+			0.33,0.33,0.33,0,
+			0.33,0.33,0.33,0,
+			0.33,0.33,0.33,0,
+			0,0,0,1,
+			0,0,0,0
+		)
+		owner.update_eyes()
+		owner.add_color_mod("stressed",desired_color_mod)
+
+/status_effect/stressed/on_effect_removed(var/mob/living/owner,var/magnitude,var/duration)
+	if(owner && owner.client)
+		owner.remove_color_mod("stressed")
 	return TRUE

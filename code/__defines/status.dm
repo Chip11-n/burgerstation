@@ -72,3 +72,10 @@
 
 #define SLIP "slip"
 //Honk
+
+#define SOULTRAP "soultrap"
+//Converting kills to souls
+
+#define PARRIED "parried"
+
+#define STRESSED "stressed"

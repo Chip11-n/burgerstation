@@ -1,3 +1,5 @@
+var/global/antag_count = 0
+
 /mob/abstract/observer/verb/load_most_recent_character()
 	set name = "Quickload Character"
 	set category = "Menu"
@@ -49,8 +51,6 @@
 
 	. = client.load(mobdata,file_num)
 
-	return .
-
 /mob/abstract/observer/verb/new_character()
 	set name = "New Character"
 	set category = "Menu"
@@ -68,6 +68,10 @@
 			return FALSE
 
 		var/character_id = mobdata.get_next_character_id()
+
+		if(text2num(character_id) > MAX_CHARACTERS)
+			src.to_chat(span("warning","You exceed the maximum allocated characters! ([text2num(character_id)-1]/[MAX_CHARACTERS])"))
+			return FALSE
 
 		if(mobdata.create_new_character(character_id))
 			var/turf/T = get_turf(pick(chargen_spawnpoints))
@@ -88,6 +92,7 @@
 		else
 			to_chat(span("danger","You were unable to create a new character! Please inform BurgerBB of this issue with your ckey so they can investigate what happened with the following code: 02. Rejoining may fix this."))
 			log_error("WARNING: [ckey] was unable to create a new character!")
+			return FALSE
 
 
 
@@ -129,13 +134,17 @@
 		src.to_chat(span("warning","The round is currently ending!"))
 		return FALSE
 
+	var/antag_limit = 2 + length(all_mobs_with_clients)*0.2
+
+	if(antag_count > antag_limit)
+		src.to_chat(span("warning","There are no available antag types!"))
+		return FALSE
+
 	if(length(all_antag_markers) <= 0)
 		src.to_chat(span("warning","There are no available antag types!"))
 		return FALSE
 
 	return TRUE
-
-
 
 /mob/abstract/observer/verb/become_antagonist()
 	set name = "Become Antagonist"
@@ -146,7 +155,7 @@
 
 	var/client/C = src.client
 
-	var/choice = input("Are you sure you wish to spend an antag token to become an antagonist? You will spawn in as a Syndicate Assassin with predetermined gear.") as null|anything in list("Yes","No","Cancel")
+	var/choice = input("Are you sure you wish to spend an antag token to become an antagonist?") as null|anything in list("Yes","No","Cancel")
 
 	if(choice != "Yes")
 		src.to_chat(span("notice","Good choice."))
@@ -168,14 +177,14 @@
 
 	if(!length(all_antag_markers))
 		src.to_chat(span("warning","Someone stole your slot! There are no antagonist slots left!"))
-		return ..()
+		return FALSE
 
 	if(!antagonist_choice || !length(all_antag_markers[antagonist_choice]))
 		src.to_chat(span("warning","Someone stole your slot! Pick another antagonist type!"))
-		return ..()
+		return FALSE
 
 	if(!can_become_antagonist())
-		return ..()
+		return FALSE
 
 	var/obj/marker/antag/chosen_marker = pick(all_antag_markers[antagonist_choice])
 	all_antag_markers[antagonist_choice] -= chosen_marker
@@ -190,3 +199,5 @@
 
 	var/mob/living/advanced/player/antagonist/P = new chosen_marker.spawn_type(get_turf(chosen_marker),C)
 	P.prepare()
+
+	antag_count++

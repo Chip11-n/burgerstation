@@ -22,9 +22,8 @@
 	. = ..()
 
 	if(.)
-		explode(get_turf(hit_atom),2,owner,src,loyalty_tag)
+		explode(get_turf(hit_atom),20,owner,src,loyalty_tag)
 
-	return .
 
 
 /obj/projectile/magic/fireball/lava
@@ -41,11 +40,6 @@
 		GENERATE(L)
 		FINALIZE(L)
 
-	return .
-
-
-
-
 /obj/projectile/magic/chaos
 	name = "chaos ball"
 	icon_state = "chaos"
@@ -61,6 +55,19 @@
 	icon_state = "blade"
 
 	collision_bullet_flags = FLAG_COLLISION_BULLET_SOLID
+
+/obj/projectile/magic/blade/update_projectile(var/tick_rate=1)
+
+	. = ..()
+
+	if(.)
+		vel_x *= 0.95
+		vel_y *= 0.95
+		alpha = clamp(alpha-5,0,255)
+
+		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
+			on_hit(current_loc,TRUE)
+			return FALSE
 
 /obj/projectile/magic/rift
 	name = "magic rift"
@@ -81,7 +88,6 @@
 		if(L.dead && L.loyalty_tag == src.loyalty_tag)
 			L.resurrect()
 
-	return .
 
 /obj/projectile/magic/lightning
 	name = "lightning"
@@ -104,7 +110,6 @@
 			on_hit(current_loc,TRUE)
 			return FALSE
 
-	return .
 
 /obj/projectile/magic/frost
 	name = "frost"
@@ -123,7 +128,6 @@
 			on_hit(current_loc,TRUE)
 			return FALSE
 
-	return .
 
 
 /obj/projectile/magic/lesser_fire
@@ -143,7 +147,6 @@
 			on_hit(current_loc,TRUE)
 			return FALSE
 
-	return .
 
 
 /obj/projectile/magic/lightning_bolt
@@ -163,7 +166,6 @@
 			on_hit(current_loc,TRUE)
 			return FALSE
 
-	return .
 
 /obj/projectile/magic/crystal
 	name = "magic crystal"
@@ -179,13 +181,12 @@
 	if(.)
 		vel_x *= 0.9
 		vel_y *= 0.9
-		alpha = clamp(alpha-5,0,255)
+		alpha = clamp(FLOOR(alpha*0.9,1),0,255)
 
 		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
 			on_hit(current_loc,TRUE)
 			return FALSE
 
-	return .
 
 
 /obj/projectile/magic/crystal/fire
@@ -235,4 +236,3 @@
 	if(!found_curse)
 		new /obj/effect/temp/hazard/curse(new_loc,SECONDS_TO_DECISECONDS(10),owner)
 
-	return .

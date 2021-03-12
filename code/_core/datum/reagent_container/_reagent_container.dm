@@ -29,7 +29,7 @@
 
 /reagent_container/Destroy()
 	owner = null
-	SSreagent.all_reagent_containers -= src
+	SSreagent.all_temperature_reagent_containers -= src
 	return ..()
 
 /reagent_container/proc/get_contents_english()
@@ -53,11 +53,10 @@
 
 	. = ..()
 
-	SSreagent.all_reagent_containers += src
+	if(!(flags_temperature & REAGENT_TEMPERATURE_NO_AMBIENT))
+		SSreagent.all_temperature_reagent_containers += src
 
-	return .
-
-/reagent_container/proc/metabolize(var/multiplier=1)
+/reagent_container/proc/metabolize(var/mob/living/living_owner,var/multiplier=1)
 
 	if(!volume_current)
 		return
@@ -67,6 +66,9 @@
 
 	if(!flags_metabolism)
 		return
+
+	var/trait/metabolism/M = living_owner.get_trait_by_category(/trait/metabolism/)
+	if(M) multiplier *= M.metabolism_multiplier
 
 	for(var/r_id in stored_reagents)
 
@@ -80,12 +82,7 @@
 		if(!(flags_metabolism & R.flags_metabolism))
 			continue
 
-		var/atom/owner_to_use = owner
-
-		if(owner && is_organ(owner) && owner.loc && flags_metabolism & REAGENT_METABOLISM_INGEST)
-			owner_to_use = owner.loc
-
-		var/metabolize_amount = R.metabolize(owner,owner_to_use,src,volume,multiplier)
+		var/metabolize_amount = R.metabolize(living_owner,src,volume,multiplier)
 
 		if(metabolize_amount)
 			remove_reagent(r_id,metabolize_amount,FALSE)
@@ -132,6 +129,7 @@
 
 	if(average_temperature > desired_temperature) //If we're hotter than we want to be.
 		average_temperature = max(desired_temperature,average_temperature + temperature_change)
+		. = FALSE
 	else //If we're colder than we need to be.
 		temperature_change *= 0.5 //This means it's slow to heat up, but fast to cool down.
 		average_temperature = min(desired_temperature,average_temperature + temperature_change)
@@ -157,7 +155,7 @@
 		update_container()
 		return TRUE
 
-	process_recipes() //Don't worry, this is only called when there was a temperature change and nothing else.
+	process_recipes(from_temperature_change=TRUE) //Don't worry, this is only called when there was a temperature change and nothing else.
 
 	return TRUE
 
@@ -183,8 +181,7 @@
 		var/reagent/R = REAGENT(r_id)
 		stored_reagents[r_id] = round(stored_reagents[r_id],REAGENT_ROUNDING)
 
-		if(R.lethal)
-			contains_lethal = TRUE
+		if(R.lethal) contains_lethal = TRUE
 
 		var/volume = stored_reagents[r_id]
 		var/temperature = stored_reagents_temperature[r_id] ? stored_reagents_temperature[r_id] : T0C + 20
@@ -222,7 +219,7 @@
 	return TRUE
 
 
-/reagent_container/proc/process_recipes(var/mob/caller)
+/reagent_container/proc/process_recipes(var/mob/caller,var/from_temperature_change=FALSE)
 
 	if(!allow_recipie_processing)
 		return FALSE
@@ -231,16 +228,20 @@
 		var/obj/item/I = src.owner
 		caller = I.last_interacted
 
-	var/list/c_id_to_volume = list() //What is in the reagent container, but in a nice id = volume form
-	var/list/c_id_to_temperature = list()
+	var/list/c_id_to_volume = stored_reagents
+	var/list/c_id_to_temperature = stored_reagents_temperature
 
-	for(var/reagent_type in stored_reagents)
-		c_id_to_volume[reagent_type] = stored_reagents[reagent_type]
-		c_id_to_temperature[reagent_type] = stored_reagents_temperature[reagent_type]
+	var/list/recipes_to_check = list()
+	for(var/k in stored_reagents)
+		var/reagent/R = REAGENT(k)
+		if(!R.involved_in_recipes)
+			continue
+		if(from_temperature_change && !R.has_temperature_recipe)
+			continue
+		recipes_to_check |= R.involved_in_recipes
 
 	var/reagent_recipe/found_recipe = null
-
-	for(var/k in SSreagent.all_reagent_recipes)
+	for(var/k in recipes_to_check)
 
 		CHECK_TICK(75,FPS_SERVER)
 
@@ -254,6 +255,7 @@
 		var/good_recipe = TRUE
 
 		for(var/reagent_type in recipe.required_reagents)
+			CHECK_TICK(50,FPS_SERVER)
 			if(recipe.required_container && !istype(owner,recipe.required_container))
 				if(debug) log_debug("Recipe [recipe.name] invalid because of wrong container type.")
 				good_recipe = FALSE
@@ -292,11 +294,9 @@
 		var/required_amount = found_recipe.required_reagents[k]
 		var/current_volume = c_id_to_volume[k]
 		var/math_to_do = current_volume / required_amount
-
 		if(!portions_to_make)
 			portions_to_make = math_to_do
 			continue
-
 		portions_to_make = min(portions_to_make,math_to_do)
 
 	var/amount_removed = 0
@@ -313,6 +313,7 @@
 	update_container(FALSE)
 
 	for(var/k in found_recipe.results)
+		CHECK_TICK(75,FPS_SERVER)
 		var/v = found_recipe.results[k] * portions_to_make
 		add_reagent(k,v,desired_temperature,FALSE,FALSE,caller)
 
@@ -398,12 +399,10 @@
 			R.on_remove_living(L,src)
 
 	if(check_recipes)
-		process_recipes()
+		process_recipes(caller)
 
 	if(should_update)
 		update_container()
-
-	return .
 
 /reagent_container/proc/remove_reagent(var/reagent_type,var/amount=0,var/should_update = TRUE,var/check_recipes = TRUE,var/mob/living/caller)
 	return -add_reagent(reagent_type,-amount,TNULL,should_update,check_recipes,caller)
@@ -415,36 +414,6 @@
 	update_container()
 
 	return TRUE
-
-/*
-/reagent_container/proc/transfer_reagent_to(var/reagent_container/target_container,var/reagent_type,var/amount=0,var/should_update = TRUE, var/check_recipes = TRUE,var/mob/living/caller) //Transfer a single reagent by id.
-	var/old_temperature = stored_reagents_temperature[reagent_type] ? stored_reagents_temperature[reagent_type] : T0C + 20
-	return target_container.add_reagent(reagent_type,remove_reagent(reagent_type,amount,should_update,check_recipes,caller),old_temperature,should_update,check_recipes,caller)
-*/
-
-/reagent_container/proc/remove_reagents(var/amount,var/should_update=TRUE,var/check_recipes = TRUE)
-
-	if(amount <= 0)
-		return FALSE
-
-	amount = min(amount,volume_current)
-
-	var/total_amount_removed = 0
-
-	var/old_volume = volume_current
-
-	for(var/r_id in stored_reagents)
-		var/volume = stored_reagents[r_id]
-		var/ratio = volume / old_volume
-		total_amount_removed += remove_reagent(r_id,ratio*amount,FALSE,FALSE)
-
-	if(should_update)
-		src.update_container()
-
-	if(check_recipes)
-		src.process_recipes()
-
-	return total_amount_removed
 
 /reagent_container/proc/transfer_reagents_to(var/reagent_container/target_container,var/amount=0,var/should_update=TRUE,var/check_recipes = TRUE,var/mob/living/caller) //Transfer all the reagents.
 
@@ -469,10 +438,11 @@
 		else if(target_container.owner && is_living(target_container.owner.loc))
 			L2 = target_container.owner.loc
 
-		if(L2 && L1.loyalty_tag && L1.loyalty_tag == L2.loyalty_tag)
+		if(L2 && L1 != L2 && L1.loyalty_tag && L1.loyalty_tag == L2.loyalty_tag)
 			for(var/r_id in stored_reagents)
 				var/reagent/R = REAGENT(r_id)
 				if(R.lethal)
+					caller.to_chat(span("warning","Your loyalty prevents you from giving lethal reagents to your allies!"))
 					return 0
 
 	var/total_amount_transfered = 0
@@ -493,8 +463,8 @@
 		target_container.update_container()
 
 	if(check_recipes)
-		src.process_recipes()
-		target_container.process_recipes()
+		src.process_recipes(caller)
+		target_container.process_recipes(caller)
 
 	return total_amount_transfered
 
@@ -516,7 +486,9 @@
 
 	var/list/english_flavor_profile = list()
 
-	for(var/i=1,i<=min(4,length(flavor_profile)),i++)
+	var/flavor_count = min(4,length(flavor_profile))
+
+	for(var/i=1,i<=flavor_count,i++)
 		var/k = flavor_profile[i] //This gets the key (flavor name)
 		var/v = flavor_profile[k] //This gets the value (flavor strength)
 		var/flavor_text
@@ -534,7 +506,8 @@
 		if(flavor_text)
 			english_flavor_profile += flavor_text
 
-	return list(english_list(english_flavor_profile),flavor_flags)
+
+	return list(english_list(english_flavor_profile),flavor_flags,flavor_count)
 
 
 /reagent_container/proc/splash(var/mob/caller,var/atom/target,var/splash_amount = volume_current,var/silent = FALSE,var/strength_mod=1)
@@ -592,6 +565,7 @@
 
 		var/final_flavor_text = flavor_data[1]
 		var/list/flavor_flags = flavor_data[2]
+		var/flavor_count = flavor_data[3]
 
 		var/like_score = 0
 		var/species/SP = SPECIES(A.species)
@@ -601,6 +575,9 @@
 				like_score += flavor_flags[k]
 			if(real_bit & SP.flags_flavor_hate)
 				like_score -= flavor_flags[k]*5 //Things you dislike in food are much more obvious than things you like.
+
+		if(flavor_count > 1 && like_score > 0)
+			like_score *= 1 + flavor_count*0.5 //Bonuses for multiple flavor types. More effort must've been put into it.
 
 		if(final_flavor_text && (A.last_flavor_time + SECONDS_TO_DECISECONDS(3) <= world.time || A.last_flavor != final_flavor_text) )
 			A.last_flavor = final_flavor_text
@@ -618,7 +595,8 @@
 		else
 			consumer.visible_message(span("notice","\The [consumer.name] [consume_verb]s \the [src.owner.name]."),span("notice","You [consume_verb] \the [src.owner.name]."))
 
-		if(consume_sound) play(consume_sound,get_turf(consumer))
+		if(consume_sound)
+			play_sound(consume_sound,get_turf(consumer),range_max=VIEW_RANGE*0.5)
 
 		if(final_flavor_text)
 			consumer.to_chat(span("notice",final_flavor_text))
@@ -628,4 +606,3 @@
 	else
 		. = transfer_reagents_to(consumer.reagents,volume_current, caller = caller)
 
-	return .

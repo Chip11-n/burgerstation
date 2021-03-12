@@ -20,7 +20,7 @@
 
 	var/spawn_on_markers = TRUE
 
-	var/atom/list/priority_targets  = list()
+	var/list/atom/priority_targets  = list()
 
 /gamemode/horde/update_objectives()
 
@@ -32,8 +32,6 @@
 			SSvote.create_vote(/vote/continue_round)
 		else
 			world.end(WORLD_END_NANOTRASEN_VICTORY)
-
-	return .
 
 /gamemode/horde/proc/create_horde_mob(var/desired_loc)
 	var/mob/living/L = pickweight(enemy_types_to_spawn)
@@ -80,6 +78,7 @@
 	add_objective(/objective/artifact)
 	add_objective(/objective/hostage)
 	add_objective(/objective/defense)
+	add_objective(/objective/abnormality)
 
 	if(player_count >= 10)
 		add_objective(/objective/hostage)
@@ -98,16 +97,13 @@
 		log_debug("Adding player count 40 objectives.")
 
 	next_objective_update = world.time + 100
-
 	return TRUE
 
 /gamemode/horde/on_continue()
 
-	if(!add_objective(/objective/kill_boss))
+	if(!add_objective(/objective/kill_boss) && !add_objective(/objective/artifact))
 		state = GAMEMODE_BREAK
 		SSvote.create_vote(/vote/continue_round)
-	else
-		add_objective(/objective/artifact)
 
 	points += 20
 
@@ -140,6 +136,7 @@
 	round_time = 0
 	round_time_next = HORDE_DELAY_GEARING
 	SSshuttle.next_pod_launch = world.time + SECONDS_TO_DECISECONDS(60*10 + 10)
+	add_objectives()
 	announce(
 		"Central Command Update",
 		"Prepare for Landfall",
@@ -147,7 +144,6 @@
 		ANNOUNCEMENT_STATION,
 		'sound/voice/announcement/landfall_crew_8_minutes.ogg'
 	)
-	add_objectives()
 	return TRUE
 
 /gamemode/horde/proc/on_gearing()
@@ -225,7 +221,7 @@
 		log_error("ERROR: Could not find a valid horde target!")
 		return TRUE
 
-	var/obj/marker/map_node/list/found_path = spawn_node.find_path(target_node)
+	var/list/obj/marker/map_node/found_path = spawn_node.find_path(target_node)
 	if(!found_path)
 		log_error("ERROR: Could not find a valid path from [spawn_node.get_debug_name()] to [target_node.get_debug_name()]!")
 		return TRUE
@@ -233,6 +229,26 @@
 	next_spawn_check = world.time + get_wave_frequency()
 
 	var/turf/T = get_turf(spawn_node)
+	for(var/k in SSai.path_stuck_ai) //Unclog stuck AI.
+		CHECK_TICK(50,FPS_SERVER*5)
+		var/ai/AI = k
+		var/mob/living/L = AI.owner
+		if(L.dead)
+			SSai.path_stuck_ai -= k
+			continue
+		var/should_spawn = TRUE
+		for(var/mob/living/advanced/P in all_mobs_with_clients_by_z["[L.z]"])
+			if(P.dead)
+				continue
+			if(get_dist(P,L) <= VIEW_RANGE + ZOOM_RANGE)
+				should_spawn = FALSE
+				break
+		if(!should_spawn)
+			continue
+		L.force_move(T)
+		wave_to_spawn--
+		SSai.path_stuck_ai -= k
+
 	while(wave_to_spawn > 0)
 		wave_to_spawn--
 		CHECK_TICK(50,FPS_SERVER*5)
@@ -257,8 +273,8 @@
 	var/player_count = length(all_clients)
 
 	switch(player_count)
-		if(0 to 10)
-			return SECONDS_TO_DECISECONDS(60)
+		if(-INFINITY to 10)
+			return SECONDS_TO_DECISECONDS(90)
 		if(10 to 20)
 			return SECONDS_TO_DECISECONDS(45)
 		if(20 to 30)
@@ -266,7 +282,7 @@
 		if(30 to INFINITY)
 			return SECONDS_TO_DECISECONDS(15)
 
-	return SECONDS_TO_DECISECONDS(60)
+	return SECONDS_TO_DECISECONDS(60) //Fallback lol
 
 /gamemode/horde/proc/get_wave_size()
 
@@ -308,7 +324,7 @@
 /gamemode/horde/proc/get_enemies_to_spawn()
 	. = enemies_to_spawn_base
 	if(enemies_to_spawn_per_player)
-		. += length(all_players)*enemies_to_spawn_per_player
+		. += min(30,length(all_players))*enemies_to_spawn_per_player
 	if(enemies_to_spawn_per_minute)
 		. += DECISECONDS_TO_SECONDS(world.time)/(60*enemies_to_spawn_per_minute)
 	. = min(.,50)
@@ -347,6 +363,9 @@
 	return null
 
 /gamemode/horde/proc/find_horde_spawn()
+
+	if(!length(all_syndicate_spawns))
+		return null
 
 	var/picks_remaining = 3
 

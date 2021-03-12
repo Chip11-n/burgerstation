@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/revolver/45.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 1.25
+	shoot_delay = 1
 
 	automatic = FALSE
 
@@ -37,8 +37,6 @@
 	open = TRUE //Starts open.
 
 	can_shoot_while_open = TRUE
-
-	inaccuracy_modifer = 0.25
 
 	attachment_whitelist = list(
 		/obj/item/attachment/barrel/charger = TRUE, /obj/item/attachment/barrel/charger/advanced = TRUE,
@@ -73,6 +71,9 @@
 	attachment_undermount_offset_y = 18 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/deathsquad
+
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.02
 
 /obj/item/weapon/ranged/bullet/revolver/horse/get_static_spread()
 	return 0

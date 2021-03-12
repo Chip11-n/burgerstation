@@ -1,7 +1,7 @@
 /objective/
 	var/name = "Objective Name"
 	var/desc = "Objective Description"
-	var/atom/list/tracked_atoms = list()
+	var/list/atom/tracked_atoms = list()
 	var/completion_state = ACTIVE
 	var/credit_reward = 0
 	var/burgerbux_reward = 0
@@ -10,6 +10,11 @@
 	var/antagonist = FALSE
 
 	var/trackable = TRUE
+
+	var/track_cargo = FALSE
+
+/objective/proc/on_object_sold(var/atom/movable/object)
+	return TRUE
 
 /objective/New()
 
@@ -66,8 +71,6 @@
 		var/area/A2 = get_area(A)
 		if(A2) . += A2
 
-	return .
-
 /objective/proc/get_description()
 	return "[initial(desc)] ([completion_state])"
 
@@ -112,4 +115,3 @@
 		if(completion_state == COMPLETED)
 			on_completion()
 
-	return .

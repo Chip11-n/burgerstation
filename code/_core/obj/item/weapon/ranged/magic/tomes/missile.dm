@@ -3,7 +3,7 @@
 	desc = "ARCANE MISSILE! ARCANE MISSILE! CLOTHING DOESN'T COUNT!"
 	desc_extended = "Fires a magical missile."
 	cost_mana = 15
-	shoot_delay = 5
+	shoot_delay = 8
 
 	icon = 'icons/obj/item/weapons/ranged/magic/tomes/missile.dmi'
 
@@ -13,6 +13,6 @@
 
 	shoot_sounds = list('sound/weapons/magic/magic_missile.ogg')
 
-	projectile_speed = 20
+	projectile_speed = TILE_SIZE - 1
 
 	value = 500

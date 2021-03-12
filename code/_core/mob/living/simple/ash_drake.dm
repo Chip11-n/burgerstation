@@ -23,9 +23,11 @@
 
 	stun_angle = 0
 
-	health_base = 6000
+	health_base = 10000
 	stamina_base = 500
 	mana_base = 2000
+
+	boss_loot = /loot/lavaland/ash_drake
 
 	var/boss_state = 0
 	//0 = walking
@@ -71,7 +73,7 @@
 		FIRE = TRUE
 	)
 
-	mob_size = MOB_SIZE_BOSS
+	size = SIZE_BOSS
 
 	enable_medical_hud = FALSE
 	enable_security_hud = FALSE
@@ -81,6 +83,8 @@
 
 	blood_type = /reagent/blood/ancient
 	blood_volume = 3000
+
+	soul_size = SOUL_SIZE_RARE
 
 
 /*
@@ -184,15 +188,12 @@
 	if(boss_state)
 		. *= 0.5
 
-	return .
-
 /mob/living/simple/ash_drake/proc/shoot_fireball(var/atom/desired_target)
 	shoot_projectile(src,desired_target,null,null,/obj/projectile/magic/fireball/lava,/damagetype/ranged/magic/fireball,16,16,0,TILE_SIZE*0.75,1,"#FFFFFF",0,0,1,iff_tag,loyalty_tag)
 
 /mob/living/simple/ash_drake/post_death()
 	..()
 	icon_state = "dead"
-	CREATE(/obj/structure/interactive/crate/necro/ash_drake,get_turf(src))
 	update_sprite()
 
 

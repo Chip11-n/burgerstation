@@ -37,8 +37,6 @@
 
 		. += div(is_injured ? "warning" : "notice","[noun] [O.name] is [english_list(damage_desc,nothing_text="healthy")][number_text].")
 
-	return .
-
 /mob/living/advanced/get_examine_list(var/mob/examiner)
 
 	var/pronoun = get_pronoun_he_she_it(src)
@@ -46,6 +44,10 @@
 	. = ..()
 
 	if(examiner != src)
+		if(is_living(examiner))
+			var/mob/living/L = examiner
+			if(L.loyalty_tag != "NanoTrasen" && L.loyalty_tag != src.loyalty_tag)
+				return .
 		var/blocked_clothing = 0x0
 		for(var/obj/item/clothing/C in worn_objects)
 			var/bits_to_block = (C.blocks_clothing | C.hidden_clothing) & ~C.item_slot
@@ -61,8 +63,6 @@
 		for(var/k in held_objects)
 			var/obj/item/I = k
 			. += div("notice","(<a href='?src=\ref[examiner];take=\ref[I]'>Take</a>) [capitalize(pronoun)] is holding \the <b>[I.name]</b> on their [initial(I.loc.name)].")
-
-	return .
 
 mob/living/advanced/get_examine_details_list(var/mob/examiner)
 
@@ -83,8 +83,10 @@ mob/living/advanced/get_examine_details_list(var/mob/examiner)
 		. += div("notice","Speed: [FLOOR(steps_per_second,0.1)] steps per second.")
 
 	if(handcuffed)
-		. += div("warning","(<a href='?src=\ref[examiner];uncuff=\ref[src]'>Remove</a>) [capitalize(pronoun)] is handcuffed!")
+		if(examiner == src)
+			. += div("danger","You are handcuffed!")
+		else
+			. += div("warning","(<a href='?src=\ref[examiner];uncuff=\ref[src]'>Remove</a>) [capitalize(pronoun)] is handcuffed!")
 
 	. += ..()
 
-	return .

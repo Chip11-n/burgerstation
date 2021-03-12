@@ -169,6 +169,7 @@
 /obj/structure/interactive/vending/robotics
 	name = "robotics vendor"
 
+/*
 /obj/structure/interactive/vending/robotics/mech_gun_fabricator
 	name = "mech fabricator"
 	icon_state = "mech"
@@ -206,10 +207,78 @@
 		/obj/item/weapon/melee/tool/multitool,
 		/obj/item/powercell/vehicle
 	)
+*/
 
 /obj/structure/interactive/vending/chaplain/wardrobe
 	name = "chaplain wardrobe vendor"
 	icon_state = "chapdrobe"
+
+	stored_types = list(
+
+		/obj/item/clothing/head/helmet/knight/templar,
+		/obj/item/clothing/overwear/armor/knight/templar,
+
+		/obj/item/clothing/head/helmet/knight/yellow,
+		/obj/item/clothing/overwear/armor/knight/yellow,
+
+		/obj/item/clothing/mask/daddy,
+		/obj/item/clothing/overwear/armor/knight/daddy,
+		/obj/item/clothing/neck/mantle/daddy,
+
+		/obj/item/clothing/uniform/priest,
+		/obj/item/clothing/overwear/coat/chaplain,
+
+		/obj/item/storage/glovebox/white,
+		/obj/item/storage/shoebox/black,
+
+		/obj/item/storage/pouch/single/brown,
+		/obj/item/storage/pouch/double/brown,
+		/obj/item/storage/pouch/triple/brown,
+
+		/obj/item/clothing/back/storage/backpack/poly/chaplain
+	)
+
+/obj/structure/interactive/vending/chaplain/equipment
+	name = "chaplain equipment vendor"
+	icon_state = "chapment"
+
+	stored_types = list(
+		/obj/item/clothing/glasses/blindfold,
+		/obj/item/deployable/bodybag,
+
+		/obj/item/cross,
+		/obj/item/emf,
+		/obj/item/ghost_box,
+		/obj/item/light_sensor,
+
+		/obj/item/weapon/melee/shield,
+		/obj/item/weapon/melee/shield/glass,
+
+		/obj/item/weapon/melee/null_rod,
+		/obj/item/weapon/melee/null_rod/dagger,
+		/obj/item/weapon/melee/null_rod/staff,
+
+		/obj/item/weapon/melee/sword/claymore,
+		/obj/item/weapon/melee/sword/curvedsword,
+		/obj/item/weapon/melee/sword/zweihander,
+
+		/obj/item/weapon/melee/vampire_killer,
+
+		/obj/item/weapon/melee/mace,
+
+		/obj/item/weapon/melee/torch,
+		/obj/item/weapon/melee/torch/lantern,
+
+		/obj/item/weapon/ranged/bow/steel,
+		/obj/item/weapon/ranged/bow/wood,
+		/obj/item/bullet_cartridge/arrow,
+		/obj/item/clothing/belt/belt_quiver,
+
+		/obj/item/weapon/ranged/magic/tome/lightning,
+
+		/obj/item/weapon/ranged/magic/tome/summon/totem/sacred_flame
+
+	)
 
 /obj/structure/interactive/vending/chemistry/wardrobe
 	name = "chemist wardrobe vendor"
@@ -249,7 +318,8 @@
 	name = "nutriment vendor"
 	icon_state = "nutri"
 	stored_types = list(
-		/obj/item/container/beaker/bucket/water
+		/obj/item/container/beaker/bucket/water,
+		/obj/item/storage/bags/botany/processor
 	)
 
 /obj/structure/interactive/vending/hydroponics/seeds
@@ -259,10 +329,14 @@
 /obj/structure/interactive/vending/hydroponics/seeds
 	stored_types = list(
 		/obj/item/seed/cabbage,
+		/obj/item/seed/lettuce,
 		/obj/item/seed/tomato,
 		/obj/item/seed/chanterelle,
 		/obj/item/seed/wheat,
-		/obj/item/seed/poppy
+		/obj/item/seed/poppy,
+		/obj/item/seed/cannabis,
+		/obj/item/seed/cannabis/life,
+		/obj/item/seed/cannabis/death
 	)
 
 /obj/structure/interactive/vending/soda
@@ -308,13 +382,11 @@
 	if(. && P && (P in equipped_players))
 		P.to_chat(span("notice","You already selected your equipment!"))
 		return FALSE
-	return .
 
 /obj/structure/interactive/vending/autolocker/purchase_item(var/mob/living/advanced/player/P,var/obj/item/associated_item,var/item_value=0,var/obj/hud/inventory/I)
 	. = ..()
 	if(. && P && !(P in equipped_players))
 		equipped_players += P
-	return .
 */
 
 /obj/structure/interactive/vending/junk
@@ -379,7 +451,6 @@
 		B.name = "beaker of [R.name]"
 		FINALIZE(B)
 
-	return .
 
 /obj/structure/interactive/vending/smart_fridge/chemistry/purchase_item(var/mob/living/advanced/player/P,var/obj/item/associated_item,var/item_value=0,var/obj/hud/inventory/I)
 
@@ -393,12 +464,10 @@
 			I2.reagents.add_reagent(r_id,amount,should_update = FALSE)
 		I2.reagents.update_container()
 
-	return .
 
 /obj/structure/interactive/vending/smart_fridge/chemistry/Finalize()
 	. = ..()
 	sortTim(stored_objects, /proc/cmp_name_dsc)
-	return .
 
 /obj/structure/interactive/vending/smart_fridge/kitchen
 	name = "kitchen smart fridge"
@@ -479,3 +548,21 @@
 		/obj/item/bikehorn
 	)
 
+
+/obj/structure/interactive/vending/halloween
+	name = "chocolate bar vendor"
+	icon_state = "sustenance"
+	desc = "Get your rare chocolate bars here!"
+	desc_extended = "A special vendor that only sells the best chocolate bars in the galaxy."
+
+	stored_types = list(
+		/obj/item/container/food/package/junkfood/halloween/coconut_joy,
+		/obj/item/container/food/package/junkfood/halloween/credit,
+		/obj/item/container/food/package/junkfood/halloween/elon_musk_bar,
+		/obj/item/container/food/package/junkfood/halloween/hurr_bar,
+		/obj/item/container/food/package/junkfood/halloween/kit_catgirl_metaclique_bar,
+		/obj/item/container/food/package/junkfood/halloween/malf_way,
+		/obj/item/container/food/package/junkfood/halloween/sniggers_bar,
+		/obj/item/container/food/package/junkfood/halloween/triggerfinger,
+		/obj/item/container/food/package/junkfood/halloween/twink_bar
+	)

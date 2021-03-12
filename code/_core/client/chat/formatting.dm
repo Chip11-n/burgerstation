@@ -2,6 +2,7 @@ var/global/icon/chat_tags = new('icons/hud/chat_tags_old.dmi')
 var/global/icon/chat_icons = new('icons/hud/chat_icon.dmi')
 var/global/icon/chat_language = new('icons/hud/language.dmi')
 var/global/icon/chat_toolbox = new('icons/hud/chat_toolbox_old.dmi')
+var/global/icon/chat_admin = new('icons/hud/chat_admin.dmi')
 
 
 /proc/format_language(var/speaker,var/text,var/language = LANGUAGE_BASIC) //Here lies a failed experiment
@@ -56,15 +57,14 @@ proc/format_speech(var/speaker,var/datum/source,var/text,var/talk_type,var/frequ
 		var/client/C = speaker
 		if(C.byond_member)
 			. += ICON_TO_HTML(chat_icons.icon,"byond",20,20)
-		if(C.permissions & FLAG_PERMISSION_BRONZE)
-			. += ICON_TO_HTML(chat_toolbox.icon,"bronze",20,13)
-		if(C.permissions & FLAG_PERMISSION_SILVER)
-			. += ICON_TO_HTML(chat_toolbox.icon,"silver",20,13)
 		if(C.permissions & FLAG_PERMISSION_GOLD)
 			. += ICON_TO_HTML(chat_toolbox.icon,"gold",20,13)
-
-	return .
-
+		else if(C.permissions & FLAG_PERMISSION_SILVER)
+			. += ICON_TO_HTML(chat_toolbox.icon,"silver",20,13)
+		else if(C.permissions & FLAG_PERMISSION_BRONZE)
+			. += ICON_TO_HTML(chat_toolbox.icon,"bronze",20,13)
+		if(C.permissions & FLAG_PERMISSION_ADMIN || C.permissions & FLAG_PERMISSION_MODERATOR)
+			. += ICON_TO_HTML(chat_admin.icon,"admin",20,13)
 
 /proc/get_ooc_color(var/datum/speaker) //WIP
 
@@ -72,6 +72,10 @@ proc/format_speech(var/speaker,var/datum/source,var/text,var/talk_type,var/frequ
 		var/client/C = speaker
 		if(C.permissions & FLAG_PERMISSION_HOST)
 			return "#B71C00"
+		else if(C.permissions % FLAG_PERMISSION_ADMIN)
+			return "#42B500"
+		else if(C.permissions % FLAG_PERMISSION_MODERATOR)
+			return "#42B500"
 		else if(C.permissions & FLAG_PERMISSION_GOLD)
 			return "#D9B131"
 		else if(C.permissions & FLAG_PERMISSION_SILVER)
@@ -104,6 +108,10 @@ proc/format_speaker(var/speaker,var/source,var/tag,var/frequency=-1,var/language
 			. = "[get_chat_icons(speaker)][.]"
 		tag = trim(tag)
 		tag_text += ICON_TO_HTML(chat_tags.icon,tag,32,10)
-		. = span(tag,"[tag_text][.]")
 
-	return .
+		if(tag == "OOC")
+			. = style("color:[get_ooc_color(speaker)]","[tag_text][.]")
+
+
+		///. = span(tag == "OOC","[tag_text][.]",tag == "OOC" ? "color:[get_ooc_color(speaker)]" : null)
+

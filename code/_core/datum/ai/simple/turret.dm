@@ -22,7 +22,7 @@
 	var/scan_mod = 1
 
 
-/ai/turret/New(var/mob/living/desired_owner)
+/ai/turret/New(var/desired_loc,var/mob/living/desired_owner)
 
 	. = ..()
 
@@ -34,8 +34,6 @@
 	valid_scan_dirs += initial_dir
 	valid_scan_dirs += turn(initial_dir,-45)
 	valid_scan_dirs += turn(initial_dir,-90)
-
-	return .
 
 /ai/turret/on_life()
 
@@ -69,11 +67,9 @@
 /ai/turret/deployable
 	var/mob/living/simple/turret/deployable/owner_as_turret
 
-/ai/turret/deployable/New(var/mob/living/desired_owner)
+/ai/turret/deployable/New(var/desired_loc,var/mob/living/desired_owner)
 	. = ..()
 	owner_as_turret = owner
-	return .
-
 
 /ai/turret/deployable/should_life()
 

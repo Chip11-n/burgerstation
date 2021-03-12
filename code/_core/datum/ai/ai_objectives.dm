@@ -11,6 +11,11 @@
 
 	var/atom/old_attack = objective_attack
 
+	if(old_attack == A)
+		return FALSE
+
+	attackers -= old_attack
+
 	if(A) owner.set_dir(get_dir(owner,A))
 
 	if(objective_investigate)
@@ -70,13 +75,15 @@
 
 	return TRUE
 
-/ai/proc/handle_objectives(var/tick_rate=AI_TICK)
+/ai/proc/handle_objectives(var/tick_rate)
 
 	if(CALLBACK_EXISTS("set_new_objective_\ref[src]"))
 		return TRUE
 
 	if(objective_attack)
-		if(is_living(objective_attack))
+		if(objective_attack.qdeleting || !objective_attack.health)
+			set_objective(null)
+		else if(is_living(objective_attack))
 			if(!should_attack_mob(objective_attack,FALSE))
 				set_objective(null)
 			else
@@ -139,27 +146,30 @@
 
 	return TRUE
 
+/ai/proc/get_view_range()
+	. = radius_find_enemy
+	switch(alert_level)
+		if(ALERT_LEVEL_NOISE)
+			. = radius_find_enemy_noise
+		if(ALERT_LEVEL_CAUTION)
+			. = radius_find_enemy_caution
+		if(ALERT_LEVEL_COMBAT)
+			. = radius_find_enemy_combat
+
 /ai/proc/get_possible_targets()
 
 	. = list()
 
-	if(retaliate && length(attackers))
+	if(retaliate && attackers)
 		for(var/k in attackers)
+			CHECK_TICK(75,FPS_SERVER*2)
 			var/atom/A = k
 			if(A.qdeleting)
 				attackers -= k
 				continue
 			.[A] = TRUE
 
-	var/range_to_use = radius_find_enemy
-	switch(alert_level)
-		if(ALERT_LEVEL_NOISE)
-			range_to_use = radius_find_enemy_noise
-		if(ALERT_LEVEL_CAUTION)
-			range_to_use = radius_find_enemy_caution
-		if(ALERT_LEVEL_COMBAT)
-			range_to_use = radius_find_enemy_combat
-
+	var/range_to_use = get_view_range()
 	if(range_to_use <= 0)
 		return .
 
@@ -173,9 +183,6 @@
 			if(!should_attack_mob(L))
 				continue
 			.[L] = TRUE
-
-	return .
-
 
 /ai/proc/investigate(var/atom/desired_target)
 

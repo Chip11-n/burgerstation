@@ -37,6 +37,9 @@
 
 		for(var/instance in formatted_data)
 
+			if(prob(90))
+				continue
+
 			var/x_cord = formatted_data[instance]["x"]
 			var/y_cord = formatted_data[instance]["y"]
 			var/z_cord = formatted_data[instance]["z"]
@@ -53,13 +56,6 @@
 			var/date = formatted_data[instance]["date"]
 			var/time = formatted_data[instance]["time"]
 
-			/*
+			var/obj/structure/interactive/soapstone_message/SM = new(desired_loc,dir,color,name,ckey,text,date,time)
 			if(color == "#000000")
-				if(prob(90))
-					continue
-			else
-				if(prob(75))
-					continue
-			*/
-
-			new/obj/structure/interactive/soapstone_message(desired_loc,dir,color,name,ckey,text,date,time)
+				SM.invisibility = INVISIBLITY_GHOST

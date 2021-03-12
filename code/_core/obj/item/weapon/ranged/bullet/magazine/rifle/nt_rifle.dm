@@ -6,7 +6,7 @@
 	icon_state = "inventory"
 	value = 200
 
-	shoot_delay = 2
+	shoot_delay = 2.5
 
 	automatic = TRUE
 
@@ -68,6 +68,9 @@
 	attachment_undermount_offset_y = 17 - 16
 
 	dan_mode = TRUE
+
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.03
 
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/standard/get_static_spread()

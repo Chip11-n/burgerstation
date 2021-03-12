@@ -28,13 +28,12 @@ var/global/mob/abstract/node_checker
 	anchored = TRUE
 
 /obj/marker/map_node/get_examine_list(var/mob/examiner)
+
 	. = ..()
 
 	for(var/k in adjacent_map_nodes)
 		var/obj/marker/map_node/MN = adjacent_map_nodes[k]
 		. += div("notice",MN.get_debug_name())
-
-	return .
 
 /obj/marker/map_node/New(var/desired_loc)
 	plane = PLANE_HIDDEN
@@ -72,7 +71,7 @@ var/global/mob/abstract/node_checker
 
 var/global/list/stored_paths = list()
 
-/obj/marker/map_node/proc/find_path(var/obj/marker/map_node/desired_node,var/obj/marker/map_node/list/checked_nodes = list(),var/obj/marker/map_node/list/current_path=list())
+/obj/marker/map_node/proc/find_path(var/list/obj/marker/map_node/desired_node,var/list/obj/marker/map_node/checked_nodes = list(),var/list/obj/marker/map_node/current_path=list())
 
 	if(stored_paths["\ref[src],\ref[desired_node]"])
 		return stored_paths["\ref[src],\ref[desired_node]"]
@@ -106,8 +105,7 @@ var/global/list/stored_paths = list()
 
 	. = list()
 
-	if(!point_A || !point_B)
-		return .
+	if(!point_A || !point_B) return .
 
 	var/mob/abstract/node_checker/NC = new /mob/abstract/node_checker(point_A)
 	var/limit = 10
@@ -126,18 +124,22 @@ var/global/list/stored_paths = list()
 
 	qdel(NC)
 
-	return .
-
-
-/proc/find_closest_node(var/atom/A,var/distance = VIEW_RANGE)
+/proc/find_closest_node(var/atom/A,var/distance = VIEW_RANGE,var/check_view=FALSE)
 
 	var/obj/marker/map_node/best_node = null
 	var/best_distance = INFINITY
 
-	for(var/obj/marker/map_node/N in range(distance,A))
-		var/N_distance = get_dist_real(A,N)
-		if(!best_node || best_distance > N_distance)
-			best_node = N
-			best_distance = N_distance
+	if(check_view)
+		for(var/obj/marker/map_node/N in view(distance,A))
+			var/N_distance = get_dist_real(A,N)
+			if(!best_node || best_distance > N_distance)
+				best_node = N
+				best_distance = N_distance
+	else
+		for(var/obj/marker/map_node/N in range(distance,A))
+			var/N_distance = get_dist_real(A,N)
+			if(!best_node || best_distance > N_distance)
+				best_node = N
+				best_distance = N_distance
 
 	return best_node

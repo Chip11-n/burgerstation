@@ -22,27 +22,26 @@
 /obj/item/container/blood_pack/drop_item(var/atom/desired_loc,var/pixel_x_offset = 0,var/pixel_y_offset = 0,var/silent=FALSE)
 	. = ..()
 	update_sprite()
-	return .
-
+	
 /obj/item/container/blood_pack/on_pickup(var/atom/old_location,var/obj/hud/inventory/new_location) //When the item is picked up.
 	update_sprite()
 	return ..()
 
 /obj/item/container/blood_pack/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	var/atom/defer_object = object.defer_click_on_object(location,control,params)
 
-	if(is_living(defer_object))
+
+	if(is_living(object))
 		INTERACT_CHECK
 		INTERACT_CHECK_OBJECT
 		INTERACT_DELAY(1)
-		var/mob/living/L = defer_object
+		var/mob/living/L = object
 		if(attached_to == L)
 			detach(caller)
 			return TRUE
 		if(attached_to) //This statement and the above is weird and I hate it.
 			detach(caller)
-		try_attach(caller,defer_object)
+		try_attach(caller,object)
 		return TRUE
 
 	return ..()
@@ -134,8 +133,7 @@
 	else
 		draw_delay--
 
-	return .
-
+	
 /obj/item/container/blood_pack/update_icon()
 	icon = initial(icon)
 	icon_state = "liquid_[CEILING(clamp(reagents.volume_current/reagents.volume_max,0,1)*icon_count,1)]"

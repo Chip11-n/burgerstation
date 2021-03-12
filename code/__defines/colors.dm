@@ -1,3 +1,6 @@
+// Nonesensical value for l_color default, so we can detect if it gets set to null.
+#define NONSENSICAL_VALUE -99999
+
 //Basic Colors
 #define COLOR_WHITE "#FFFFFF"
 #define COLOR_GREY "#999999"
@@ -39,6 +42,7 @@
 #define COLOR_NANOTRASEN "#10436B"
 #define COLOR_VISIBLE_GREEN "#B6FF00"
 #define COLOR_BULLET "#BCA258"
+#define COLOR_OLIVE_DRAB "#797659"
 
 //Department Colors
 #define COLOR_CARGO "#BB9042"
@@ -82,10 +86,16 @@
 #define COLOR_URANIUM "#5B9646"
 #define COLOR_TITANIUM "#8A99AD"
 
-
 #define COLOR_BLOOD "#B20000"
 #define COLOR_OIL "#3D3D3D"
 
+//Rarity
+#define COLOR_BROKEN "#FFFFFF"
+#define COLOR_COMMON "#404040"
+#define COLOR_UNCOMMON "#8888FF"
+#define COLOR_RARE "#FFFF88"
+#define COLOR_MYTHICAL "#FF88FF"
+#define COLOR_LEGENDARY "#D17A24"
 
 
 

@@ -23,8 +23,7 @@
 	var/heat_current = 0
 	var/heat_max = 0.2
 
-	var/movement_spread_base = 0.05
-	var/movement_spread_mul = 0.1
+	var/movement_spread_base = 0.05 //half this at walking speed, this at running speed, this times two at sprinting speed
 
 	var/bullet_color = "#FFFFFF"
 
@@ -36,7 +35,7 @@
 
 	var/obj/item/firing_pin/firing_pin = /obj/item/firing_pin/electronic/iff/nanotrasen //Unless stated otherwise, all guns can only be fired by NanoTrasen personel.
 
-	var/inaccuracy_modifer = 1 //The modifer for target doll inaccuracy. Lower values means more accurate.
+	var/inaccuracy_modifier = 1 //The modifer for target doll inaccuracy. Lower values means more accurate.
 
 	var/use_loyalty_tag = FALSE //Set to true if this weapon uses a loyalty tag instead of a firing pin. Used for spells.
 
@@ -65,7 +64,6 @@
 	SAVEATOM("attachment_sight")
 	SAVEATOM("attachment_undermount")
 	SAVEATOM("attachment_stock")
-	return .
 
 /obj/item/weapon/ranged/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
@@ -74,8 +72,6 @@
 	LOADATOM("attachment_sight")
 	LOADATOM("attachment_undermount")
 	LOADATOM("attachment_stock")
-	update_attachment_stats()
-	return .
 
 /obj/item/weapon/ranged/Finalize()
 
@@ -84,53 +80,53 @@
 	if(!istype(firing_pin))
 		firing_pin = null
 
-	return .
-
+	update_attachment_stats()
 
 /obj/item/weapon/ranged/proc/get_ranged_damage_type()
 	return ranged_damage_type
 
 /obj/item/weapon/ranged/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params) //The src was clicked on by the object
 
-	object = object.defer_click_on_object(location,control,params)
-
-	if(istype(object,/obj/item/attachment))
+	if(is_inventory(object) && (caller.attack_flags & CONTROL_MOD_ALT))
+		var/obj/hud/inventory/INV = object
 		INTERACT_CHECK
 		INTERACT_CHECK_OBJECT
 		INTERACT_DELAY(5)
-		add_attachment(caller,object)
+		var/obj/item/I = remove_attachment(caller)
+		if(I) INV.add_object(I)
 		return TRUE
 
-	else if(!use_loyalty_tag && is_item(object))
+	else if(is_item(object))
 		var/obj/item/I = object
-		if(I.flags_tool & FLAG_TOOL_MULTITOOL)
+		if(istype(I,/obj/item/attachment))
 			INTERACT_CHECK
 			INTERACT_CHECK_OBJECT
 			INTERACT_DELAY(5)
-			remove_attachment(caller)
+			add_attachment(caller,I)
 			return TRUE
-		if(I.flags_tool & FLAG_TOOL_SCREWDRIVER)
-			INTERACT_CHECK
-			INTERACT_CHECK_OBJECT
-			INTERACT_DELAY(5)
-			if(istype(firing_pin))
-				firing_pin.drop_item(get_turf(src))
-				caller.visible_message(span("notice","\The [caller.name] removes a firing pin from \the [src.name]."),span("notice","You remove \the [firing_pin.name] from \the [src.name]."))
-				firing_pin = null
-			else
-				caller.to_chat(span("warning","There is no firing pin inside \the [src.name]!"))
-			return TRUE
-		if(istype(I,/obj/item/firing_pin/))
-			INTERACT_CHECK
-			INTERACT_CHECK_OBJECT
-			INTERACT_DELAY(5)
-			if(istype(firing_pin))
-				caller.to_chat(span("warning","There is already a [firing_pin.name] installed in \the [src.name]! Remove it with a screwdriver first!"))
-			else
-				I.drop_item(src)
-				firing_pin = I
-				caller.visible_message(span("notice","\The [caller.name] installs a firing pin into \the [src.name]."),span("notice","You carefully slide in and install \the [I.name] into \the [src.name]."))
-			return TRUE
+		if(!use_loyalty_tag)
+			if(I.flags_tool & FLAG_TOOL_SCREWDRIVER)
+				INTERACT_CHECK
+				INTERACT_CHECK_OBJECT
+				INTERACT_DELAY(5)
+				if(istype(firing_pin))
+					firing_pin.drop_item(get_turf(src))
+					caller.visible_message(span("notice","\The [caller.name] removes a firing pin from \the [src.name]."),span("notice","You remove \the [firing_pin.name] from \the [src.name]."))
+					firing_pin = null
+				else
+					caller.to_chat(span("warning","There is no firing pin inside \the [src.name]!"))
+				return TRUE
+			if(istype(I,/obj/item/firing_pin/))
+				INTERACT_CHECK
+				INTERACT_CHECK_OBJECT
+				INTERACT_DELAY(5)
+				if(istype(firing_pin))
+					caller.to_chat(span("warning","There is already a [firing_pin.name] installed in \the [src.name]! Remove it with a screwdriver first!"))
+				else
+					I.drop_item(src)
+					firing_pin = I
+					caller.visible_message(span("notice","\The [caller.name] installs a firing pin into \the [src.name]."),span("notice","You carefully slide in and install \the [I.name] into \the [src.name]."))
+				return TRUE
 
 	return ..()
 
@@ -152,19 +148,32 @@
 	return 0.1 - (0.1 * L.get_skill_power(SKILL_RANGED))
 
 /obj/item/weapon/ranged/proc/get_movement_spread(var/mob/living/L)
-	return clamp(movement_spread_base + movement_spread_mul*(TICKS_TO_SECONDS(L.move_delay)),0,movement_spread_base)
+	if(L.move_delay < 0)
+		return 0
+
+	. = movement_spread_base
+
+	switch(L.move_mod)
+		if(1)
+			. *= 0.5
+		if(3)
+			. *= 3
+
 
 /obj/item/weapon/ranged/proc/get_ammo_count() //How much ammo is in the gun.
 	return 1 //Unlimited
 
 /obj/item/weapon/ranged/proc/can_owner_shoot(var/mob/caller,var/atom/object,location,params)
 
-	if(!caller.can_attack(object,src,location,params))
+	if(!caller.can_attack(caller,object,src,location,params))
 		return FALSE
 
 	return TRUE
 
 /obj/item/weapon/ranged/proc/can_gun_shoot(var/mob/caller,var/atom/object,location,params)
+
+	if(quality <= 0)
+		return FALSE
 
 	if(!use_loyalty_tag)
 		if(ispath(firing_pin))
@@ -195,6 +204,9 @@
 
 /obj/item/weapon/ranged/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
+	if(object.plane >= PLANE_HUD)
+		return ..()
+
 	INTERACT_CHECK
 
 	if(wield_only && !wielded)
@@ -202,7 +214,7 @@
 		return ..()
 
 	if(istype(object,/obj/parallax))
-		object = object.defer_click_on_object(location,control,params)
+		object = object.defer_click_on_object(caller,location,control,params) //Only time defer_click_on_object should be used like this.
 
 	if(object.z && shoot(caller,object,location,params))
 		return TRUE
@@ -215,8 +227,7 @@ obj/item/weapon/ranged/proc/handle_ammo(var/mob/caller)
 obj/item/weapon/ranged/proc/handle_empty(var/mob/caller)
 	if(length(empty_sounds))
 		var/turf/T = get_turf(src)
-		play(pick(empty_sounds),T,range_max = 5)
-		create_alert(VIEW_RANGE,T,caller,ALERT_LEVEL_NOISE)
+		play_sound(pick(empty_sounds),T,range_max = VIEW_RANGE*0.5)
 
 	return FALSE
 
@@ -230,15 +241,14 @@ obj/item/weapon/ranged/proc/get_shoot_delay(var/mob/caller,var/atom/target,locat
 		if(A.ai)
 			. *= max(1,(heat_current*ai_heat_sensitivity)*(get_dist(caller,target)/VIEW_RANGE)*RAND_PRECISE(0.9,1.1))
 
-	return .
 
 obj/item/weapon/ranged/proc/play_shoot_sounds(var/mob/caller,var/list/shoot_sounds_to_use = list(),var/shoot_alert_to_use = ALERT_LEVEL_NONE)
 
 	if(length(shoot_sounds_to_use))
 		var/turf/T = get_turf(src)
-		play(pick(shoot_sounds_to_use),T)
+		play_sound(pick(shoot_sounds_to_use),T,range_max=VIEW_RANGE + ZOOM_RANGE*3)
 		if(shoot_alert_to_use)
-			create_alert(VIEW_RANGE,T,caller,shoot_alert_to_use)
+			create_alert(VIEW_RANGE + ZOOM_RANGE*3,T,caller,shoot_alert_to_use)
 		return TRUE
 
 	return FALSE
@@ -268,20 +278,24 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 	if(!can_gun_shoot(caller,object,location,params))
 		return FALSE
 
+	var/quality_bonus = get_quality_bonus(0.5,2)
+	var/quality_penalty = 1/get_quality_bonus(0.25,2)
+
 	var/obj/projectile/projectile_to_use = projectile
 	var/list/shoot_sounds_to_use = shoot_sounds
 	var/damage_type_to_use = get_ranged_damage_type()
 	var/bullet_count_to_use = bullet_count
 	var/bullet_spread_to_use = 0
-	var/projectile_speed_to_use = projectile_speed
+	var/projectile_speed_to_use = projectile_speed*quality_penalty
 	var/bullet_color_to_use = bullet_color
-	var/inaccuracy_modifer_to_use = inaccuracy_modifer
+	var/inaccuracy_modifer_to_use = get_bullet_inaccuracy(caller,object)
 	var/view_punch_to_use = view_punch
 	var/shoot_delay_to_use = get_shoot_delay(caller,object,location,params)
 	var/max_bursts_to_use = max_bursts
 	var/shoot_alert_to_use = shoot_alert
 	var/damage_multiplier_to_use = damage_multiplier
 
+	if(ranged_damage_type) damage_multiplier_to_use *= quality_bonus
 
 	var/obj/item/bullet_cartridge/spent_bullet = handle_ammo(caller)
 
@@ -294,6 +308,7 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 		SET(projectile_speed_to_use,spent_bullet.projectile_speed)
 		SET(bullet_color_to_use,spent_bullet.bullet_color)
 		MUL(inaccuracy_modifer_to_use,spent_bullet.inaccuracy_modifer)
+		damage_multiplier_to_use *= quality_bonus
 
 	else if(requires_bullets)
 		handle_empty(caller)
@@ -314,8 +329,8 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 		var/icon_pos_y = text2num(params[PARAM_ICON_Y])
 
 		var/prone = FALSE
-		var/static_spread = get_static_spread()
-		var/heat_spread = get_heat_spread()
+		var/static_spread = get_static_spread() * quality_penalty
+		var/heat_spread = get_heat_spread() * quality_penalty
 		var/skill_spread = 0
 		var/movement_spread = 0
 		var/loyalty_tag = null
@@ -368,9 +383,10 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 	if(automatic && is_player(caller))
 		spawn(next_shoot_time - world.time)
 			var/mob/living/advanced/player/P = caller
-			if(P && P.client && ((params["left"] && P.attack_flags & CONTROL_MOD_LEFT) || (params["right"] && P.attack_flags & CONTROL_MOD_RIGHT) || max_bursts_to_use) )
+			if(P && P.client && !P.qdeleting && ((params["left"] && P.attack_flags & CONTROL_MOD_LEFT) || (params["right"] && P.attack_flags & CONTROL_MOD_RIGHT) || max_bursts_to_use) )
 				var/list/screen_loc_parsed = parse_screen_loc(P.client.last_params["screen-loc"])
 				if(!length(screen_loc_parsed))
+					log_error("Warning: [caller] had no screen loc parsed.")
 					return TRUE
 				var/turf/caller_turf = get_turf(caller)
 				var/desired_x = FLOOR(screen_loc_parsed[1]/TILE_SIZE,1) + caller_turf.x - VIEW_RANGE
@@ -384,6 +400,8 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 					else if(max_bursts_to_use > 0)
 						next_shoot_time = world.time + (burst_delay ? burst_delay : shoot_delay*current_bursts)
 						current_bursts = 0
+				else
+					log_error("Warning: [caller] tried shooting in an inavlid turf: [desired_x],[desired_y],[caller.z].")
 			else if(max_bursts_to_use > 0)
 				next_shoot_time = world.time + (burst_delay ? burst_delay : shoot_delay*current_bursts)
 				current_bursts = 0
@@ -421,13 +439,16 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 		target_fake_y = caller.y*TILE_SIZE + screen_loc_parsed[2] - (VIEW_RANGE * TILE_SIZE)
 		if(ismob(caller))
 			var/mob/M = caller
-			target_fake_x += M.client.pixel_x
-			target_fake_y += M.client.pixel_y
+			if(M.client)
+				target_fake_x = caller.x*TILE_SIZE + screen_loc_parsed[1] - (M.client.view * TILE_SIZE)
+				target_fake_y = caller.y*TILE_SIZE + screen_loc_parsed[2] - (M.client.view * TILE_SIZE)
+				target_fake_x += M.client.pixel_x
+				target_fake_y += M.client.pixel_y
 	else
 		target_fake_x = target.x*TILE_SIZE + icon_pos_x
 		target_fake_y = target.y*TILE_SIZE + icon_pos_y
 
-	var/list/xy_list = get_projectile_path(caller,target_fake_x,target_fake_y,accuracy_loss)
+	var/list/xy_list = get_projectile_path(caller ? caller : src,target_fake_x,target_fake_y,accuracy_loss)
 
 	. = list()
 
@@ -463,7 +484,6 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 			FINALIZE(P)
 			. += P
 
-	return .
 
 /atom/proc/get_base_spread() //Random spread for when it shoots more than one projectile.
 	return 0
@@ -490,8 +510,24 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 	if(bullet_num_max > 1) new_angle += RAND_PRECISE(-accuracy,accuracy)*90
 	return list(cos(new_angle),sin(new_angle))
 
-/obj/item/weapon/ranged/proc/get_bullet_inaccuracy(var/mob/living/L,var/atom/target,var/obj/projectile/P,var/inaccuracy_modifier)
-	return max(0,1 - L.get_skill_power(SKILL_PRECISION))*(1 + get_dist(L,target))*inaccuracy_modifier
+/obj/item/weapon/ranged/proc/get_bullet_inaccuracy(var/mob/living/L,var/atom/target)
+
+	. = inaccuracy_modifier //Base var
+	. *= max(0,1 - L.get_skill_power(SKILL_PRECISION)*0.75) //Based on skill
+	//. *= (1 + get_dist(L,target)) //Based on distance
+
+	if(L.client)
+		var/total_zoom_mul = zoom_mul
+		if(attachment_stats["zoom_mul"])
+			total_zoom_mul *= attachment_stats["zoom_mul"]
+		if(L.client.is_zoomed)
+			. *= 1/total_zoom_mul
+		else
+			. *= total_zoom_mul/1
+
+	if(L.move_delay >= 0)
+		. *= 1.5 //If you're moving, harder to be precise.
+		. += 0.5 //If you're moving, harder to be precise.
 
 /obj/item/weapon/ranged/update_overlays()
 
@@ -525,4 +561,3 @@ obj/item/weapon/ranged/proc/shoot(var/mob/caller,var/atom/object,location,params
 		I.pixel_y = attachment_stock.attachment_offset_y + attachment_stock_offset_y
 		add_overlay(I)
 
-	return .

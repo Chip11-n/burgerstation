@@ -5,6 +5,7 @@
 
 	damage_type = /damagetype/unarmed/bite/
 	class = /class/carp/
+	ai = /ai/
 
 	health_base = 300
 	stamina_base = 300
@@ -35,7 +36,7 @@
 		PAIN = AP_SWORD
 	)
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	movement_delay = DECISECONDS_TO_TICKS(2)
 
@@ -51,3 +52,4 @@
 	blood_type = /reagent/blood/carp
 	blood_volume = 750
 
+	soul_size = SOUL_SIZE_COMMON

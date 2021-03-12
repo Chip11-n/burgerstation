@@ -1,7 +1,7 @@
 /obj/item/light_sensor
-	name = "light sensor"
+	name = "ambient light sensor"
 	desc = "Let there be light."
-	desc_extended = "A special passive light sensor that detects ambient light levels, natural and artificial."
+	desc_extended = "A special passive light sensor that detects ambient light levels."
 
 	icon = 'icons/obj/item/analyzers/light.dmi'
 	icon_state = "inventory"
@@ -15,15 +15,11 @@
 /obj/item/light_sensor/Finalize()
 	. = ..()
 	update_sprite()
-	return .
-
 
 /obj/item/light_sensor/update_underlays()
 	. = ..()
 	var/icon/I = new/icon(initial(icon),initial(icon_state))
 	underlays += I
-	return .
-
 
 /obj/item/light_sensor/click_self(var/mob/caller)
 
@@ -35,7 +31,7 @@
 
 	caller.to_chat(span("notice","You turn \the [src.name] [active ? "on" : "off"]."))
 
-	play('sound/machines/click.ogg',get_turf(src))
+	play_sound('sound/machines/click.ogg',get_turf(src),range_max=VIEW_RANGE*0.25)
 
 	if(active)
 		start_thinking(src)

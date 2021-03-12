@@ -45,7 +45,7 @@
 */
 
 
-//https://www.desmos.com/calculator/bjhgq1m6e0
+//https://www.desmos.com/calculator/ihpykmskji
 /proc/calculate_damage_with_armor(var/damage_dealt,var/armor_rating)
 	if(damage_dealt < 0)
 		CRASH_SAFE("Damage [damage_dealt] was negative!")
@@ -59,8 +59,8 @@
 
 	var/a = armor_rating
 	var/d = damage_dealt
-	var/c = 0.8 //Cooefient
-	var/m = 200 //Ideal armor rating to negative c (as a percent) damage.
+	var/c = 0.9 //Cooefient
+	var/m = 150 //Ideal armor rating to negative c (as a percent) damage.
 
 	if(armor_rating >= m)
 		return d*c

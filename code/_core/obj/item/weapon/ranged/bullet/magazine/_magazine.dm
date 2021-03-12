@@ -12,7 +12,6 @@
 /obj/item/weapon/ranged/bullet/magazine/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	if(src.stored_magazine) .["stored_magazine"] = src.stored_magazine.save_item_data(save_inventory)
-	return .
 
 /obj/item/weapon/ranged/bullet/magazine/proc/get_magazine()
 	return stored_magazine
@@ -26,7 +25,6 @@
 		src.stored_magazine = load_and_create(P,object_data["stored_magazine"],src)
 		src.open = FALSE
 
-	return .
 
 
 /obj/item/weapon/ranged/bullet/magazine/proc/get_cock_sound(var/direction="both")
@@ -67,7 +65,8 @@
 	var/turf/T = get_turf(src)
 
 	if(cock_type)
-		if(T) play(get_cock_sound(cock_type),T)
+		if(T)
+			play_sound(get_cock_sound(cock_type),T,range_max=VIEW_RANGE*0.5)
 		update_sprite()
 
 	return TRUE
@@ -84,7 +83,7 @@
 		qdel(src)
 	else
 		stored_magazine.drop_item(T)
-		play(stored_magazine.get_magazine_eject_sound(),T)
+		play_sound(stored_magazine.get_magazine_eject_sound(),T,range_max=VIEW_RANGE*0.5)
 		if(stored_magazine)
 			stored_magazine.update_sprite()
 			stored_magazine = null
@@ -136,7 +135,6 @@
 		if(!requires_cock_each_shot)
 			load_new_bullet_from_magazine(caller)
 
-	return .
 
 
 /obj/item/weapon/ranged/bullet/magazine/proc/can_fit_magazine(var/obj/item/I)
@@ -161,9 +159,8 @@
 			sound_strength = 1 - clamp(capacity/empty_warning_percent,0,1)
 
 		if(sound_strength > 0)
-			play('sound/effects/gun_empty_sound.ogg',caller, pitch = 1 + sound_strength*0.5, volume = 100 * sound_strength)
+			play_sound('sound/effects/gun_empty_sound.ogg',get_turf(src), pitch = 1 + sound_strength*0.5, volume = 100 * sound_strength,range_max=VIEW_RANGE)
 
-	return .
 
 /obj/item/weapon/ranged/bullet/magazine/get_examine_list(var/mob/caller)
 
@@ -172,4 +169,3 @@
 	if(stored_magazine)
 		. += div("notice","[length(stored_magazine.stored_bullets)] bullet\s remaining in the magazine.")
 
-	return .

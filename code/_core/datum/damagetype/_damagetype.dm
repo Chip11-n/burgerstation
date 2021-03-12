@@ -81,7 +81,8 @@
 
 	var/list/skill_damage = list()
 
-	var/list/bonus_experience = list()
+	var/list/bonus_experience_skill = list()
+	var/list/bonus_experience_attribute = list()
 
 	var/use_blamed_stats = FALSE
 
@@ -109,10 +110,13 @@
 	var/attack_delay_max = 20 //Time, in deciseconds. Attack delay with dex is 0
 
 	var/damage_mod = 1 //Simple multiplier for all damage of this type
+	var/penetration_mod = 1 //Simple multiplier for all penetration of this type
 
 	var/experience_mod = 1 //Simple multiplier for all experience gains via this type.
 
 	var/target_floors = FALSE //Can this damagetype target floors?
+
+	var/attack_animation_distance = 18
 
 /damagetype/proc/get_examine_text(var/mob/caller)
 	/*
@@ -164,10 +168,9 @@
 	return ATTACK_TYPE_MELEE
 
 /damagetype/proc/perform_miss(var/atom/attacker,var/atom/victim,var/atom/weapon)
-	var/time_to_wait = do_attack_animation(attacker,victim,weapon)
-	CALLBACK("\ref[attacker]_\ref[victim]_[world.time]_miss_sound",time_to_wait,src,.proc/do_miss_sound,attacker,victim,weapon)
-	CALLBACK("\ref[attacker]_\ref[victim]_[world.time]_miss_message",time_to_wait,src,.proc/display_miss_message,attacker,victim,weapon,null,"missed")
-	return time_to_wait
+	. = do_attack_animation(attacker,victim,weapon)
+	CALLBACK("\ref[attacker]_\ref[victim]_[world.time]_miss_sound",.,src,.proc/do_miss_sound,attacker,victim,weapon)
+	CALLBACK("\ref[attacker]_\ref[victim]_[world.time]_miss_message",.,src,.proc/display_miss_message,attacker,victim,weapon,null,"missed")
 
 /damagetype/proc/do_critical_hit(var/atom/attacker,var/atom/victim,var/atom/weapon,var/atom/hit_object,var/list/damage_to_deal)
 	return crit_multiplier
@@ -202,7 +205,7 @@
 				new_attack_damage[damage_type] += attack_damage
 				if(debug) log_debug("Getting [attack_damage] [damage_type] damage from [skill].")
 
-	var/bonus_damage_multiplier = RAND_PRECISE(1,1.1)*(hit_object && hit_object.health && hit_object.health.damage_multiplier ? hit_object.health.damage_multiplier : 1)*damage_multiplier*damage_mod
+	var/bonus_damage_multiplier = RAND_PRECISE(1,1.1)*(hit_object && hit_object.health ? hit_object.health.get_damage_multiplier() : 1)*damage_multiplier*damage_mod
 
 	if(debug) log_debug("Getting final damage by [bonus_damage_multiplier] from bonuses.")
 
@@ -220,6 +223,9 @@
 /damagetype/proc/get_critical_hit_condition(var/atom/attacker,var/atom/victim,var/atom/weapon,var/atom/hit_object)
 
 	if(!attacker.is_player_controlled() || victim.is_player_controlled())
+		return FALSE
+
+	if(!is_living(attacker)) //Ghost Admins causing explosions.
 		return FALSE
 
 	if(ismovable(victim))
@@ -247,7 +253,7 @@
 	if(!length(hit_objects))
 		return perform_miss(attacker,victims[1],weapon)
 
-	var/swing_time = 0
+	. = 0
 
 	for(var/i=1,i<=length(victims),i++)
 		var/atom/victim = victims[i]
@@ -287,11 +293,11 @@
 			return FALSE
 
 		if(i==1)
-			swing_time = max(1,do_attack_animation(attacker,victim,weapon,hit_object))
+			. = max(1,do_attack_animation(attacker,victim,weapon,hit_object))
 
-		CALLBACK("\ref[weapon]_\ref[hit_object]",swing_time,src,.proc/hit,attacker,victim,weapon,hit_object,blamed,damage_multiplier)
+		CALLBACK("\ref[weapon]_\ref[hit_object]",CEILING(.*0.125,1),src,.proc/hit,attacker,victim,weapon,hit_object,blamed,damage_multiplier)
 
-	return swing_time
+	return .
 
 /damagetype/proc/hit(var/atom/attacker,var/atom/victim,var/atom/weapon,var/atom/hit_object,var/atom/blamed,var/damage_multiplier=1)
 	return process_damage(attacker,victim,weapon,hit_object,blamed,damage_multiplier)
@@ -333,12 +339,12 @@
 			var/mob/living/advanced/A = victim
 			if(A.parry(attacker,weapon,hit_object,src))
 				A.to_chat(span("warning","You parried [attacker.name]'s attack!"),CHAT_TYPE_COMBAT)
-				play('sound/effects/parry.ogg',get_turf(A))
+				play_sound('sound/effects/parry.ogg',get_turf(A),range_max=VIEW_RANGE)
 				if(is_living(attacker))
 					var/mob/living/LA = attacker
 					LA.to_chat(span("danger","Your attack was parried by \the [A.name]!"),CHAT_TYPE_ALL)
 					if(get_dist(A,LA) <= 1)
-						LA.add_status_effect(STAGGER,30,30)
+						LA.add_status_effect(PARRIED,30,30)
 				return FALSE
 		damage_multiplier *= L.get_damage_received_multiplier(attacker,victim,weapon,hit_object,blamed,src)
 
@@ -357,38 +363,34 @@
 	var/fatigue_damage = 0
 
 	var/damage_blocked = 0
-	var/defense_rating_victim = victim.health.get_defense(attacker,hit_object)
+	var/defense_rating_victim = victim.health.get_defense(attacker,hit_object,FALSE)
 	var/atom/object_to_check = null
 	if(is_organ(hit_object))
 		var/obj/item/organ/O = hit_object
 		if(is_advanced(attacker))
 			var/mob/living/advanced/A = attacker
 			object_to_check = A.labeled_organs[O.id]
-	var/defense_rating_attacker = (attacker && attacker.health) ? attacker.health.get_defense(attacker,object_to_check) : list()
+	var/defense_rating_attacker = (attacker && attacker.health) ? attacker.health.get_defense(attacker,object_to_check,TRUE) : list()
 
 	if(debug) log_debug("Calculating [length(damage_to_deal)] damage types...")
-	var/has_fatigue_damage = FALSE
 	for(var/damage_type in damage_to_deal)
 		if(!damage_type)
 			continue
-		if(damage_type == FATIGUE)
-			has_fatigue_damage = TRUE
 		if(debug) log_debug("Calculating [damage_type]...")
 		var/old_damage_amount = damage_to_deal[damage_type] * critical_hit_multiplier
 		if(debug) log_debug("Initial [damage_type] damage: [old_damage_amount].")
 		var/victim_defense = defense_rating_victim[damage_type]
 		if(debug) log_debug("Inital victim's defense against [damage_type]: [victim_defense].")
-		if(IS_INFINITY(victim_defense)) //Defense is infinite. No point in calculating further armor.
+		if(IS_INFINITY(victim_defense)) //Defense is infinite. No point in calculating further damage or armor.
 			damage_to_deal[damage_type] = 0
+			if(debug) log_debug("Victim has infinite [damage_type] defense.")
 			continue
 		if(victim_defense > 0 && attack_damage_penetration[damage_type]) //Penetrate armor only if it exists.
-			victim_defense = max(0,victim_defense - attack_damage_penetration[damage_type])
+			victim_defense = max(0,victim_defense - attack_damage_penetration[damage_type]*penetration_mod)
 			if(debug) log_debug("Victim's [damage_type] defense after penetration: [victim_defense].")
 		if(!ignore_armor_bonus_damage && old_damage_amount && length(defense_rating_attacker) && defense_rating_attacker[damage_type] && (damage_type == ARCANE || damage_type == HOLY || damage_type == DARK)) //Deal bonus damage.
 			if(IS_INFINITY(defense_rating_attacker[damage_type])) //Don't do any magic damage if we resist magic.
 				damage_to_deal[damage_type] = 0
-				continue
-			if(IS_INFINITY(victim_defense))
 				continue
 			victim_defense -= defense_rating_attacker[damage_type]*0.5
 			if(debug) log_debug("Victim's new [damage_type] defense due to attacker's [defense_rating_attacker[damage_type]] armor: [victim_defense].")
@@ -398,7 +400,7 @@
 		if(debug) log_debug("Blocked [damage_type] damage: [damage_to_block].")
 		damage_blocked += damage_to_block
 		damage_to_deal[damage_type] = CEILING(max(0,new_damage_amount),1)
-		if(damage_type_to_fatigue[damage_type])
+		if(damage_type != FATIGUE && damage_type_to_fatigue[damage_type])
 			var/fatigue_damage_to_convert = damage_blocked*damage_type_to_fatigue[damage_type]
 			if(is_living(victim))
 				var/mob/living/L = victim
@@ -406,11 +408,14 @@
 			if(debug) log_debug("Converting blocked [damage_type] damage into [fatigue_damage_to_convert] fatigue damage.")
 			fatigue_damage += fatigue_damage_to_convert
 
-	if(!length(defense_rating_victim) || !defense_rating_victim[FATIGUE] || defense_rating_victim[FATIGUE] != INFINITY)
+	if(!length(defense_rating_victim) || !defense_rating_victim[FATIGUE] || !IS_INFINITY(defense_rating_victim[FATIGUE]))
 		damage_to_deal[FATIGUE] += CEILING(fatigue_damage,1)
+		if(debug) log_debug("Dealing [fatigue_damage] extra fatigue damage due to blocked damage.")
 
 	for(var/damage_type in damage_to_deal)
 		var/damage_amount = damage_to_deal[damage_type]
+		if(!damage_amount)
+			continue
 		var/real_damage_type = attack_damage_conversion[damage_type]
 		if(islist(real_damage_type))
 			var/list_length = length(real_damage_type)
@@ -437,6 +442,7 @@
 				pain = damage_to_deal_main[PAIN],
 				rad = damage_to_deal_main[RAD],
 				sanity = damage_to_deal_main[SANITY],
+				mental = damage_to_deal_main[MENTAL],
 				update = FALSE
 			)
 		else
@@ -451,8 +457,6 @@
 	if(is_living(victim) && victim.health)
 		var/mob/living/L = victim
 		L.to_chat(span("warning","Took <b>[round(total_damage_dealt,0.1)]</b> damage to [hit_object == victim ? "yourself" : "your [hit_object.name]"] by \the [attacker == weapon ? "[attacker.name]'s attack" : "[attacker.name]'s [weapon.name]"] (<b>[max(0,victim.health.health_current - total_damage_dealt)]/[victim.health.health_max]</b>)."),CHAT_TYPE_COMBAT)
-		if(has_fatigue_damage && L.ai && L.has_status_effect(STAMCRIT) && !L.has_status_effect(SLEEP))
-			L.add_status_effect(SLEEP,600,600)
 
 	if(is_living(blamed) && victim.health && blamed != victim) //TODO: Seperate log for blamed.
 		var/mob/living/L = blamed
@@ -500,11 +504,19 @@
 						A.add_attribute_xp(attribute,xp_to_give)
 						experience_gained += "[xp_to_give] [attribute] xp"
 
-				for(var/skill in bonus_experience)
-					var/xp_to_give = CEILING(bonus_experience[skill] * 0.01 * total_damage_dealt * experience_multiplier,1)
+				for(var/skill in bonus_experience_skill)
+					var/xp_to_give = CEILING(bonus_experience_skill[skill] * 0.01 * total_damage_dealt * experience_multiplier,1)
 					if(xp_to_give > 0)
 						A.add_skill_xp(skill,xp_to_give)
 						experience_gained += "[xp_to_give] [skill] xp"
+
+				for(var/attribute in bonus_experience_attribute)
+					var/xp_to_give = CEILING(bonus_experience_attribute[attribute] * 0.01 * total_damage_dealt * experience_multiplier,1)
+					if(xp_to_give > 0)
+						A.add_attribute_xp(attribute,xp_to_give)
+						experience_gained += "[xp_to_give] [attribute] xp"
+
+
 			if(length(experience_gained))
 				A.to_chat(span("notice","You gained [english_list(experience_gained)]."),CHAT_TYPE_COMBAT)
 
@@ -564,35 +576,32 @@
 /damagetype/proc/do_attack_sound(var/atom/attacker,var/atom/victim,var/atom/weapon,var/atom/hit_object)
 
 	if(is_living(victim) && length(impact_sounds_flesh))
-		play(pick(impact_sounds_flesh),get_turf(hit_object))
+		play_sound(pick(impact_sounds_flesh),get_turf(hit_object),range_max=VIEW_RANGE)
 
 	if(length(impact_sounds))
 		var/turf/T = get_turf(hit_object)
-		play(pick(impact_sounds),T)
-		create_alert(VIEW_RANGE,T,attacker,ALERT_LEVEL_CAUTION)
+		play_sound(pick(impact_sounds),T,range_max=VIEW_RANGE)
 
 	return TRUE
 
 /damagetype/proc/do_swing_sound(var/atom/attacker,var/atom/victim,var/atom/weapon)
 	if(length(swing_sounds))
 		var/turf/T = get_turf(victim)
-		play(pick(swing_sounds),T)
+		play_sound(pick(swing_sounds),T,range_max=VIEW_RANGE*0.5)
 		return TRUE
 	return FALSE
 
 /damagetype/proc/do_miss_sound(var/atom/attacker,var/atom/victim,var/atom/weapon)
 	if(length(miss_sounds))
 		var/turf/T = get_turf(victim)
-		play(pick(miss_sounds),T)
+		play_sound(pick(miss_sounds),T,range_max=VIEW_RANGE*0.75)
 		return TRUE
 	return FALSE
 
 /damagetype/proc/do_attack_animation(var/atom/attacker,var/atom/victim,var/atom/weapon,var/atom/hit_object)
 
-	var/caller_attack_delay = attacker.attack_next - world.time
-	var/weapon_attack_delay = weapon ? weapon.attack_next - world.time : attacker ? caller_attack_delay : ATTACK_ANIMATION_LENGTH * 2
+	var/attack_delay = get_attack_delay(attacker)
 
-	var/punch_distance = 12
 	var/list/pixel_offset = direction_to_pixel_offset(get_dir(attacker,victim))
 
 	if(is_living(attacker))
@@ -601,23 +610,21 @@
 		if(L.horizontal)
 			attack_matrix = turn(attack_matrix,L.stun_angle)
 
-		attack_matrix.Translate(pixel_offset[1]*punch_distance,pixel_offset[2]*punch_distance)
+		attack_matrix.Translate(pixel_offset[1]*attack_animation_distance,pixel_offset[2]*attack_animation_distance)
 
-		animate(L, transform = attack_matrix, time = FLOOR(weapon_attack_delay*0.125,1), flags = ANIMATION_LINEAR_TRANSFORM)
+		animate(L, transform = attack_matrix, time = CEILING(attack_delay*0.125,1), flags = ANIMATION_PARALLEL, easing = BACK_EASING) // This does the attack
 
 		if(L.horizontal)
-			animate(transform = turn(matrix(), L.stun_angle), time = FLOOR(caller_attack_delay*0.99,1), flags = ANIMATION_LINEAR_TRANSFORM)
+			animate(transform = turn(matrix(), L.stun_angle), time = FLOOR(attack_delay*0.5*0.99,1), flags = ANIMATION_PARALLEL) //This does the reset
 		else
-			animate(transform = matrix(), time = FLOOR(caller_attack_delay*0.99,1), flags = ANIMATION_LINEAR_TRANSFORM)
+			animate(transform = matrix(), time = FLOOR(attack_delay*0.5*0.99,1), flags = ANIMATION_PARALLEL) //This does the reset.
 
-	. = CEILING(weapon_attack_delay*0.125,1)
+	. = CEILING(attack_delay,1)
 
 	do_swing_sound(attacker,victim,weapon)
 
 	if(draw_weapon)
-		new /obj/effect/temp/impact/weapon_clone(get_turf(attacker),. * 2,victim,attacker,weapon)
-
-	return
+		new /obj/effect/temp/impact/weapon_clone(get_turf(attacker),. * 0.5,victim,attacker,weapon)
 
 /damagetype/proc/get_block_power_penetration(var/atom/attacker,var/atom/victim,var/atom/weapon,var/atom/hit_object)
 	return 0
@@ -727,6 +734,9 @@
 		var/mob/living/L = attacker
 		if(attack_delay_max < attack_delay)
 			attack_delay_max = attack_delay
-		return attack_delay + (attack_delay_max - attack_delay)*(1-L.get_attribute_power(ATTRIBUTE_DEXTERITY))
+		if(L.ai)
+			return attack_delay + (attack_delay_max - attack_delay)*(2-L.get_attribute_power(ATTRIBUTE_DEXTERITY))
+		else
+			return attack_delay + (attack_delay_max - attack_delay)*(1-L.get_attribute_power(ATTRIBUTE_DEXTERITY))
 
 	return attack_delay

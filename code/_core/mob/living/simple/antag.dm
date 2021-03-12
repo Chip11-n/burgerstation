@@ -29,7 +29,7 @@ var/global/list/valid_antag_colors = list(
 	iff_tag = "NanoTrasen"
 	loyalty_tag = "NanoTrasen"
 
-	mob_size = MOB_SIZE_BOSS
+	size = SIZE_BOSS
 
 	armor_base = list(
 		ION = INFINITY
@@ -44,7 +44,9 @@ var/global/list/valid_antag_colors = list(
 	enable_security_hud = TRUE
 	enable_medical_hud = TRUE
 
-	mob_size = MOB_SIZE_HUMAN
+	size = SIZE_HUMAN
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/antag/Initialize()
 	var/image/I = new/image(icon,"shadow")

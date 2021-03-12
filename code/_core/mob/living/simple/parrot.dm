@@ -21,7 +21,7 @@
 	loyalty_tag = "Parrot"
 	iff_tag = "Parrot"
 
-	mob_size = MOB_SIZE_CRITTER
+	size = SIZE_CRITTER
 
 	blood_type = /reagent/blood/bird
 	blood_volume = 100
@@ -29,6 +29,8 @@
 	butcher_contents = list(
 		/obj/item/container/food/dynamic/chicken/raw
 	)
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/parrot/Finalize()
 	post_move(src.loc)
@@ -89,3 +91,38 @@
 /mob/living/simple/parrot/poly/setup_name()
 	name = initial(name)
 	return TRUE
+
+/mob/living/simple/parrot/clockwork
+	name = "clock hark"
+	desc = "ROBOTIC SQUAWK!"
+	desc_extended = "A basic brass hawk."
+	icon = 'icons/mob/living/simple/clockwork_hawk.dmi'
+
+	damage_type = /damagetype/unarmed/claw/
+	class = /class/bear
+
+	health_base = 100
+	stamina_base = 100
+	mana_base = 100
+
+	listener = TRUE
+
+	value = 1500
+
+	loyalty_tag = "Clockwork"
+	iff_tag = "Clockwork"
+
+	blood_type = /reagent/blood/robot
+
+	butcher_contents = list()
+
+	armor_base = list(
+		BLADE = AP_SWORD,
+		PIERCE = AP_SWORD,
+		ARCANE = AP_GREATSWORD,
+		HEAT = -AP_SWORD,
+		COLD = AP_GREATSWORD,
+		FATIGUE = INFINITY,
+		ION = 0,
+		PAIN = INFINITY
+	)

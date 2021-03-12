@@ -2,13 +2,13 @@
 	var/name = "Gamemode Name"
 	var/desc = "Gamemode Description"
 
-	var/objective/list/crew_active_objectives = list()
-	var/objective/list/crew_completed_objectives = list()
-	var/objective/list/crew_failed_objectives = list()
+	var/list/objective/crew_active_objectives = list()
+	var/list/objective/crew_completed_objectives = list()
+	var/list/objective/crew_failed_objectives = list()
 
-	var/objective/list/antagonist_active_objectives = list()
-	var/objective/list/antagonist_completed_objectives = list()
-	var/objective/list/antagonist_failed_objectives = list()
+	var/list/objective/antagonist_active_objectives = list()
+	var/list/objective/antagonist_completed_objectives = list()
+	var/list/objective/antagonist_failed_objectives = list()
 
 	var/allow_launch = FALSE
 
@@ -52,9 +52,7 @@
 /gamemode/proc/handle_alert_level()
 	var/desired_alert_level = CODE_GREEN //Failsafe.
 	switch(points)
-		if(-INFINITY to 0)
-			desired_alert_level = CODE_DELTA
-		if(0 to 15)
+		if(-INFINITY to 15)
 			desired_alert_level = CODE_RED
 		if(15 to 25)
 			desired_alert_level = CODE_AMBER
@@ -68,7 +66,6 @@
 		set_message("Code [alert_level]",TRUE)
 		switch(alert_level)
 			if(CODE_BLUE)
-				play("",all_mobs_with_clients)
 				CALLBACK_GLOBAL(\
 					"gamemode_announce_alert",\
 					SECONDS_TO_DECISECONDS(10),\
@@ -134,6 +131,19 @@
 /gamemode/proc/can_continue()
 	//Can we even continue?
 	return TRUE
+
+/gamemode/proc/on_object_sold(var/atom/movable/M)
+
+	for(var/k in crew_active_objectives)
+		var/objective/O = k
+		if(!O.track_cargo)
+			continue
+		O.on_object_sold(M)
+
+	return TRUE
+
+
+
 
 /gamemode/proc/add_objective(var/objective/O)
 	O = new O

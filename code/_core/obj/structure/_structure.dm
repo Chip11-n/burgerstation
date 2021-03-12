@@ -1,7 +1,3 @@
-#define FLAGS_PLACEMENT_NONE 0x0
-#define FLAGS_PLACEMENT_ALLOW_MULTIPLE 0x1 //Allow multiple of this structure to exist on this turf, always.
-#define FLAGS_PLACEMENT_DIRECTIONAL 0x2 //Allow multiple of this structure to exist on this turf as long as the directions are different.
-
 
 /obj/structure/
 	name = "structure"
@@ -18,8 +14,6 @@
 
 	can_rotate = TRUE
 
-	var/light_sprite //The light sprite of the object, if any.
-
 	var/flags_placement = FLAGS_PLACEMENT_NONE
 	var/list/structure_blacklist = list() //Things that can't be constructed on the same turf that's occupying this.
 
@@ -29,7 +23,6 @@
 	. = ..()
 	loc.visible_message(span("warning","\The [src.name] is crushed under \the [src.loc.name]!"))
 	qdel(src)
-	return .
 
 /obj/structure/should_smooth_with(var/turf/T)
 
@@ -49,7 +42,6 @@
 	if(desired_light_range && desired_light_power && desired_light_color)
 		set_light(desired_light_range,desired_light_power,desired_light_color)
 
-	return .
 
 /obj/structure/proc/on_active(var/mob/living/advanced/player/P)
 	return TRUE

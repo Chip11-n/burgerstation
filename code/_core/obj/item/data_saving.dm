@@ -18,7 +18,6 @@
 		if(IB.blend) .[id]["blend"] = IB.blend
 		if(IB.special_type) .[id]["special_type"] = IB.special_type
 
-	return .
 
 /obj/item/proc/set_blend_data(var/list/blend_data)
 
@@ -81,7 +80,7 @@
 	. = list()
 
 	if(!should_save)
-		return .
+		return
 
 	if(name != initial(name))
 		.["name"] = name
@@ -117,7 +116,12 @@
 	if(reagents && reagents.stored_reagents && length(reagents.stored_reagents))
 		.["reagents"] = reagents.stored_reagents
 
-	return .
+	if(quality && quality != initial(quality))
+		.["quality"] = min(quality,140)
+
+	if(luck && luck != initial(luck))
+		.["luck"] = luck
+
 
 /obj/item/organ/save_item_data(var/save_inventory = TRUE)
 
@@ -126,7 +130,6 @@
 	var/list/blend_data = get_blend_data()
 	if(length(blend_data)) .["blend_data"] = blend_data
 
-	return .
 
 /obj/item/organ/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 
@@ -139,7 +142,6 @@
 	else
 		log_debug("No blend data found for: [src.type].")
 
-	return .
 
 /obj/item/proc/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 
@@ -161,6 +163,10 @@
 		item_count_current = object_data["item_count_current"]
 	if(object_data["delete_on_drop"])
 		delete_on_drop = TRUE
+	if(object_data["quality"])
+		quality = min(object_data["quality"],140)
+	if(object_data["luck"])
+		luck = object_data["luck"]
 
 	return TRUE
 
@@ -210,6 +216,9 @@
 	. = new/list(content_length)
 
 	for(var/i=1,i<=content_length,i++)
-		.[i] = contents[i].save_item_data(save_inventory)
+		var/obj/item/I = contents[i]
+		if(istype(I))
+			.[i] = I.save_item_data(save_inventory)
+		else
+			.[i] = list()
 
-	return .

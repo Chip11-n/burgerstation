@@ -35,7 +35,7 @@
 	var/move_mod_button = 0
 
 	var/vision = 0x0
-	sight = SEE_BLACKNESS
+	sight = 0x0
 	see_invisible = INVISIBILITY_DEFAULT
 
 	invisibility = INVISIBILITY_MOBS
@@ -91,6 +91,8 @@
 
 	var/next_emote = 0 //Prevents spam
 
+	var/last_z = 0
+
 /mob/proc/update_eyes()
 	vision = initial(vision)
 	sight = initial(sight)
@@ -122,9 +124,6 @@
 	QDEL_NULL(examine_overlay)
 
 	return ..()
-
-/mob/proc/do_mouse_wheel(object,delta_x,delta_y,location,control,params)
-	return TRUE
 
 /mob/Login()
 
@@ -200,12 +199,12 @@
 
 	return TRUE
 
-/mob/Initialize()
+/mob/Finalize()
 	. = ..()
-	force_move(src.loc)
-	return .
+	update_parallax()
+	update_z_position()
 
-/mob/New(var/loc/spawning_location,var/client/C)
+/mob/New(var/desired_loc,var/client/C)
 
 	parallax = list()
 	buttons = list()

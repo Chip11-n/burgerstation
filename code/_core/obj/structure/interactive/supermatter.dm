@@ -29,13 +29,34 @@ var/global/list/obj/structure/interactive/supermatter/known_supermatters = list(
 	var/charge = 0
 	var/charge_max = SECONDS_TO_DECISECONDS(600)
 
+/obj/structure/interactive/supermatter/defense
+	health_base = 3000
+	charge_max = SECONDS_TO_DECISECONDS(1200)
+
+/obj/structure/interactive/supermatter/defense/can_be_attacked(var/atom/attacker,var/atom/weapon,var/params,var/damagetype/damage_type)
+
+	if(is_living(attacker))
+		var/mob/living/L = attacker
+		if(L.loyalty_tag == "NanoTrasen")
+			return FALSE
+
+	. = ..()
+
+/obj/structure/interactive/supermatter/defense/projectile_should_collide(var/obj/projectile/P,var/turf/new_turf,var/turf/old_turf)
+
+	if(is_living(P.owner))
+		var/mob/living/L = P.owner
+		if(L.iff_tag == "NanoTrasen")
+			return FALSE
+
+	. = ..()
+
 /obj/structure/interactive/supermatter/get_examine_list(var/mob/examiner)
 
 	. = ..()
 
 	. += div("notice","It is [FLOOR(charge,1)]/[charge_max]([FLOOR(100*(charge/charge_max),1)]%) charged.")
 
-	return .
 
 /obj/structure/interactive/supermatter/proc/add_charge(var/charge_amount=0)
 	charge += charge_amount
@@ -57,8 +78,11 @@ var/global/list/obj/structure/interactive/supermatter/known_supermatters = list(
 	var/turf/T = get_turf(src)
 	qdel(src)
 	. = ..()
-	explode(T,VIEW_RANGE,src,src)
-	return .
+	if(is_living(caller))
+		var/mob/living/L = caller
+		if(L.is_player_controlled())
+			log_admin("Player [L.get_debug_name()] belonging to [L.loyalty_tag] destroyed the supermatter.")
+	explode(T,10000,T,T,"Supermatter")
 
 /obj/structure/interactive/supermatter/Finalize()
 	update_map_text()
@@ -79,10 +103,8 @@ var/global/list/obj/structure/interactive/supermatter/known_supermatters = list(
 		var/threshold = max(0.01,health_percent*0.2)
 		if((last_warning_percent - health_percent) >= threshold && last_warning_time + SECONDS_TO_DECISECONDS(3) <= world.time)
 			trigger_warning()
-
 		update_map_text()
 
-	return .
 
 /obj/structure/interactive/supermatter/unanchored
 	anchored = FALSE

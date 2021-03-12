@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/revolver/357.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 4
+	shoot_delay = 5
 
 	automatic = FALSE
 
@@ -69,6 +69,10 @@
 	attachment_undermount_offset_y = 19 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/syndicate
+
+	inaccuracy_modifier = 0.5
+	movement_spread_base = 0.04
+
 
 /obj/item/weapon/ranged/bullet/revolver/traitor_357/get_static_spread()
 	return 0

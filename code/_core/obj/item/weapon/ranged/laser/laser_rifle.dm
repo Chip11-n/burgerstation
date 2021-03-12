@@ -10,7 +10,7 @@
 	bullet_color = "#FF0000"
 
 	projectile_speed = TILE_SIZE - 1
-	shoot_delay = 2
+	shoot_delay = 3
 
 	automatic = TRUE
 
@@ -23,8 +23,8 @@
 
 	shoot_sounds = list('sound/weapons/laser_rifle/shoot.ogg')
 
-	heat_per_shot = 0.01
-	heat_max = 0.06
+	heat_per_shot = 0.005
+	heat_max = 0.1
 
 	polymorphs = list(
 		"base" = "#FFFFFF",
@@ -41,14 +41,14 @@
 		/obj/item/attachment/barrel/compensator = FALSE,
 		/obj/item/attachment/barrel/extended = FALSE,
 		/obj/item/attachment/barrel/gyro = FALSE,
-		/obj/item/attachment/barrel/laser_charger = TRUE,
+		/obj/item/attachment/barrel/laser_charger = TRUE, /obj/item/attachment/barrel/laser_charger/advanced = TRUE,
 		/obj/item/attachment/barrel/suppressor = FALSE,
 
 		/obj/item/attachment/sight/laser_sight = TRUE,
 		/obj/item/attachment/sight/quickfire_adapter = TRUE,
 		/obj/item/attachment/sight/red_dot = TRUE,
-		/obj/item/attachment/sight/scope = TRUE,
-		/obj/item/attachment/sight/scope/large = TRUE,
+		/obj/item/attachment/sight/scope = FALSE,
+		/obj/item/attachment/sight/scope/large = FALSE,
 		/obj/item/attachment/sight/targeting_computer = TRUE,
 
 		/obj/item/attachment/stock/c20r = FALSE,
@@ -68,6 +68,9 @@
 	attachment_undermount_offset_x = 29 - 16
 	attachment_undermount_offset_y = 12 - 16
 
+	inaccuracy_modifier = 0.5
+	movement_spread_base = 0.04
+
 /obj/item/weapon/ranged/energy/rifle/get_static_spread()
 	if(wielded) return 0
 	return 0.0005
@@ -78,7 +81,6 @@
 /obj/item/weapon/ranged/energy/rifle/New(var/desired_loc)
 	. = ..()
 	update_sprite()
-	return .
 
 /obj/item/weapon/ranged/energy/rifle/update_overlays()
 
@@ -94,7 +96,6 @@
 /obj/item/weapon/ranged/energy/rifle/update_sprite()
 	. = ..()
 	bullet_color = polymorphs["barrel"]
-	return .
 
 /obj/item/weapon/ranged/energy/rifle/hardlight
 	name = "AER13b Hardlight Rifle"
@@ -102,7 +103,7 @@
 	ranged_damage_type = /damagetype/ranged/laser/rifle/hardlight
 
 	projectile_speed = 26
-	shoot_delay = 2.5
+	shoot_delay = 4
 
 	charge_cost = CELL_SIZE_BASIC / 50
 
@@ -121,7 +122,7 @@
 	ranged_damage_type = /damagetype/ranged/laser/rifle/xray
 
 	projectile_speed = 20
-	shoot_delay = 3
+	shoot_delay = 4
 
 	charge_cost = CELL_SIZE_BASIC / 50
 
@@ -139,7 +140,7 @@
 	desc_extended = "A modular model of laser rifle, capable of using different crystals to shoot beams with different effects. This one shoots a x-ray beams that completely ignores armor. This one has a phoron crystal, and a special fusion battery that charges over time."
 
 	projectile_speed = TILE_SIZE - 1
-	shoot_delay = 1.5
+	shoot_delay = 4
 
 	view_punch = 30
 
@@ -169,4 +170,3 @@
 	update_attachment_stats()
 	update_sprite()
 
-	return .

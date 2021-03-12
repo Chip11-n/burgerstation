@@ -20,8 +20,7 @@
 	if(A)
 		buckle(A,caller)
 	if(close_sound)
-		play(close_sound,src)
-		create_alert(VIEW_RANGE,src.loc,caller,ALERT_LEVEL_NOISE)
+		play_sound(close_sound,src.loc,range_max=VIEW_RANGE)
 	door_state = SLEEPER_CLOSING
 	update_icon()
 	CALLBACK("on_close_\ref[src]",close_time,src,.proc/on_close,caller)

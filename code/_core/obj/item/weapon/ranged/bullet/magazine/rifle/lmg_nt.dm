@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/rifle/762_lmg_2.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 2
+	shoot_delay = 2.5
 
 	automatic = TRUE
 
@@ -34,7 +34,7 @@
 
 	size = SIZE_4
 
-	value = 800
+	value = 1100
 	weight = 25
 
 	ai_heat_sensitivity = 0.1
@@ -72,6 +72,9 @@
 
 	attachment_undermount_offset_x = 25 - 16
 	attachment_undermount_offset_y = 15 - 16
+
+	inaccuracy_modifier = 1
+	movement_spread_base = 0.2
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/lmg_nt/get_static_spread()
 	return 0.015

@@ -52,7 +52,7 @@
 	owner_as_ghost.icon_state = ghost_type
 	owner_as_ghost.name = ghost_type
 
-/ai/ghost/New(var/mob/living/desired_owner)
+/ai/ghost/New(var/desired_loc,var/mob/living/desired_owner)
 
 	. = ..()
 
@@ -72,9 +72,6 @@
 	if(T2)
 		owner.force_move(T2)
 		notify_ghosts("\The [owner.name] moved to [T2.loc.name].",T2)
-
-	return .
-
 
 /ai/ghost/proc/create_emf(var/turf/loc,var/desired_level=3,var/desired_range=VIEW_RANGE)
 
@@ -107,7 +104,7 @@
 
 	return null
 
-/ai/ghost/on_life(var/tick_rate=AI_TICK)
+/ai/ghost/on_life(var/tick_rate)
 
 	anger = clamp(anger,0,200)
 
@@ -120,7 +117,7 @@
 		return TRUE
 
 	if(owner.move_delay <= 0)
-		handle_movement_reset()
+		//handle_movement_reset()
 		handle_movement()
 
 	if(owner.attack_next <= world.time)
@@ -151,7 +148,7 @@
 						anger = 200
 						notify_ghosts("\The [owner.name] is now hunting!",T)
 						owner.icon_state = "[ghost_type]_angry"
-						play('sound/ghost/ghost_ambience_2.ogg',T,volume=75)
+						play_sound('sound/ghost/ghost_ambience_2.ogg',T,volume=75)
 					else
 						set_objective(null)
 						owner.icon_state = "[ghost_type]"
@@ -163,23 +160,23 @@
 
 
 	//Who is looking at us?
-	var/list/viewers = list()
+	var/list/found_viewers = list()
 	var/mob/living/advanced/insane
 	var/sanity_rating = 75
 	if(T.lightness >= 0 && owner.invisibility < 101)
-		for(var/mob/living/advanced/ADV in view(owner,owner.view))
+		for(var/mob/living/advanced/ADV in viewers(VIEW_RANGE,owner))
 			if(ADV.dead)
 				continue
 			if(!ADV.client)
 				continue
 			if(!(ADV.dir & get_dir(ADV,owner)))
 				continue
-			viewers += ADV
+			found_viewers += ADV
 			ADV.sanity -= DECISECONDS_TO_SECONDS(2)
 			if(ADV.sanity < sanity_rating)
 				insane = ADV
 				sanity_rating = ADV.sanity
-	var/viewer_count = length(viewers)
+	var/viewer_count = length(found_viewers)
 
 	//What should our alpha be?
 	var/desired_alpha = 200
@@ -220,7 +217,7 @@
 				var/mob/living/advanced/ADV = LS.top_atom
 				if(anger >= 50)
 					if(talks && !annoying_player)
-						play(pick('sound/ghost/pain_1.ogg','sound/ghost/pain_2.ogg','sound/ghost/pain_3.ogg'),T)
+						play_sound(pick('sound/ghost/pain_1.ogg','sound/ghost/pain_2.ogg','sound/ghost/pain_3.ogg'),T,range_max=VIEW_RANGE)
 						next_voice = world.time + SECONDS_TO_DECISECONDS(10)
 					anger += 25
 					ADV.sanity -= 50
@@ -241,20 +238,20 @@
 					create_emf(T2,3,VIEW_RANGE*3)
 					notify_ghosts("\The [owner.name] moved to [T2.loc.name].",T2)
 					if(talks)
-						play(pick('sound/ghost/over_here1.ogg','sound/ghost/over_here2.ogg'),T2)
+						play_sound(pick('sound/ghost/over_here1.ogg','sound/ghost/over_here2.ogg'),T2,range_max=VIEW_RANGE)
 						next_voice = world.time + SECONDS_TO_DECISECONDS(10)
 					last_teleport = world.time
 			else if(viewer_count || insane)
-				var/mob/living/advanced/ADV = insane ? insane : pick(viewers)
+				var/mob/living/advanced/ADV = insane ? insane : pick(found_viewers)
 				var/turf/T2 = get_turf(ADV)
 				owner.force_move(T2)
 				last_teleport = world.time
 				if(talks)
 					if(anger <= 50)
-						play(pick('sound/ghost/behind_you1.ogg','sound/ghost/behind_you2.ogg'),T2)
+						play_sound(pick('sound/ghost/behind_you1.ogg','sound/ghost/behind_you2.ogg'),T2,range_max=VIEW_RANGE)
 						next_voice = world.time + SECONDS_TO_DECISECONDS(10)
 					else
-						play(pick('sound/ghost/turn_around1.ogg','sound/ghost/turn_around2.ogg'),T2)
+						play_sound(pick('sound/ghost/turn_around1.ogg','sound/ghost/turn_around2.ogg'),T2,range_max=VIEW_RANGE)
 						next_voice = world.time + SECONDS_TO_DECISECONDS(10)
 				anger += 10
 
@@ -263,7 +260,7 @@
 	if(insane)
 		owner.set_dir(get_dir(owner,insane))
 		if(talks && next_voice < world.time && prob(25))
-			play(pick('sound/ghost/i_see_you1.ogg','sound/ghost/i_see_you2.ogg','sound/ghost/im_here1.ogg','sound/ghost/im_here2.ogg'),insane)
+			play_sound_target(pick('sound/ghost/i_see_you1.ogg','sound/ghost/i_see_you2.ogg','sound/ghost/im_here1.ogg','sound/ghost/im_here2.ogg'),insane)
 			next_voice = world.time + SECONDS_TO_DECISECONDS(10)
 
 

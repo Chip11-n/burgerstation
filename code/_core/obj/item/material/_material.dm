@@ -5,6 +5,7 @@
 	icon_state = "shard_1"
 
 	var/material_id = /material/steel
+	var/material_multiplier = 1
 
 	item_count_current = 1
 	item_count_max = 50
@@ -21,12 +22,10 @@
 /obj/item/material/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEPATH("material_id")
-	return .
 
 /obj/item/material/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADPATH("material_id")
-	return .
 
 /obj/item/material/Initialize()
 	if(!SSmaterials.all_materials[material_id])
@@ -42,11 +41,11 @@
 /obj/item/material/PostInitialize()
 	. = ..()
 	update_sprite()
-	return .
 
 /obj/item/material/get_base_value()
+	. = ..()
 	var/material/M = SSmaterials.all_materials[material_id]
-	return ..() * M.value_per_unit
+	. *= M.value_per_unit * material_multiplier
 
 /*
 /obj/item/material/Crossed(atom/movable/O)

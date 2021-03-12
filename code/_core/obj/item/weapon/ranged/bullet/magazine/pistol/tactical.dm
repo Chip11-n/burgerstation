@@ -5,10 +5,13 @@
 	value = 30
 
 	icon = 'icons/obj/item/weapons/ranged/pistol/45.dmi'
-	shoot_delay = 3
+	shoot_delay = 4
 	shoot_sounds = list('sound/weapons/45/shoot.ogg')
 
 	view_punch = 6
+
+	movement_spread_base = 0.008
+	inaccuracy_modifier = 0.5
 
 	automatic = FALSE
 
@@ -28,7 +31,8 @@
 	bullet_diameter_max = 12
 
 	attachment_whitelist = list(
-		/obj/item/attachment/barrel/charger = TRUE, /obj/item/attachment/barrel/charger/advanced = TRUE,
+		/obj/item/attachment/barrel/charger = TRUE,
+		/obj/item/attachment/barrel/charger/advanced = TRUE,
 		/obj/item/attachment/barrel/compensator = TRUE,
 		/obj/item/attachment/barrel/extended = TRUE,
 		/obj/item/attachment/barrel/gyro = TRUE,
@@ -88,7 +92,8 @@
 	heat_max = 0.12
 
 	attachment_whitelist = list(
-		/obj/item/attachment/barrel/charger = TRUE, /obj/item/attachment/barrel/charger/advanced = TRUE,
+		/obj/item/attachment/barrel/charger = TRUE,
+		/obj/item/attachment/barrel/charger/advanced = TRUE,
 		/obj/item/attachment/barrel/compensator = TRUE,
 		/obj/item/attachment/barrel/extended = TRUE,
 		/obj/item/attachment/barrel/suppressor = TRUE,

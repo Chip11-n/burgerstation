@@ -2,7 +2,7 @@
 	src.visible_message("<b>\The [src.name]</b> seizes up and falls limp, their eyes dead and lifeless...")
 	return TRUE
 
-/mob/living/proc/death()
+/mob/living/proc/death(var/silent=FALSE)
 
 	if(dead)
 		return FALSE
@@ -10,13 +10,14 @@
 	if(boss)
 		SSbosses.living_bosses -= src
 
-	death_message()
+	if(!silent) death_message()
 
 	pre_death()
 
-	src.to_chat(span("danger","<h1>You died!</h1>"))
-	src.to_chat(span("danger","Your death is not the end. Someone may come along and revive you, or you can be cloned again by ghosting and loading your current character."))
-	src.to_chat(span("danger","Be warned, if you choose to be cloned or you cannot be revived, you will lose all your items until they are retrieved again!."))
+	if(!silent)
+		src.to_chat(span("danger","<h1>You died!</h1>"))
+		src.to_chat(span("danger","Your death is not the end. Someone may come along and revive you, or you can be cloned again by ghosting and loading your current character."))
+		src.to_chat(span("danger","Be warned, if you choose to be cloned or you cannot be revived, you will lose all your items until they are retrieved again!."))
 
 	dead = TRUE
 	time_of_death = world.time
@@ -29,6 +30,14 @@
 		ai.on_death()
 
 	var/turf/T = get_turf(src)
+
+	if(boss && boss_loot)
+		var/obj/structure/interactive/boss_loot/BL = new(T)
+		BL.loot_to_give = boss_loot
+		BL.allowed_users = players_fighting_boss.Copy()
+		INITIALIZE(BL)
+		GENERATE(BL)
+		FINALIZE(BL)
 
 	create_alert(VIEW_RANGE*0.5,T, alert_level = ALERT_LEVEL_CAUTION, visual = TRUE)
 
@@ -61,8 +70,22 @@
 
 	if(master)
 		dust()
+	else if(!is_player_controlled() && soul_size && has_status_effect(SOULTRAP))
+		var/obj/effect/temp/soul/S = new(get_turf(src),SECONDS_TO_DECISECONDS(20))
+		S.appearance = src.appearance
+		S.transform = matrix()
+		S.color = "#000000"
+		S.soul_size = soul_size
+		S.plane = PLANE_EFFECT
+		S.layer = 1000
+		S.name = "soul of [initial(name)]:"
+		INITIALIZE(S)
+		GENERATE(S)
+		FINALIZE(S)
+		remove_status_effect(SOULTRAP)
 
 	return TRUE
+
 
 /*
 /mob/living/proc/do_loot_drop(var/atom/desired_loc)
@@ -106,14 +129,15 @@
 
 /mob/living/proc/rejuvenate()
 	if(health) health.adjust_loss_smart(
-		-health.get_loss(BRUTE),
-		-health.get_loss(BURN),
-		-health.get_loss(TOX),
-		-health.get_loss(OXY),
-		-health.get_loss(FATIGUE),
-		-health.get_loss(PAIN),
-		-health.get_loss(RAD),
-		-health.get_loss(SANITY)
+		brute = -health.get_loss(BRUTE),
+		burn = -health.get_loss(BURN),
+		tox = -health.get_loss(TOX),
+		oxy = -health.get_loss(OXY),
+		fatigue = -health.get_loss(FATIGUE),
+		pain = -health.get_loss(PAIN),
+		rad = -health.get_loss(RAD),
+		sanity = -health.get_loss(SANITY),
+		mental = -health.get_loss(MENTAL)
 	)
 	blood_volume = blood_volume_max
 	if(reagents) reagents.remove_all_reagents()
@@ -130,35 +154,39 @@
 	return TRUE
 
 /mob/living/proc/post_death()
+
+	if(boss)
+		var/turf/T = get_turf(src)
+		if(T)
+			var/list/loot_spawned = CREATE_LOOT(/loot/boss,T)
+			for(var/k in loot_spawned)
+				var/obj/item/I = k
+				var/item_move_dir = pick(DIRECTIONS_ALL)
+				var/turf/turf_to_move_to = get_step(T,item_move_dir)
+				if(!turf_to_move_to)
+					turf_to_move_to = T
+				I.force_move(turf_to_move_to)
+				var/list/pixel_offsets = direction_to_pixel_offset(item_move_dir)
+				I.pixel_x = -pixel_offsets[1]*TILE_SIZE
+				I.pixel_y = -pixel_offsets[2]*TILE_SIZE
+				animate(I,pixel_x=rand(-8,8),pixel_y=rand(-8,8),time=5)
+
 	HOOK_CALL("post_death")
+
 	return TRUE
 
-/mob/living/can_attack(var/atom/victim,var/atom/weapon,var/params,var/damagetype/damage_type)
+/mob/living/can_attack(var/atom/attacker,var/atom/victim,var/atom/weapon,var/params,var/damagetype/damage_type)
 
 	if(dead)
 		return FALSE
 
-	if(has_status_effects(PARALYZE,SLEEP,STAGGER,STAMCRIT,STUN))
+	if(has_status_effects(PARALYZE,SLEEP,STAMCRIT,STUN,PARRIED))
 		return FALSE
 
 	if(grabbing_hand && grabbing_hand.owner && get_dir(grabbing_hand.owner,src) == src.dir)
 		return FALSE
 
 	return ..()
-
-/*
-/mob/living/can_use_controls(object,location,control,params)
-
-	/*
-	if(dead)
-		return FALSE
-
-	if(has_status_effects(PARALYZE,SLEEP,STAGGER,STUN))
-		return FALSE
-	*/
-
-	return ..()
-*/
 
 /mob/living/proc/handle_horizontal()
 
@@ -168,7 +196,7 @@
 		if(desired_horizontal) //KNOCK DOWN
 			if(stun_angle != 0) animate(src,transform = turn(matrix(), stun_angle), pixel_z = 0, time = 1)
 			update_collisions(FLAG_COLLISION_CRAWLING)
-			play(pick('sound/effects/impacts/bodyfall2.ogg','sound/effects/impacts/bodyfall3.ogg','sound/effects/impacts/bodyfall4.ogg'),get_turf(src), volume = 25)
+			play_sound(pick('sound/effects/impacts/bodyfall2.ogg','sound/effects/impacts/bodyfall3.ogg','sound/effects/impacts/bodyfall4.ogg'),get_turf(src), volume = 25,range_max=VIEW_RANGE*0.5)
 		else //GET UP
 			if(stun_angle != 0) animate(src,transform = matrix(), pixel_z = initial(src.pixel_z), time = 2)
 			update_collisions(initial(collision_flags))
@@ -176,7 +204,7 @@
 
 	return desired_horizontal
 
-/mob/living/proc/on_life()
+/mob/living/proc/on_life() //TODO: Find out why this has so much self cpu
 
 	if(!initialized || qdeleting)
 		return FALSE
@@ -223,6 +251,9 @@
 	var/thirst_mod = health && (health.stamina_current <= health.stamina_max*0.5) ? 2 : 1
 	var/quality_mod = 1 + clamp(1 - get_nutrition_quality_mod(),0,1)*5
 
+	var/trait/metabolism/M = get_trait_by_category(/trait/metabolism/)
+	if(M) quality_mod *= M.hunger_multiplier
+
 	add_nutrition(-(LIFE_TICK_SLOW/10)*0.10*quality_mod)
 	add_nutrition_fast(-(LIFE_TICK_SLOW/10)*0.20*quality_mod)
 	add_hydration(-(LIFE_TICK_SLOW/10)*0.05*thirst_mod)
@@ -257,7 +288,10 @@ mob/living/proc/on_life_slow()
 		return FALSE
 
 	if(blood_volume < blood_volume_max)
-		var/blood_volume_to_add = -(add_hydration(-0.05) + add_nutrition(-0.3))*0.5
+		var/consume_multiplier = 1
+		var/trait/blood_regen/BR = get_trait_by_category(/trait/blood_regen/)
+		if(BR) consume_multiplier *= BR.regen_multiplier
+		var/blood_volume_to_add = -(add_hydration(-0.05*consume_multiplier) + add_nutrition(-0.3*consume_multiplier))*0.5
 		blood_volume = clamp(blood_volume + blood_volume_to_add,0,blood_volume_max)
 		queue_health_update = TRUE
 	else if(blood_volume > blood_volume_max)
@@ -268,7 +302,7 @@ mob/living/proc/on_life_slow()
 	handle_regen()
 
 	if(reagents)
-		reagents.metabolize()
+		reagents.metabolize(src)
 
 	//handle_charges(LIFE_TICK_SLOW)
 
@@ -280,11 +314,22 @@ mob/living/proc/on_life_slow()
 
 /mob/living/proc/handle_intoxication()
 
-	if(intoxication)
-		var/intoxication_to_remove = (0.025 + intoxication*0.0025)*(LIFE_TICK_SLOW/10)
-		intoxication = max(0,intoxication-intoxication_to_remove)
+	if(!intoxication)
+		return TRUE
 
-	switch(intoxication)
+	var/threshold_multiplier = 1
+	var/intoxication_to_remove = (0.025 + intoxication*0.0025)*(LIFE_TICK_SLOW/10)
+	var/should_apply_status_effects = TRUE
+
+	var/trait/intoxication_regen/IR = get_trait_by_category(/trait/intoxication_regen/)
+	if(IR)
+		intoxication_to_remove *= IR.intoxication_removal_multiplier
+		threshold_multiplier *= IR.alcohol_threshold_multiplier
+		should_apply_status_effects = IR.should_apply_drunk_status_effects
+
+	intoxication = max(0,intoxication-intoxication_to_remove)
+
+	switch(intoxication/threshold_multiplier)
 		if(0 to 200)
 			if(last_intoxication_message != 0)
 				to_chat(span("notice","You feel sober."))
@@ -308,7 +353,7 @@ mob/living/proc/on_life_slow()
 			health.adjust_loss_smart(tox=0.25*(LIFE_TICK_SLOW/10),robotic = FALSE)
 			queue_health_update = TRUE
 
-	if(intoxication >= 600 && prob(intoxication/100))
+	if(should_apply_status_effects && (intoxication/threshold_multiplier) >= 600 && prob((intoxication/threshold_multiplier)/100))
 		var/list/possible_status_effects = list(
 			STAGGER,
 			CONFUSED,
@@ -357,7 +402,7 @@ mob/living/proc/on_life_slow()
 		var/pain_to_regen = clamp(pain_regen_buffer,HEALTH_REGEN_BUFFER_MIN,HEALTH_REGEN_BUFFER_MAX)
 		var/rad_to_regen = clamp(rad_regen_buffer,HEALTH_REGEN_BUFFER_MIN,HEALTH_REGEN_BUFFER_MAX)
 		var/sanity_to_regen = clamp(sanity_regen_buffer,HEALTH_REGEN_BUFFER_MIN,HEALTH_REGEN_BUFFER_MAX)
-		health.adjust_loss_smart(
+		update_health = health.adjust_loss_smart(
 			brute = -brute_to_regen,
 			burn = -burn_to_regen,
 			tox=-tox_to_regen,
@@ -372,7 +417,6 @@ mob/living/proc/on_life_slow()
 		pain_regen_buffer -= pain_to_regen
 		rad_regen_buffer -= rad_to_regen
 		sanity_regen_buffer -= sanity_to_regen
-		update_health = TRUE
 
 	if(can_buffer_stamina())
 		var/stamina_to_regen = clamp(stamina_regen_buffer,STAMINA_REGEN_BUFFER_MIN,STAMINA_REGEN_BUFFER_MAX)
@@ -413,8 +457,11 @@ mob/living/proc/on_life_slow()
 	var/nutrition_hydration_mod = get_nutrition_mod() * get_hydration_mod()
 	var/player_controlled = is_player_controlled()
 
+	var/trait/general_regen/GR = get_trait_by_category(/trait/general_regen/)
+
 	if(health_regen_delay <= 0 && health.health_regeneration > 0)
 		var/health_mod = DECISECONDS_TO_SECONDS(health.health_regeneration * delay_mod * nutrition_hydration_mod)
+		if(GR) health_mod *= GR.health_regen_mul
 		var/brute_to_adjust = min(max(0,health.get_loss(BRUTE) - brute_regen_buffer),health_mod)
 		var/burn_to_adjust = min(max(0,health.get_loss(BURN) - burn_regen_buffer),health_mod)
 		var/pain_to_adjust = min(max(0,health.get_loss(PAIN) - pain_regen_buffer),health_mod)
@@ -427,14 +474,14 @@ mob/living/proc/on_life_slow()
 				add_attribute_xp(ATTRIBUTE_FORTITUDE,health_adjust*10)
 
 	if(stamina_regen_delay <= 0 && health.stamina_regeneration > 0)
-		stamina_adjust += min(max(0,health.get_stamina_loss() - stamina_regen_buffer),health.stamina_regeneration*delay_mod*nutrition_hydration_mod*0.1)
+		stamina_adjust += min(max(0,health.get_stamina_loss() - stamina_regen_buffer),DECISECONDS_TO_SECONDS(health.stamina_regeneration*delay_mod*nutrition_hydration_mod*(GR ? GR.stamina_regen_mul : 1)))
 		if(stamina_adjust)
 			stamina_regen_buffer += stamina_adjust
 			if(stamina_adjust > 0 && player_controlled)
 				add_attribute_xp(ATTRIBUTE_RESILIENCE,stamina_adjust*10)
 
 	if(mana_regen_delay <= 0 && health.mana_regeneration > 0)
-		mana_adjust = min(max(0,health.get_mana_loss() - mana_regen_buffer),health.mana_regeneration*delay_mod*nutrition_hydration_mod*0.1*(1 + (health.mana_current/health.mana_max)*3)) //The 0.1 converts from seconds to deciseconds.
+		mana_adjust = min(max(0,health.get_mana_loss() - mana_regen_buffer),DECISECONDS_TO_SECONDS(health.mana_regeneration*delay_mod*nutrition_hydration_mod*(1+(health.mana_current/health.mana_max)*3)*(GR ? GR.mana_regen_mul : 1)))
 		if(mana_adjust)
 			mana_regen_buffer += mana_adjust
 			if(mana_adjust > 0 && player_controlled)
@@ -450,5 +497,5 @@ mob/living/proc/on_life_slow()
 			continue
 		M.client.queued_shakes += 5
 	new/obj/effect/temp/fist(T,4,"#FFFFFF")
-	play('sound/effects/anima_fragment_attack.ogg',T)
+	play_sound('sound/effects/anima_fragment_attack.ogg',T,range_max=VIEW_RANGE)
 	on_crush()

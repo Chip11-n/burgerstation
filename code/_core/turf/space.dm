@@ -5,12 +5,12 @@
 /turf/bluespace/Entered(atom/movable/Obj, atom/OldLoc)
 
 	if(!istype(Obj,/mob/abstract/))
-		Obj.visible_message(span("danger","\The [Obj.name] flashes violently!"),span("danger","You flash violently!"))
+		if(Obj.mouse_opacity) Obj.visible_message(span("danger","\The [Obj.name] flashes violently!"),span("danger","You flash violently!"))
 		if(is_safe_to_delete(Obj))
 			qdel(Obj)
 		else if(length(rift_markers))
 			Obj.force_move(get_turf(pick(rift_markers)))
-			Obj.visible_message(span("danger","\The [Obj.name] appears out of nowhere!"),span("warning","You appear in some location..."))
+			if(Obj.mouse_opacity) Obj.visible_message(span("danger","\The [Obj.name] appears out of nowhere!"),span("warning","You appear in some location..."))
 		return TRUE
 
 	return ..()
@@ -36,7 +36,8 @@
 			if(FS)
 				M.force_move(FS.loc)
 			else
-				M.force_move(pick(cryo_spawnpoints).loc)
+				var/atom/movable/fallback = pick(cryo_spawnpoints)
+				M.force_move(get_turf(fallback))
 
 	return ..()
 

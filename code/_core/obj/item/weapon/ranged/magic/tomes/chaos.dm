@@ -2,13 +2,13 @@
 	name = "tome of chaos"
 	desc = "Can't aim? Shoot balls of pure chaos around you."
 	desc_extended = "Costs mana to use."
-	cost_mana = 15
-	shoot_delay = 10
+	cost_mana = 7
+	shoot_delay = SPEED_CLUB
 
 	icon = 'icons/obj/item/weapons/ranged/magic/tomes/chaos.dmi'
 
-	bullet_count = 9
-	projectile_speed = 4
+	bullet_count = 5
+	projectile_speed = TILE_SIZE*0.25 - 1
 
 	projectile = /obj/projectile/magic/chaos
 	ranged_damage_type = /damagetype/ranged/magic/chaos

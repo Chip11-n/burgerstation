@@ -37,7 +37,7 @@
 		PAIN = AP_SWORD
 	)
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	movement_delay = DECISECONDS_TO_TICKS(1.5)
 
@@ -46,6 +46,8 @@
 	stun_angle = 180
 
 	blood_type = /reagent/blood/carp
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/spacecarp/post_death()
 	..()

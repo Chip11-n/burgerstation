@@ -12,38 +12,29 @@
 
 	return TRUE
 
-/client/MouseWheel(object,delta_x,delta_y,location,control,params)
-
-	var/list/aug = params2list(params)
-
-	if(mob && (mob.attack_flags & CONTROL_MOD_GRAB) && allow_zoom_controls)
-		var/change_in_screen = delta_y > 1 ? 1 : -1
-		if(precise_zoom)
-			change_in_screen *= 0.1
-		update_zoom(zoom_level + change_in_screen)
-		return TRUE
-
-	mob.do_mouse_wheel(object,delta_x,delta_y,location,control,aug)
-
-	return TRUE
-
 /client/proc/update_view_range()
 
 	if(settings && settings.loaded_data["view_range"])
-		view = clamp(settings.loaded_data["view_range"],4,VIEW_RANGE)
+		view = clamp(settings.loaded_data["view_range"],8,VIEW_RANGE)
 	else
 		view = VIEW_RANGE
 
 	return TRUE
 
-/client/proc/handle_camera()
+/client/MouseEntered(object,location,control,params)
 
-	var/zoom_offset_x = 0
-	var/zoom_offset_y = 0
+	if(!mob)
+		return ..()
 
-	if(is_zoomed)
+	if(object && examine_mode)
+		mob.examine_overlay.maptext = "[object]"
 
+	if(is_zoomed && mob && isturf(location))
 		var/zoom_mul = 1
+		var/real_angle = get_angle(mob,location) + 90
+		var/real_dir = angle2dir(real_angle)
+		is_zoomed = real_dir
+		mob.set_dir(real_dir)
 		if(is_advanced(mob))
 			var/mob/living/advanced/A = mob
 			if(A.right_item && A.right_item.wielded && (A.right_item.wielded || !A.right_item.can_wield))
@@ -58,19 +49,27 @@
 					var/obj/item/weapon/ranged/R = A.left_item
 					if(R.attachment_stats["zoom_mul"])
 						zoom_mul *= R.attachment_stats["zoom_mul"]
-		var/list/returning_list = direction_to_pixel_offset(is_zoomed)
-		zoom_offset_x = returning_list[1]*TILE_SIZE*ZOOM_RANGE*zoom_mul
-		zoom_offset_y = returning_list[2]*TILE_SIZE*ZOOM_RANGE*zoom_mul
+		var/desired_x_offset = sin(real_angle)
+		var/desired_y_offset = cos(real_angle)
+		zoom_pixel_x = desired_x_offset*TILE_SIZE*ZOOM_RANGE*zoom_mul
+		zoom_pixel_y = desired_y_offset*TILE_SIZE*ZOOM_RANGE*zoom_mul
+
+	. = ..()
+
+/client/proc/handle_camera()
 
 	if(queued_shakes > 0)
 		desired_punch_x = rand(-TILE_SIZE*4,TILE_SIZE*4)
 		desired_punch_y = rand(-TILE_SIZE*4,TILE_SIZE*4)
 		queued_shakes--
 
+	var/zoom_offset_x = is_zoomed ? zoom_pixel_x : 0
+	var/zoom_offset_y = is_zoomed ? zoom_pixel_y : 0
+
 	var/final_pixel_x = desired_pixel_x + zoom_offset_x + desired_recoil_x + desired_punch_x
 	var/final_pixel_y = desired_pixel_y + zoom_offset_y + desired_recoil_y + desired_punch_y
 
-	if(istype(mob.loc,/obj/projectile/))
+	if(mob && istype(mob.loc,/obj/projectile/))
 		var/obj/projectile/P = mob.loc
 		final_pixel_x = P.pixel_x_float
 		final_pixel_y = P.pixel_y_float
@@ -82,8 +81,9 @@
 	var/x_mod = clamp(final_pixel_x - pixel_x,-speed,speed)
 	var/y_mod = clamp(final_pixel_y - pixel_y,-speed,speed)
 
-	if(x_mod) pixel_x = pixel_x + x_mod
-	if(y_mod) pixel_y = pixel_y + y_mod
+	pixel_x = pixel_x + x_mod
+	pixel_y = pixel_y + y_mod
+
 	if(desired_recoil_x)
 		desired_recoil_x = clamp(desired_recoil_x,-TILE_SIZE,TILE_SIZE)
 		desired_recoil_x -= clamp(desired_recoil_x,-CAMERA_RECOIL_SPEED,CAMERA_RECOIL_SPEED)

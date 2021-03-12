@@ -5,6 +5,7 @@
 	icon_state = "lava"
 
 	footstep = /footstep/lava
+	fishing_rewards = /loot/fishing/lava
 
 	plane = PLANE_FLOOR
 
@@ -20,11 +21,6 @@
 	if(istype(O,/mob/abstract/node_checker))
 		return FALSE
 
-	if(is_living(O))
-		var/mob/living/L = O
-		if(L.ai && !(length(L.status_immune) && L.status_immune[FIRE]))
-			return FALSE
-
 	return ..()
 
 /turf/simulated/hazard/lava/Entered(atom/movable/O,atom/oldloc)
@@ -32,6 +28,12 @@
 		lava_idiot(O)
 	return ..()
 
+/turf/simulated/hazard/lava/post_change_turf(var/old_turf_type)
+
+	. = ..()
+
+	for(var/mob/living/L in contents)
+		lava_idiot(L)
 
 /turf/simulated/hazard/lava/proc/lava_idiot(var/mob/living/L,var/check=FALSE)
 

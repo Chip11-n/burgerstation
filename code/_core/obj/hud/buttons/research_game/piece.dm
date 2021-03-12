@@ -166,7 +166,7 @@
 		desired_dir = -90
 	M.Turn(desired_dir)
 	animate(src,transform = M,time = 5, easing = ELASTIC_EASING)
-	play('sound/ui/game/rotate_piece.ogg',caller, sound_setting = SOUND_SETTING_UI)
+	play_sound_target('sound/ui/game/rotate_piece.ogg',caller, sound_setting = SOUND_SETTING_UI)
 	sleep(3)
 	fake_dir += desired_dir
 	turning = FALSE
@@ -174,7 +174,7 @@
 
 	var/points = check_clear() ** 2
 	if(points)
-		play('sound/ui/game/score_piece.ogg',caller, sound_setting = SOUND_SETTING_UI)
+		play_sound_target('sound/ui/game/score_piece.ogg',caller, sound_setting = SOUND_SETTING_UI)
 		for(var/i=1,i<=points,i++)
 			if(!length(linked_board.cleared_pieces))
 				break
@@ -249,14 +249,11 @@
 /obj/hud/button/research/piece/update_sprite()
 	. = ..()
 	screen_loc = "CENTER+[x_p-RESEARCH_BOARD_SIZE*0.5],CENTER+[y_p-RESEARCH_BOARD_SIZE*0.5]"
-	return .
-
-
+	
 /obj/hud/button/research/piece/update_icon()
 	. = ..()
 	icon_state = "piece_static"
-	return .
-
+	
 /obj/hud/button/research/piece/update_underlays()
 
 	. = ..()
@@ -276,4 +273,4 @@
 	I4.color = color_04
 	underlays += I4
 
-	return .
+	

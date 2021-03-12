@@ -37,7 +37,7 @@
 		PAIN = INFINITY
 	)
 
-	mob_size = MOB_SIZE_ANIMAL
+	size = SIZE_ANIMAL
 
 	damage_type = /damagetype/npc/slime
 
@@ -51,6 +51,8 @@
 
 	blood_type = null
 
+	soul_size = SOUL_SIZE_COMMON
+
 
 /mob/living/simple/slime/create_override_contents(var/mob/living/caller)
 	var/obj/item/slime_core/SC = new(src.loc)
@@ -62,7 +64,6 @@
 /mob/living/simple/slime/PostInitialize()
 	. = ..()
 	update_sprite()
-	return .
 
 /mob/living/simple/slime/post_death()
 
@@ -87,8 +88,6 @@
 	stored_slimes = 0
 
 	update_sprite()
-
-	return .
 
 /mob/living/simple/slime/update_icon()
 

@@ -90,9 +90,9 @@
 	rarity = RARITY_RARE
 
 	defense_rating = list(
-		BLADE = AP_AXE,
-		BLUNT = AP_AXE,
-		PIERCE = AP_AXE,
+		BLADE = AP_CLUB,
+		BLUNT = AP_CLUB,
+		PIERCE = AP_CLUB,
 		LASER = AP_SWORD,
 		HEAT = -AP_SWORD,
 		ARCANE = AP_CLUB,
@@ -108,7 +108,7 @@
 	name = "giant father's armor"
 	rarity = RARITY_LEGENDARY
 	desc = "THE LEGEND NEVER DIES"
-	desc = "A matching suit of armor for your Chaos Zweihander."
+	desc_extended = "A matching suit of armor for your Chaos Zweihander."
 	icon = 'icons/obj/item/clothing/suit/knight_daddy.dmi'
 
 	defense_rating = list(
@@ -124,6 +124,26 @@
 	size = SIZE_7
 
 	value = 4000
+
+/obj/item/clothing/overwear/armor/knight/clockwork
+	name = "clockwork armor"
+	rarity = RARITY_RARE
+	desc = "HAIL RATVAR."
+	desc_extended = "A bronze plate of protective armor."
+	icon = 'icons/obj/item/clothing/suit/clockwork.dmi'
+
+	defense_rating = list(
+		BLADE = AP_AXE,
+		BLUNT = AP_AXE,
+		PIERCE = AP_AXE,
+		LASER = -AP_CLUB,
+		ARCANE = AP_CLUB,
+		HEAT = -AP_AXE
+	)
+
+	size = SIZE_6
+
+	value = 900
 
 /obj/item/clothing/overwear/armor/knight/magnus
 	name = "magnus armor"
@@ -151,3 +171,22 @@
 
 /obj/item/clothing/overwear/armor/knight/magnus/gold
 	color = COLOR_GOLD
+
+/obj/item/clothing/overwear/armor/knight/goblin
+	name = "goblin knight torso"
+	desc = "Where's the pants?"
+	desc_extended = "A kinght suit without the pants. Good for short goblins."
+	icon = 'icons/obj/item/clothing/suit/goblin.dmi'
+
+	defense_rating = list(
+		BLADE = AP_GREATSWORD,
+		BLUNT = AP_AXE,
+		PIERCE = AP_AXE,
+		LASER = AP_AXE,
+		HEAT = -AP_AXE,
+		ARCANE = -AP_GREATSWORD,
+		PAIN = AP_CLUB
+	)
+
+	protected_limbs = list(BODY_TORSO,BODY_GROIN,BODY_ARM_LEFT,BODY_ARM_RIGHT)
+

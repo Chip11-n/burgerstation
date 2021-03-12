@@ -32,6 +32,8 @@
 #define LAYER_BLOOD            LAYER_MOB_DEAD - 0.1
 #define LAYER_MOB_DEAD         6
 
+#define LAYER_OBJ_AIRLOCK      7
+
 #define LAYER_MOB_BELOW        LAYER_MOB - 0.1
 #define LAYER_MOB              8
 
@@ -89,11 +91,10 @@
 #define LAYER_MOB_CLOTHING_BELT        FLOAT_LAYER + 0.44
 #define LAYER_MOB_CLOTHING_ARMOR       FLOAT_LAYER + 0.45
 
-#define LAYER_MOB_CLOTHING_MASK        FLOAT_LAYER + 0.51
-#define LAYER_MOB_INJURY               FLOAT_LAYER + 0.52
-#define LAYER_MOB_HANDS                FLOAT_LAYER + 0.53
-#define LAYER_MOB_CLOTHING_GLOVES      FLOAT_LAYER + 0.54
-#define LAYER_MOB_INJURY_HANDS         FLOAT_LAYER + 0.55
+#define LAYER_MOB_INJURY               FLOAT_LAYER + 0.51
+#define LAYER_MOB_HANDS                FLOAT_LAYER + 0.52
+#define LAYER_MOB_CLOTHING_GLOVES      FLOAT_LAYER + 0.53
+#define LAYER_MOB_INJURY_HANDS         FLOAT_LAYER + 0.54
 
 #define LAYER_MOB_CLOTHING_HARDSUIT    FLOAT_LAYER + 0.61
 #define LAYER_MOB_CLOTHING_COAT        FLOAT_LAYER + 0.62

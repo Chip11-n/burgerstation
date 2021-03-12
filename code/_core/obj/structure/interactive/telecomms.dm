@@ -64,12 +64,15 @@ var/global/list/all_telecomms = list()
 		var/obj/item/device/radio/R = k
 		if(!R || R.qdeleting)
 			continue
-		if(!(data_to_process["frequency"] in R.listening_frequencies))
+		if(R.frequency != data_to_process["frequency"] && !(data_to_process["frequency"] in R.listening_frequencies))
 			continue
 		var/area/A = get_area(R)
+		if(!A)
+			log_error("Warning: Tried processing radio data for [R.get_debug_name()], but it didn't have a valid area!")
+			continue
 		if(!A.area_identifier || !broadcasting_areas[A.area_identifier])
 			continue
-		use_ears(data_to_process["speaker"],R,data_to_process["text_to_say"],data_to_process["language_text_to_say"],data_to_process["text_type"],data_to_process["frequency"],data_to_process["language"],data_to_process["talk_range"])
+		use_ears(data_to_process["speaker"],R,data_to_process["text_to_say"],data_to_process["language_text_to_say"],data_to_process["text_type"],data_to_process["frequency"],data_to_process["language"],data_to_process["talk_range"],R.broadcasting_range)
 
 	return TRUE
 
@@ -78,9 +81,7 @@ var/global/list/all_telecomms = list()
 	name = "station telecomms system"
 
 /obj/structure/interactive/telecomms/station/Initialize()
-
 	add_telecomm("Burgerstation")
 	add_telecomm("Mission")
 	add_telecomm("Central Command")
-
 	return ..()

@@ -21,10 +21,12 @@ var/global/list/mob/living/simple/cat/runtime/all_runtimes = list()
 	iff_tag = "Cat"
 	loyalty_tag = "Cat"
 
-	mob_size = MOB_SIZE_ANIMAL
+	size = SIZE_ANIMAL
 
 	blood_type = /reagent/blood/cat
 	blood_volume = 200
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/cat/post_move(var/atom/old_loc)
 

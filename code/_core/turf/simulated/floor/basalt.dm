@@ -14,9 +14,11 @@
 
 	footstep = /footstep/concrete
 
-	delay_modifier = 1.05
+	move_delay_modifier = 1.05
 
 	destruction_turf = /turf/simulated/hazard/lava/
+
+	health_base = 300
 
 /turf/simulated/floor/basalt/setup_turf_light(var/sunlight_freq)
 	if(prob(10))

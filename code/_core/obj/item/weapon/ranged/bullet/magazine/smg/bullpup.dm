@@ -18,8 +18,6 @@
 
 	view_punch = 6
 
-
-
 	size = SIZE_3
 	weight = 10
 
@@ -58,10 +56,6 @@
 
 		/obj/item/attachment/stock/c20r = TRUE,
 
-		/obj/item/attachment/undermount/angled_grip = TRUE,
-		/obj/item/attachment/undermount/bipod = TRUE,
-		/obj/item/attachment/undermount/burst_adapter = TRUE,
-		/obj/item/attachment/undermount/vertical_grip = TRUE
 	)
 
 	attachment_barrel_offset_x = 29 - 16
@@ -91,7 +85,6 @@
 	update_attachment_stats()
 	update_sprite()
 
-	return .
 
 /obj/item/weapon/ranged/bullet/magazine/smg/bullpup/update_icon()
 

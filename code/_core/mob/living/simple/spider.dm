@@ -33,7 +33,7 @@
 		PAIN = AP_SWORD
 	)
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	movement_delay = DECISECONDS_TO_TICKS(2)
 
@@ -41,6 +41,8 @@
 	iff_tag = "Spider"
 
 	blood_type = /reagent/blood/spider
+
+	soul_size = SOUL_SIZE_COMMON
 
 /mob/living/simple/spider/post_death()
 	..()
@@ -74,7 +76,6 @@
 /mob/living/simple/spider/desert/Initialize()
 	. = ..()
 	set_light(4,0.25,"#00FF00")
-	return .
 
 /mob/living/simple/spider/twilight
 	name = "twilight spider"

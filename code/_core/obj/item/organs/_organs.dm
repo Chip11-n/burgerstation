@@ -20,9 +20,7 @@
 	var/list/obj/item/organ/attached_organs //The organs that are attached to it.
 	var/attach_method = 0 //0 Means it's attached to it. 1 means inside it. TODO: Flags.
 
-	var/style
-
-	color = "#FFFFFF"
+	//var/style
 
 	no_held_draw = TRUE
 
@@ -104,26 +102,6 @@
 	O.attached_organs += src
 	return TRUE
 
-/*
-/obj/item/organ/get_miss_chance(var/atom/attacker,var/atom/weapon,var/atom/target)
-
-	if(src.loc && !isturf(src.loc))
-		return src.loc.get_miss_chance(attacker,weapon,target) + base_miss_chance
-
-	return ..()
-*/
-
-/* HEALTH TODO: FIX THIS
-/obj/item/organ/get_examine_text(var/mob/examiner)
-	. = ..()
-	for(var/k in wounds)
-		var/wound/W = k
-		W.update_name()
-		. += span("notice",W.name)
-
-	return .
-*/
-
 /obj/item/organ/initialize_blends()
 
 	if(enable_skin)
@@ -144,12 +122,10 @@
 /obj/item/organ/New()
 	. = ..()
 	attached_organs = list()
-	return .
 
 /obj/item/organ/PostInitialize()
 	. = ..()
 	initialize_blends()
-	return .
 
 /obj/item/organ/proc/unattach_from_parent(var/turf/T)
 
@@ -217,9 +193,9 @@
 /obj/item/organ/proc/on_life()
 
 	if(reagents)
-		reagents.metabolize()
+		reagents.metabolize(is_advanced(src.loc) ? src.loc : null)
 
-	if(bleeding >= 1 && is_advanced(src.loc))
+	if(bleeding >= 0.25 && is_advanced(src.loc))
 		var/mob/living/advanced/A = src.loc
 		if(A.blood_type && A.health && A.blood_volume && A.should_bleed() && prob(80)) //Blood optimizations!
 			var/bleed_amount = bleeding*DECISECONDS_TO_SECONDS(LIFE_TICK_SLOW)
@@ -284,7 +260,7 @@ obj/item/organ/proc/get_damage_description(var/mob/examiner,var/verbose=FALSE)
 
 
 	switch(bleeding)
-		if(1 to 2)
+		if(0.5 to 2)
 			damage_desc += "trickling blood"
 		if(2 to 4)
 			damage_desc += "<b>bleeding</b>"

@@ -6,9 +6,12 @@
 	icon_state = "inventory"
 	value = 150
 
-	shoot_delay = 3
+	shoot_delay = 4
 
 	automatic = FALSE
+
+	movement_spread_base = 0.005
+	inaccuracy_modifier = 0.5
 
 	shoot_sounds = list('sound/weapons/12/shoot.ogg')
 

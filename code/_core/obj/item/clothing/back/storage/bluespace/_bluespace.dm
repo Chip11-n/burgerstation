@@ -7,7 +7,7 @@
 
 
 	dynamic_inventory_count = MAX_INVENTORY_X*4
-	container_max_size = SIZE_5
+	container_max_size = SIZE_5*3
 
 	size = MAX_INVENTORY_X*4*SIZE_5
 
@@ -26,8 +26,8 @@
 
 	icon = 'icons/obj/item/clothing/back/satchel/bluespace.dmi'
 
-	dynamic_inventory_count = MAX_INVENTORY_X*3
-	container_max_size = SIZE_4
+	dynamic_inventory_count = MAX_INVENTORY_X*4
+	container_max_size = SIZE_4*3
 
 	size = MAX_INVENTORY_X*4*SIZE_4
 
@@ -38,3 +38,13 @@
 	)
 
 	value = 2500
+
+/obj/item/clothing/back/storage/satchel/bluespace/prank
+	name = "satchel of hold"
+	desc = "What the fuck, this is just the worst."
+	desc_extended = "A prank version of the satchel of holding. It has been cursed to only hold one object."
+
+	dynamic_inventory_count = 1
+	container_max_size = SIZE_10
+
+	size = SIZE_10

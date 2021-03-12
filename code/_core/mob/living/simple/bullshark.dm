@@ -17,7 +17,7 @@
 	enable_medical_hud = FALSE
 	enable_security_hud = FALSE
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 	blood_type = /reagent/blood/carp
 	blood_volume = 750
@@ -42,8 +42,9 @@
 
 	stun_angle = 180
 
+	soul_size = SOUL_SIZE_COMMON
+
 /mob/living/simple/bullshark/post_death()
 	. = ..()
 	icon_state = "dead"
-	return .
 

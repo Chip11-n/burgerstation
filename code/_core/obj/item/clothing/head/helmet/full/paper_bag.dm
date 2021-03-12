@@ -1,15 +1,14 @@
 /obj/item/clothing/head/helmet/full/paperbag
 	name = "paper bag"
 	desc = "Put the MONEY in the BAG! PUT IT IN!"
-	desc_extended = "Holds items but preferably food. Can be dyed. Can apply a logo by Alt-clicking on help intent nearby, background with disarm intent. Also a fashion statement when worn (must be empty)."
+	desc_extended = "Holds items but preferably food. Can be dyed. Can change the design by Alt-clicking it in your hand. Also a fashion statement when worn (must be empty)."
 	icon = 'icons/obj/item/clothing/hats/paperbag.dmi'
 	var/logo = 0
 	var/logobg = 0
-	dynamic_inventory_count = 7
-	container_max_slots = 1
-	container_max_size = SIZE_1
+	dynamic_inventory_count = MAX_INVENTORY_X
+	container_max_size = SIZE_2
 
-	size = SIZE_2
+	size = SIZE_3
 	is_container = TRUE
 
 	value = 10
@@ -32,49 +31,58 @@
 /obj/item/clothing/head/helmet/full/paperbag/Finalize()
 	. = ..()
 	update_inventory()
-	return .
 
 /obj/item/clothing/head/helmet/full/paperbag/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEVAR("logo")
 	SAVEVAR("logobg")
-	return .
 
 /obj/item/clothing/head/helmet/full/paperbag/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADVAR("logo")
 	LOADVAR("logobg")
-	return .
 
-/obj/item/clothing/head/helmet/full/paperbag/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params) //The src is used on the object
+/obj/item/clothing/head/helmet/full/paperbag/click_self(var/mob/caller)
 
-	INTERACT_CHECK
-	INTERACT_CHECK_OBJECT
-	INTERACT_DELAY(1)
-
-	var/mob/living/C = caller
+	var/mob/C = caller
 	if(C.attack_flags & CONTROL_MOD_ALT)
-		if(C.intent == INTENT_DISARM)
-			if(logobg < 2)
-				logobg++
-				caller.to_chat(span("notice","You change \the pattern from \the [src.name]."))
-			else
-				logobg = 0
-				caller.to_chat(span("notice","You wipe \the pattern from \the [src.name]."))
+		INTERACT_CHECK
+		var/choice = input("What do you want to change on \the [src.name]?","Design Selection") as null|anything in list("Logo","Background")
+		if(choice == "Logo")
+			var/logomenu = list(
+				"none" = 0,
+				"nanotrasen" = 1,
+				"syndicate" = 3,
+				"mchonk" = 2,
+				"heart" = 4,
+				"happy" = 5
+			)
+			INTERACT_CHECK
+			choice = input("What do you want to change the logo to?","Logo Selection") as null|anything in logomenu
+			if(choice)
+				INTERACT_CHECK
+				logo = logomenu[choice]
+				caller.to_chat(span("notice","You change \the [src.name]'s logo."))
+		else if(choice == "Background")
+			var/bgmenu = list(
+				"none" = 0,
+				"stripe" = 1,
+				"circle" = 2
+			)
 
-		if(C.intent == INTENT_HELP)
-			if(logo < 5)
-				logo++
-				caller.to_chat(span("notice","You change \the logo from \the [src.name]."))
-			else
-				logo = 0
-				caller.to_chat(span("notice","You wipe \the logo from \the [src.name]."))
+			INTERACT_CHECK
+			choice = input("What do you want to change the background to?","Background Selection") as null|anything in bgmenu
+			if(choice)
+				INTERACT_CHECK
+				logobg = bgmenu[choice]
+				caller.to_chat(span("notice","You change \the [src.name]'s background."))
+		else
+			caller.to_chat(span("notice","You decide not to change \the [src.name]'s design."))
+			return TRUE
 		update_sprite()
+		return TRUE
 
-
-	return TRUE
-
-
+	return ..()
 
 /obj/item/clothing/head/helmet/full/paperbag/pre_pickup(var/atom/old_location,var/obj/hud/inventory/new_location)
 
@@ -94,7 +102,6 @@
 	else
 		dynamic_inventory_count = 7
 		is_container = TRUE
-	return .
 
 /obj/item/clothing/head/helmet/full/paperbag/update_inventory()
 	. = ..()
@@ -111,7 +118,6 @@
 		icon_state = "[initial(icon_state)]2"
 	update_sprite()
 	update_overlays()
-	return .
 
 /obj/item/clothing/head/helmet/full/paperbag/update_overlays()
 

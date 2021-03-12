@@ -20,6 +20,19 @@
 
 	return src
 
+
+/obj/structure/interactive/scanner/projectile_should_collide(var/obj/projectile/P,var/turf/new_turf,var/turf/old_turf)
+
+	. = ..()
+
+	if(.)
+		return //Don't run the rest
+
+	for(var/k in P.contents)
+		var/atom/movable/M = k
+		if(!src.Cross(M))
+			return src
+
 /atom/movable/lighting_overlay/projectile_should_collide(var/obj/projectile/P,var/turf/new_turf,var/turf/old_turf)
 	return null
 
@@ -36,27 +49,15 @@
 	return null
 
 
-/*
-/mob/living/advanced/player/projectile_should_collide(var/obj/projectile/P,var/turf/new_turf,var/turf/old_turf)
-
-	if(P && !P.ignore_iff && is_living(P.owner)) //FAILSAFE. PUSSY SHIT BUT IT SHOULD PREVENT EXPLOITS.
-		var/mob/living/L = P.owner
-		if(L.loyalty_tag == src.loyalty_tag)
-			return null
-
-	return ..()
-*/
-
 /mob/living/projectile_should_collide(var/obj/projectile/P,var/turf/new_turf,var/turf/old_turf)
-
-	if(!P.hit_laying)
-		if(dead && P.target_atom != src)
-			return null
 
 	if(P && !P.ignore_iff && P.iff_tag && src.iff_tag == P.iff_tag)
 		return null
 
 	if(P && !P.ignore_loyalty && P.loyalty_tag && src.loyalty_tag == P.loyalty_tag)
+		return null
+
+	if(!P.hit_laying && dead && get_dist(src,P.target_atom) > 0)
 		return null
 
 	return ..()
@@ -94,6 +95,14 @@
 		if(!new_turf.allow_bullet_pass && new_turf.density_east)
 			return new_turf
 
+	if(old_living)
+		for(var/k in old_living)
+			var/mob/living/L = k
+			if(P.owner == L)
+				continue
+			if(L.mouse_opacity > 0 && !L.dead && L.move_delay > 0)
+				return L
+
 	return null
 
 /obj/projectile/projectile_should_collide(var/obj/projectile/P,var/turf/new_turf,var/turf/old_turf)
@@ -116,4 +125,3 @@
 		else if(luck(P.owner,bullet_block_chance,FALSE))
 			return null
 
-	return .

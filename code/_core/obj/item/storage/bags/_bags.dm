@@ -2,8 +2,7 @@
 	name = "specific item type bags"
 	icon = 'icons/obj/item/storage/bags.dmi'
 	icon_state = "mining"
-
-	value = 20
+	value = -1
 
 /obj/item/storage/bags/click_on_object(var/mob/caller as mob, var/atom/object, location, contmrol, params)
 
@@ -37,12 +36,14 @@
 	icon_state = "botany"
 
 	dynamic_inventory_count = 6
-	container_max_size = 3
+	container_max_size = SIZE_3
 	container_max_slots = 10
 	container_whitelist = list(
 		/obj/item/seed,
 		/obj/item/container/food/plant
 	)
+
+	value = 30
 
 /obj/item/storage/bags/botany/processor
 	name = "botany seed processing bag"
@@ -98,7 +99,7 @@
 
 	caller.to_chat(span("notice","You process [process_count] plants to seeds."))
 
-	return ..()
+	return TRUE
 
 
 /obj/item/storage/bags/mining
@@ -108,7 +109,7 @@
 	icon_state = "mining"
 
 	dynamic_inventory_count = 6
-	container_max_size = 3
+	container_max_size = SIZE_3
 	container_max_slots = 10
 	container_whitelist = list(
 		/obj/item/material/ore,
@@ -121,8 +122,10 @@
 	desc = "I got that bluespace fever and I can't sleep!"
 	desc_extended = "A giant orange bag that is designed to hold all your ores and ingots, now in bluespace. Holds up to 90 ores and ingots."
 	dynamic_inventory_count = 6
-	container_max_size = 100
+	container_max_size = SIZE_4
 	container_max_slots = 30
+
+	value = 100
 
 
 /obj/item/storage/bags/chemistry
@@ -131,7 +134,7 @@
 	icon_state = "chemistry"
 
 	dynamic_inventory_count = 6
-	container_max_size = 100
+	container_max_size = SIZE_4
 	container_max_slots = 10
 	container_whitelist = list(
 		/obj/item/container/beaker,
@@ -139,8 +142,7 @@
 		/obj/item/container/syringe
 	)
 
-/obj/item/storage/bags/chemistry/filled/fill_inventory()
-
+	value = 30
 
 /obj/item/storage/pillbottle
 	name = "pill bottle"
@@ -151,7 +153,7 @@
 
 	size = SIZE_1
 	dynamic_inventory_count = 1
-	container_max_size = SIZE_1
+	container_max_size = SIZE_0
 	container_max_slots = 30
 	container_whitelist = list(
 		/obj/item/container/pill,
@@ -171,24 +173,20 @@
 	SAVEVAR("color_lid")
 	SAVEVAR("color_label")
 	SAVEVAR("color_canister")
-	return .
 
 /obj/item/storage/pillbottle/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADVAR("color_lid")
 	LOADVAR("color_label")
 	LOADVAR("color_canister")
-	return .
 
 /obj/item/storage/pillbottle/PostInitialize()
 	. = ..()
 	update_sprite()
-	return .
 
 /obj/item/storage/pillbottle/update_inventory()
 	. = ..()
 	update_sprite()
-	return .
 
 /obj/item/storage/pillbottle/update_overlays()
 
@@ -209,7 +207,6 @@
 	label.color = color_label
 	add_overlay(label)
 
-	return .
 
 /obj/item/storage/pillbottle/update_icon()
 
@@ -227,8 +224,6 @@
 	var/icon_mod = CEILING( (filled_slots/(dynamic_inventory_count*container_max_slots)) * 7,1)
 	icon_state = "contents_[icon_mod]"
 	color = chosen_color
-
-	return .
 
 
 /obj/item/storage/pillbottle/bicaridine

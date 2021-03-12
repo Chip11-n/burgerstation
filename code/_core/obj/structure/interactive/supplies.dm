@@ -11,9 +11,9 @@
 
 	var/opened = FALSE
 
-	var/loot/loot = /loot/supply
+	var/loot/loot = /loot/supply_crate/all
 
-	var/chance_none = 50
+	var/chance_none = 75
 
 /obj/structure/interactive/supplies/Generate()
 	. = ..()
@@ -21,7 +21,6 @@
 	if(prob(chance_none))
 		qdel(src)
 
-	return .
 
 /obj/structure/interactive/supplies/update_icon()
 
@@ -46,6 +45,9 @@
 
 
 /obj/structure/interactive/supplies/clicked_on_by_object(var/mob/caller,var/atom/object,location,control,params)
+
+	INTERACT_CHECK
+	INTERACT_DELAY(5)
 
 	if(!opened)
 		open()

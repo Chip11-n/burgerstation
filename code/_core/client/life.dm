@@ -14,16 +14,22 @@
 
 		queued_chat_messages.Cut(1,2)
 
-	if(mob) mob.on_life_client()
+	if(mob)
+		mob.on_life_client()
+		handle_camera()
 
-	handle_camera()
+	if(restricted && inactivity <= TICKS_TO_DECISECONDS(CLIENT_TICK)*3)
+		del(src)
 
 	return TRUE
 
 /client/proc/on_life_slow()
 
 	if(!mob)
-		return TRUE
+		src << span("danger","Uhh... it seems like your mob was deleted unexpectedly. Contact Burger on Discord to tell them how you encountered this.")
+		src << span("danger","As a precaution, you were kicked. You can rejoin again.")
+		del(src)
+		return FALSE
 
 	for(var/k in stored_hud_images)
 		var/image/I = k
@@ -31,7 +37,7 @@
 		stored_hud_images -= I
 
 	if(mob.vision)
-		for(var/mob/living/L in view(mob,VIEW_RANGE*0.5))
+		for(var/mob/living/L in view(VIEW_RANGE*0.5,mob))
 			if(mob.vision & FLAG_VISION_MEDICAL && L.medical_hud_image && L.alpha >= 255)
 				stored_hud_images += L.medical_hud_image
 				images += L.medical_hud_image

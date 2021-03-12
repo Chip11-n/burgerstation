@@ -10,7 +10,7 @@
 		/obj/item/container/food/dynamic/chicken/raw/,
 		/obj/item/container/food/dynamic/chicken/raw/
 	)
-	mob_size = MOB_SIZE_CRITTER
+	size = SIZE_CRITTER
 
 	loyalty_tag = "Chicken"
 	iff_tag = "Chicken"
@@ -40,4 +40,4 @@
 	if(prob(1))
 		name = "black cock"
 		desc = "Comedy achieved."
-	return .
+	

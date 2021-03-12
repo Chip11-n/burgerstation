@@ -1,66 +1,64 @@
-/ai/proc/is_in_view(var/atom/A)
-	return A in view(owner)
-
 /ai/proc/get_sight_chance(var/atom/A,var/check_view = TRUE)
-
-	if(use_cone_vision && alert_level != ALERT_LEVEL_COMBAT && !owner.is_facing(A))
-		return 0
-
-	if(check_view && !is_in_view(A))
-		return 0
 
 	if(owner.z != A.z)
 		return 0
 
+	if(use_cone_vision && alert_level != ALERT_LEVEL_COMBAT && !owner.is_facing(A))
+		return 0
+
+	if(check_view)
+		var/view_range_to_use = get_view_range()
+		if(!(owner in viewers(view_range_to_use,A)))
+			return 0
+
 	if(A in attackers)
 		return 100
 
-	var/distance
-
-	if(!objective_attack)
-		distance = get_dist(owner,A)
-	else
-		distance = get_dist(objective_attack,A)
-
-	if(distance <= 0)
-		return 0
-
-	if(distance <= 1)
+	var/true_distance = get_dist(owner,A)
+	if(true_distance <= 1)
 		return 100
 
-	if(distance > radius_find_enemy_combat)
+	var/vision_distance = true_distance
+	if(objective_attack)
+		vision_distance = get_dist(objective_attack,A) //Objective attack is the central focus point.
+
+	if(true_distance > radius_find_enemy_combat)
 		return 0
 
-	switch(distance)
-		if(1 to VIEW_RANGE)
+	if(vision_distance > radius_find_enemy_combat)
+		return 0
+
+	. = 100
+
+	switch(vision_distance)
+		if(-INFINITY to VIEW_RANGE*0.75)
 			. = 100
-		if(VIEW_RANGE to VIEW_RANGE+ZOOM_RANGE)
+		if(VIEW_RANGE*0.75 to VIEW_RANGE+ZOOM_RANGE)
 			. = 50
 		if(VIEW_RANGE+ZOOM_RANGE to INFINITY)
-			. = 25
+			. = 10
 
 	var/turf/T = get_turf(A)
-	var/turf/T2 = get_turf(owner)
-
-	var/lightness = 0
-	switch(T.lightness)
-		if(-1 to 0.5)
-			lightness = 0.5 + T.lightness
-		if(0.5 to 1)
-			lightness = 1
-
-	if(T2.lightness < T.lightness - 0.25)
-		lightness *= 2
-
+	var/lightness = T.lightness
+	if(ismovable(A))
+		var/atom/movable/M = A
+		if(length(M.light_sprite_sources))
+			lightness = 3
+	var/final_night_vision = night_vision
 	var/atom_alpha = A.alpha
-	if(alert_level == ALERT_LEVEL_COMBAT)
-		atom_alpha += 50
-		atom_alpha *= 2
+	switch(alert_level)
+		if(ALERT_LEVEL_COMBAT)
+			final_night_vision *= 4
+			atom_alpha *= 4
+		if(ALERT_LEVEL_CAUTION)
+			final_night_vision *= 3
+			atom_alpha *= 3
+		if(ALERT_LEVEL_NOISE)
+			final_night_vision *= 2
+			atom_alpha *= 2
 
-	if(A == objective_attack)
-		atom_alpha += 50
-		atom_alpha *= 2
+	if(final_night_vision <= 0)
+		. = 0
+	else
+		. *= clamp(atom_alpha/255,0,1) * max(final_night_vision,lightness) * 3
 
-	. *= clamp(atom_alpha/255,0,1) * lightness
-
-	return .

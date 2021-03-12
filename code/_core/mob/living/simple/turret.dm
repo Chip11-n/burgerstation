@@ -20,9 +20,11 @@
 
 	enable_security_hud = TRUE
 
-	mob_size = MOB_SIZE_HUMAN
+	size = SIZE_HUMAN
 
 	armor_base = CYBORG_ARMOR
+
+	soul_size = null
 
 /mob/living/simple/turret/face_atom(var/atom/A)
 	return set_dir(get_dir(src,A))
@@ -35,7 +37,7 @@
 		GENERATE(stored_weapon)
 		FINALIZE(stored_weapon)
 
-/mob/living/simple/turret/attack(var/atom/attacker,var/atom/victim,var/list/params,var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE) //The src attacks the victim, with the blamed taking responsibility
+/mob/living/simple/turret/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1) //The src attacks the victim, with the blamed taking responsibility
 
 	if(!stored_weapon)
 		log_error("[src.get_debug_name()] didn't have a stored weapon! Deleting!")
@@ -69,6 +71,10 @@
 
 	stored_weapon = /obj/item/weapon/ranged/energy/nanotrasen_turret
 
+/mob/living/simple/turret/nanotrasen/immortal
+	name = "immortal nanotrasen turret"
+	immortal = TRUE
+
 /mob/living/simple/turret/nanotrasen/post_death()
 	icon_state = "dead"
 	return ..()
@@ -86,7 +92,7 @@
 
 	ai = /ai/turret/deployable
 
-	mob_size = MOB_SIZE_ANIMAL
+	size = SIZE_ANIMAL
 
 /mob/living/simple/turret/deployable/get_examine_list(var/mob/examiner)
 
@@ -102,10 +108,6 @@
 		. += div("notice","It has a magazine installed. It has [length(stored_magazine.stored_bullets)]/[stored_magazine.bullet_count_max] bullets.")
 	else
 		. += div("warning","It is missing a magazine.")
-
-	return .
-
-
 
 /mob/living/simple/turret/deployable/proc/get_battery()
 	return stored_battery

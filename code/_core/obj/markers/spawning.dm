@@ -8,7 +8,6 @@
 	do_spawn(src.loc)
 	. = ..()
 	qdel(src)
-	return .
 
 /obj/marker/spawning/proc/do_spawn(var/turf/T)
 	return TRUE
@@ -96,9 +95,11 @@
 	name = "random supply crate"
 	icon_state = "supply"
 	possible_objects = list(
-		/obj/item/supply_crate/american = 2,
-		/obj/item/supply_crate/magic = 1,
-		/obj/item/supply_crate/nanotrasen = 3,
-		/obj/item/supply_crate/russian = 1,
-		/obj/item/supply_crate/syndicate = 1
+		/obj/item/supply_crate/american = 3,
+		/obj/item/supply_crate/magic = 2,
+		/obj/item/supply_crate/nanotrasen = 4,
+		/obj/item/supply_crate/russian = 2,
+		/obj/item/supply_crate/syndicate = 2,
+		/obj/item/supply_crate/medicine = 4,
+		/obj/item/supply_crate/bos = 1
 	)

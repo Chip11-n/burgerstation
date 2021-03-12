@@ -2,7 +2,19 @@
 	var/has_bloodoxygen = TRUE
 	organic = TRUE
 
-/health/mob/living/get_defense(var/atom/attacker,var/atom/hit_object)
+/health/mob/living/get_damage_multiplier()
+
+	. = ..()
+
+	var/mob/living/L = owner
+	if(L.boss)
+		var/multiplier_value = clamp(1.4 - length(L.players_fighting_boss)*0.1,0.25,1)
+		. *= multiplier_value
+
+	if(L.has_status_effect(STRESSED))
+		. += 0.5
+
+/health/mob/living/get_defense(var/atom/attacker,var/atom/hit_object,var/ignore_luck=FALSE)
 
 	. = ..()
 
@@ -38,22 +50,17 @@
 			else
 				.[damage_type] = bonus[damage_type]
 
-	return .
-
-
-
 /health/mob/living/update_health(var/atom/attacker,var/damage_dealt=0,var/update_hud=TRUE,var/check_death=TRUE)
 
 	. = ..()
 
 	if(.)
 
-		if(!is_living(owner))
-			return .
+		if(!is_living(owner)) return
 
 		var/mob/living/L = owner
 
-		if(has_bloodoxygen)
+		if(has_bloodoxygen && L.blood_volume_max)
 			var/blood_oxygen = (L.blood_volume/L.blood_volume_max) + L.blood_oxygen
 			damage[OXY] = max(0,health_max*(2 - blood_oxygen*2))
 
@@ -61,10 +68,6 @@
 
 		if(check_death && should_be_dead)
 			L.death()
-
-		if(update_hud)
-			L.update_health_element_icons(TRUE,TRUE,TRUE,TRUE)
-			L.update_boss_health()
 
 		if(L.medical_hud_image)
 			var/health_icon_state
@@ -86,14 +89,15 @@
 		if(L.medical_hud_image_advanced)
 			L.medical_hud_image_advanced.icon_state = "[damage[TOX] > 0][damage[BURN] > 0][damage[BRUTE] > 0]"
 
-	return .
+		if(update_hud)
+			L.update_health_element_icons(TRUE,TRUE,TRUE)
+			L.update_boss_health()
 
 /health/mob/living/update_health_stats()
 
 	. = ..()
 
-	if(!is_living(owner))
-		return .
+	if(!is_living(owner)) return
 
 	var/mob/living/L = owner
 
@@ -101,26 +105,49 @@
 	stamina_max = L.stamina_base + L.get_attribute_power(ATTRIBUTE_ENDURANCE)*100
 	mana_max = L.mana_base + L.get_attribute_power(ATTRIBUTE_WISDOM)*100
 
-	L.update_health_element_icons(TRUE,TRUE,TRUE,TRUE)
+	L.queue_health_update = TRUE
 
 	return TRUE
 
 
+/health/mob/living/adjust_stamina(var/adjust_value)
+	. = ..()
+	if(. && stamina_current >= stamina_max)
+		var/mob/living/L = owner
+		if(L.has_status_effect(STAMCRIT)) L.remove_status_effect(STAMCRIT)
 
-/health/mob/living/adjust_loss_smart(var/brute,var/burn,var/tox,var/oxy,var/fatigue,var/pain,var/rad,var/sanity,var/update=TRUE,var/organic=TRUE,var/robotic=TRUE)
+/health/mob/living/adjust_loss_smart(var/brute,var/burn,var/tox,var/oxy,var/fatigue,var/pain,var/rad,var/sanity,var/mental,var/update=TRUE,var/organic=TRUE,var/robotic=TRUE)
 
 	. = 0
 
-	if(fatigue)
+	if(fatigue || mental)
 		var/mob/living/L = owner
-		if(!L.has_status_effect(STAMCRIT))
-			if(adjust_stamina(-fatigue))
-				L.update_health_element_icons(stamina=TRUE)
+		var/fatigue_adjusted = FALSE
+		var/mana_adjusted = FALSE
+		if(fatigue && (L.ai || !L.has_status_effect(STAMCRIT)) && adjust_stamina(-fatigue))
+			fatigue_adjusted = TRUE
 			if(stamina_current <= 0)
-				L.add_status_effect(STAMCRIT)
+				L.add_status_effect(STAMCRIT,-1,-1)
+		if(mental && adjust_mana(-mental))
+			mana_adjusted = TRUE
+		if(fatigue_adjusted || mana_adjusted)
+			L.queue_health_update = TRUE
+		. += fatigue + mental
 		fatigue = 0
+		mental = 0
 
-	return . + ..(brute,burn,tox,oxy,fatigue,pain,rad,update,organic,robotic)
+	. += ..()
+
+	if(sanity)
+		var/mob/living/L = owner
+		var/sanity_loss = get_loss(SANITY)
+		if(sanity_loss >= 100)
+			if(!L.has_status_effect(STRESSED))
+				L.add_status_effect(STRESSED,-1,1)
+		else if(sanity_loss == 0)
+			L.remove_status_effect(STRESSED)
+
+	return .
 
 /health/mob/living/get_total_loss(var/include_fatigue = TRUE,var/include_pain=TRUE,var/include_sanity=TRUE)
 

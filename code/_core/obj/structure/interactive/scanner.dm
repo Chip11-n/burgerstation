@@ -11,21 +11,58 @@
 	desired_light_range = 2
 	desired_light_color = "#00FF00"
 
+/obj/structure/interactive/scanner/abnormality
+	name = "abnormality scanner"
+
+/obj/structure/interactive/scanner/abnormality/Cross(var/atom/movable/M)
+
+	if(!istype(M,/obj/structure/interactive/the_curse))
+		return FALSE
+
+	return ..()
+
 /obj/structure/interactive/scanner/iff
 	name = "\improper IFF body scanner"
 	desc = "YOU. SHALL NOT. PASS. Unless the conditions are met."
 	desc_extended = "A very invasive full body scanner that magically blocks movement based on the conditions coded inside. This one is programmed to prevent those without IFF implants from accessing the area."
 
-/obj/structure/interactive/scanner/iff/Cross/(var/atom/movable/M)
+/obj/structure/interactive/scanner/iff/Cross(var/atom/movable/M)
 
-	if(is_advanced(M))
-		var/mob/living/advanced/A = M
-		if(!A.iff_tag)
-			A.to_chat(span("warning","The barrier prevents you from moving!"))
+	if(is_living(M))
+		var/mob/living/L = M
+		if(!L.iff_tag)
+			L.to_chat(span("warning","The barrier prevents you from moving!"))
 			src.do_say("IFF implant not detected.")
 			return FALSE
 
+	if(istype(M,/obj/structure/interactive/crate))
+		for(var/mob/living/L in M.contents)
+			if(!src.Cross(L))
+				return FALSE
+
 	return ..()
+
+/obj/structure/interactive/scanner/iff_nanotrasen
+	name = "\improper NanoTrasen IFF body scanner"
+	desc = "YOU. SHALL NOT. PASS. Unless the conditions are met."
+	desc_extended = "A very invasive full body scanner that magically blocks movement based on the conditions coded inside. This one is programmed to prevent those without NanoTrasen IFF implants from accessing the area."
+
+/obj/structure/interactive/scanner/iff_nanotrasen/Cross(var/atom/movable/M)
+
+	if(is_living(M))
+		var/mob/living/L = M
+		if(!L.iff_tag || L.iff_tag != "NanoTrasen")
+			L.to_chat(span("warning","The barrier prevents you from moving!"))
+			src.do_say("IFF implant not detected.")
+			return FALSE
+
+	if(istype(M,/obj/structure/interactive/crate))
+		for(var/mob/living/L in M.contents)
+			if(!src.Cross(L))
+				return FALSE
+
+	return ..()
+
 
 
 /obj/structure/interactive/scanner/iff_reverse
@@ -114,6 +151,26 @@
 
 	var/mob/living/L = M
 	if(L.loyalty_tag != "Space Cop")
+		return FALSE
+
+	return ..()
+
+
+/obj/structure/interactive/scanner/rich
+	name = "rich person scanner"
+	desc = "Poor people get out."
+	desc_extended = "A proximity door scanner that prevents those with less than 20,000 credits from entering. Or leaving..."
+	icon_state = "door"
+
+/obj/structure/interactive/scanner/rich/Cross/(var/atom/movable/M)
+
+	if(!is_player(M))
+		return FALSE
+
+	var/mob/living/advanced/player/P = M
+
+	if(P.currency < 20000)
+		P.to_chat(span("warning","You are too poor to cross the rich person scanner..."))
 		return FALSE
 
 	return ..()

@@ -50,8 +50,7 @@
 			var/obj/item/bullet_cartridge/B = stored_bullets[i]
 			if(B) .["stored_bullets"][B.type] += 1
 
-	return .
-
+	
 /obj/item/magazine/load_item_data_post(var/mob/living/advanced/player/P,var/list/object_data)
 
 	. = ..()
@@ -65,8 +64,7 @@
 				FINALIZE(B)
 				stored_bullets += B
 
-	return .
-
+	
 /obj/item/magazine/Generate()
 
 	if(ammo)
@@ -94,8 +92,7 @@
 /obj/item/magazine/PostInitialize()
 	. = ..()
 	update_sprite()
-	return .
-
+	
 /obj/item/magazine/get_examine_list(var/mob/examiner)
 	return ..() + div("notice","It contains [length(stored_bullets)] bullets.")
 
@@ -136,7 +133,7 @@
 
 /obj/item/magazine/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	object = object.defer_click_on_object(location,control,params)
+
 
 	if(is_inventory(object) && !(is_dynamic_inventory(src.loc) || is_pocket(src.loc)) && length(stored_bullets))
 		INTERACT_CHECK
@@ -175,7 +172,7 @@
 
 /obj/item/magazine/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	object = object.defer_click_on_object(location,control,params)
+
 
 	if(is_bullet_gun(object) && !istype(src,/obj/item/magazine/clip))
 		INTERACT_CHECK
@@ -190,7 +187,7 @@
 		src.drop_item(G)
 		G.stored_magazine = src
 		G.open = FALSE
-		play(get_magazine_insert_sound(),src)
+		play_sound(get_magazine_insert_sound(),get_turf(src),range_max=VIEW_RANGE*0.25)
 		G.update_sprite()
 		return TRUE
 

@@ -1,4 +1,7 @@
 /obj/item/weapon/
+
+	can_rename = TRUE
+
 	var/wield_only = FALSE //Set to true if you can only attack with this while wielded.
 
 
@@ -7,6 +10,7 @@
 
 	var/override_icon_state = FALSE
 	var/override_icon_state_held = FALSE
+	enable_held_icon_states = TRUE
 
 	ignore_other_slots = TRUE
 
@@ -23,7 +27,6 @@
 	if(enchantment)
 		. += div("notice","It's enchanted with [enchantment.name].")
 
-	return .
 
 /obj/item/weapon/update_icon()
 
@@ -44,17 +47,18 @@
 	if(!override_icon_state)
 		icon_state = "[initial(icon_state)][open_text]"
 
+	return ..()
 
+/obj/item/weapon/can_attack(var/atom/attacker,var/atom/victim,var/atom/weapon,var/params,var/damagetype/damage_type)
+
+	if(wield_only && !wielded)
+		if(ismob(attacker))
+			var/mob/M = attacker
+			M.to_chat(span("warning","You can only attack with this when wielded! (CTRL+CLICK)"))
+		return FALSE
 
 	return ..()
 
-/obj/item/weapon/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
-
-	if(wield_only && !wielded && !is_inventory(object))
-		caller.to_chat(span("warning","You can only attack with this when wielded! (CTRL+CLICK)"))
-		return TRUE
-
-	return ..()
 
 /obj/item/weapon/on_drop(var/obj/hud/inventory/old_inventory,var/atom/new_loc,var/silent=FALSE)
 	wielded = FALSE
@@ -78,12 +82,10 @@
 
 
 
-	return .
 
 /obj/item/weapon/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	if(object_data["polymorphs"]) polymorphs = object_data["polymorphs"]
-	return .
 
 /obj/item/weapon/load_item_data_post(var/mob/living/advanced/player/P,var/list/object_data)
 
@@ -96,4 +98,3 @@
 		enchantment.name = enchant_data["name"]
 		enchantment.strength = enchant_data["strength"]
 
-	return .

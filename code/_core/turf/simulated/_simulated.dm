@@ -43,6 +43,20 @@ var/global/list/blood_turfs = list()
 
 	var/slip_factor = 1
 
+/turf/simulated/is_safe_teleport(var/check_contents=TRUE)
+
+	if(collision_flags & FLAG_COLLISION_WALKING)
+		return FALSE
+
+	if(check_contents)
+		for(var/atom/movable/M in src.contents)
+			if(!M.density)
+				continue
+			if(M.collision_flags & FLAG_COLLISION_WALKING)
+				return FALSE
+
+	return ..()
+
 /turf/simulated/proc/get_slip_strength(var/mob/living/L)
 	return (wet_level ? 1 : 0) + (wet_level/100)*slip_factor
 
@@ -68,13 +82,11 @@ var/global/list/blood_turfs = list()
 				if(!WFS || L.move_mod > 2)
 					L.add_status_effect(SLIP,slip_strength*10,slip_strength*10)
 
-	return .
 
 /turf/simulated/get_examine_list(var/mob/caller)
 	. = ..()
 	. += div("notice","The health of the object is: [health ? health.health_current : "none"].")
 	. += div("notice","The slippery percentage is [get_slip_strength()*100]%.")
-	return .
 
 /*
 /turf/simulated/New(var/atom/desired_loc)
@@ -103,7 +115,6 @@ var/global/list/blood_turfs = list()
 
 	change_turf(destruction_turf)
 
-	return .
 
 /turf/simulated/Initialize()
 	var/area/A = loc
@@ -121,7 +132,6 @@ var/global/list/blood_turfs = list()
 /turf/simulated/PostInitialize()
 	. = ..()
 	update_sprite()
-	return .
 
 /turf/simulated/proc/get_smooth_code()
 
@@ -227,8 +237,8 @@ var/global/list/blood_turfs = list()
 		turf_icon_cache[full_icon_string] = I
 
 	icon = I
-	pixel_x = (32 - I.Width())/2
-	pixel_y = (32 - I.Height())/2
+	pixel_x = (TILE_SIZE - I.Width())/2
+	pixel_y = (TILE_SIZE - I.Height())/2
 
 	return TRUE
 
@@ -253,7 +263,6 @@ var/global/list/blood_turfs = list()
 		var/image/I = new/image('icons/obj/effects/water.dmi',"wet_floor")
 		add_overlay(I)
 
-	return .
 
 /turf/simulated/proc/set_exposed(var/desired_exposed = FALSE,var/force=FALSE)
 

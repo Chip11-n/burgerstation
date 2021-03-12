@@ -1,5 +1,6 @@
 /obj/item/clothing/back/storage/dufflebag/poly
 	icon = 'icons/obj/item/clothing/back/dufflebag/poly.dmi'
+	dyeable = TRUE
 	polymorphs = list(
 		"body" = COLOR_WHITE,
 		"detail" = COLOR_WHITE,
@@ -34,4 +35,18 @@
 		"body" = COLOR_WHITE,
 		"straps" = COLOR_SCIENCE,
 		"detail" = COLOR_SCIENCE
+	)
+
+/obj/item/clothing/back/storage/dufflebag/poly/ntops
+	polymorphs = list(
+		"body" = COLOR_WHITE,
+		"detail" = COLOR_BLACK,
+		"straps" = COLOR_BLACK
+	)
+
+/obj/item/clothing/back/storage/dufflebag/poly/wizard
+	polymorphs = list(
+		"body" = COLOR_PURPLE,
+		"detail" = COLOR_BLUE,
+		"straps" = COLOR_BLUE
 	)

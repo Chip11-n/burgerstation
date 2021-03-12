@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/revolver/38_2.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 1.25
+	shoot_delay = 1
 
 	automatic = FALSE
 
@@ -67,6 +67,9 @@
 	attachment_undermount_offset_y = 21 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/deathsquad
+
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.04
 
 /obj/item/weapon/ranged/bullet/revolver/comp/get_static_spread()
 	return 0

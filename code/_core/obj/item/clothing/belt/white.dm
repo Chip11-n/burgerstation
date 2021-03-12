@@ -25,3 +25,12 @@
 
 /obj/item/clothing/belt/storage/colored/janitor
 	color = COLOR_JANITOR
+
+/obj/item/clothing/belt/storage/colored/purple
+	color = COLOR_PURPLE
+
+/obj/item/clothing/belt/storage/colored/merc
+	color = "#4C5E56"
+
+/obj/item/clothing/belt/storage/colored/merc_alt
+	color = "#97805C"

@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/rifle/762_snipe.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 5
+	shoot_delay = 6
 
 	automatic = FALSE
 
@@ -67,6 +67,9 @@
 	attachment_undermount_offset_x = 22 - 16
 	attachment_undermount_offset_y = 17 - 16
 
+	inaccuracy_modifier = 0.1
+	movement_spread_base = 0.07
+
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/svd/get_static_spread()
@@ -75,16 +78,3 @@
 /obj/item/weapon/ranged/bullet/magazine/rifle/svd/get_skill_spread(var/mob/living/L)
 	if(!heat_current) return 0
 	return max(0,0.002 - (0.003 * L.get_skill_power(SKILL_RANGED)))
-
-
-/obj/item/weapon/ranged/bullet/magazine/rifle/svd/get_bullet_inaccuracy(var/mob/living/L,var/atom/target,var/obj/projectile/P,var/inaccuracy_modifier)
-
-	var/distance = get_dist(L,target)
-
-	if(distance <= 3)
-		return TILE_SIZE*0.5 //No using snipers at close range.
-
-	if(distance <= VIEW_RANGE*0.5)
-		return max(0,1 - L.get_skill_power(SKILL_PRECISION)) * ((VIEW_RANGE*0.5)/get_dist(L,target)) * TILE_SIZE*0.5
-
-	return max(0,1 - L.get_skill_power(SKILL_PRECISION))*(0.1+0.9*(get_dist(L,target) - VIEW_RANGE*0.5)) * (L.client && L.client.is_zoomed ? 0.25 : 1)

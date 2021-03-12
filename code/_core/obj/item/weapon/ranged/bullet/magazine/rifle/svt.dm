@@ -6,7 +6,7 @@
 	icon_state = "inventory"
 	value = 300
 
-	shoot_delay = 3
+	shoot_delay = 6
 
 	automatic = FALSE
 
@@ -68,6 +68,9 @@
 	attachment_undermount_offset_y = 17 - 16
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
+
+	inaccuracy_modifier = 0.5
+	movement_spread_base = 0.05
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/svt/get_static_spread()
 	if(!wielded) return 0.2

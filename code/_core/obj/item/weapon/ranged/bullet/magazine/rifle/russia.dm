@@ -66,6 +66,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.02
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/ak13/get_static_spread()
 	if(!wielded)
 		return 0.15
@@ -83,7 +86,7 @@
 	icon_state = "inventory"
 	value = 175
 
-	shoot_delay = 1.5
+	shoot_delay = 2
 	max_bursts = 2
 	view_punch = 5
 
@@ -133,6 +136,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.03
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/abakan/get_static_spread()
 	if(!wielded)
 		return 0.08
@@ -151,7 +157,7 @@
 	icon_state = "inventory"
 	value = 450
 
-	shoot_delay = 1.75
+	shoot_delay = 2
 	view_punch = 5
 
 	shoot_sounds = list('sound/weapons/russia/abakan.ogg')
@@ -203,6 +209,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.02
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/ak12/get_static_spread()
 	if(!wielded)
 		return 0.12
@@ -221,7 +230,7 @@
 	icon_state = "inventory"
 	value = 650
 
-	shoot_delay = 1.75
+	shoot_delay = 2
 	view_punch = 9
 
 	shoot_sounds = list('sound/weapons/russia/abakan.ogg')
@@ -273,6 +282,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 1.25
+	movement_spread_base = 0.1
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/rpk/get_static_spread()
 	if(!wielded)
 		return 0.16
@@ -291,7 +303,7 @@
 	icon_state = "inventory"
 	value = 300
 
-	shoot_delay = 1.8
+	shoot_delay = 1.5
 	view_punch = 4
 
 	shoot_sounds = list('sound/weapons/russia/abakan.ogg')
@@ -343,6 +355,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 1
+	movement_spread_base = 0.005
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/rpk/get_static_spread()
 	if(!wielded)
 		return 0.16
@@ -361,7 +376,7 @@
 	icon_state = "inventory"
 	value = 175
 
-	shoot_delay = 1.5
+	shoot_delay = 2
 
 	automatic = TRUE
 
@@ -409,6 +424,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 1
+	movement_spread_base = 0.005
+
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/groza/get_static_spread()
 	if(!wielded)
@@ -425,9 +443,9 @@
 	desc_extended = "A modified version of the silent Vintorez sniper rifle, the assault rifle was designed as a special forces weapon."
 	icon = 'icons/obj/item/weapons/ranged/rifle/939_val.dmi'
 	icon_state = "inventory"
-	value = 200
+	value = 500
 
-	shoot_delay = 1.5
+	shoot_delay = 2
 
 	automatic = TRUE
 
@@ -454,6 +472,8 @@
 
 	ai_heat_sensitivity = 1.5
 
+	shoot_alert = ALERT_LEVEL_NONE
+
 	attachment_whitelist = list(
 		/obj/item/attachment/sight/laser_sight = TRUE,
 		/obj/item/attachment/sight/quickfire_adapter = TRUE,
@@ -475,6 +495,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.03
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/val/get_static_spread()
 	if(!wielded) return 0.04
 	return 0.001
@@ -491,7 +514,7 @@
 	icon = 'icons/obj/item/weapons/ranged/rifle/939_vintar.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 2.5
+	shoot_delay = 3
 
 	automatic = TRUE
 
@@ -521,11 +544,11 @@
 	size = SIZE_4
 
 
-	value = 250
+	value = 450
 
 	ai_heat_sensitivity = 2
 
-	inaccuracy_modifer = 0.09
+	shoot_alert = ALERT_LEVEL_NONE
 
 	attachment_whitelist = list(
 		/obj/item/attachment/barrel/charger = TRUE, /obj/item/attachment/barrel/charger/advanced = TRUE,
@@ -547,6 +570,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.02
+
 /obj/item/weapon/ranged/bullet/magazine/rifle/vintorez/get_static_spread()
 	if(!wielded) return 0.005
 	return 0.001
@@ -554,15 +580,3 @@
 /obj/item/weapon/ranged/bullet/magazine/rifle/vintorez/get_skill_spread(var/mob/living/L)
 	if(!heat_current) return 0
 	return max(0,0.002 - (0.004 * L.get_skill_power(SKILL_RANGED)))
-
-/obj/item/weapon/ranged/bullet/magazine/rifle/vintorez/get_bullet_inaccuracy(var/mob/living/L,var/atom/target,var/obj/projectile/P,var/inaccuracy_modifier)
-
-	var/distance = get_dist(L,target)
-
-	if(distance <= 3)
-		return TILE_SIZE*0.5 //No using snipers at close range.
-
-	if(distance <= VIEW_RANGE*0.5)
-		return max(0,1 - L.get_skill_power(SKILL_PRECISION)) * ((VIEW_RANGE*0.5)/get_dist(L,target)) * TILE_SIZE*0.5
-
-	return max(0,1 - L.get_skill_power(SKILL_PRECISION))*(0.1+0.9*(get_dist(L,target) - VIEW_RANGE*0.5)) * (L.client && L.client.is_zoomed ? 0.25 : 1)

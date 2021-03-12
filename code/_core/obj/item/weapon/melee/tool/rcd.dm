@@ -16,12 +16,13 @@
 /obj/item/rcd/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEATOM("rcd_disk")
-	return .
+	SAVEVAR("matter_current")
 
 /obj/item/rcd/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADATOM("rcd_disk")
-	return .
+	LOADVAR("matter_current")
+	update_sprite()
 
 /obj/item/rcd/Generate()
 	matter_current = matter_max
@@ -48,11 +49,10 @@
 		var/image/I = new/image(initial(icon),"charge_[charge_level]")
 		add_overlay(I)
 
-	return .
 
 /obj/item/rcd/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	if(is_inventory(object))
+	if(object.plane >= PLANE_HUD)
 		return ..()
 
 	if(!isturf(object)) object = get_turf(object)
@@ -122,7 +122,6 @@
 	rcd_disk.drop_item(get_turf(src))
 	. = rcd_disk
 	rcd_disk = null
-	return .
 
 /obj/item/rcd/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params) //The src was clicked on by the object
 

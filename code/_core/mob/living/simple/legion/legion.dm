@@ -31,7 +31,7 @@
 	iff_tag = "Legion"
 	loyalty_tag = "Legion"
 
-	mob_size = MOB_SIZE_HUMAN
+	size = SIZE_HUMAN
 
 	blood_type = null
 
@@ -49,6 +49,8 @@
 		ION = INFINITY,
 		PAIN = INFINITY
 	)
+
+	soul_size = null
 
 /mob/living/simple/legionare/Destroy()
 
@@ -73,7 +75,7 @@
 	if(length(tracked_heads) >= head_limit)
 		return FALSE
 
-	if(istype(stored_corpse) && stored_corpse.ckey_last)
+	if(clone) //Clones cannot create heads.
 		return FALSE
 
 	var/mob/living/simple/legionare_head/L = new head_type(get_turf(src))
@@ -90,7 +92,7 @@
 
 	tracked_heads += L
 
-	next_head = world.time + 10
+	next_head = world.time + 20
 
 	return TRUE
 
@@ -146,9 +148,9 @@
 
 
 
-	mob_size = MOB_SIZE_LARGE
+	size = SIZE_LARGE
 
 /mob/living/simple/legionare/snow/post_death()
 	. = ..()
 	icon_state = "dead"
-	return .
+	

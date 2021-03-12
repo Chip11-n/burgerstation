@@ -6,7 +6,7 @@
 	icon_state = "inventory"
 	value = 1200
 
-	shoot_delay = SECONDS_TO_DECISECONDS(2)
+	shoot_delay = 20
 
 	automatic = FALSE
 
@@ -36,8 +36,6 @@
 
 	ai_heat_sensitivity = 2
 
-	inaccuracy_modifer = 0.1
-
 	zoom_mul = 2
 
 	attachment_whitelist = list()
@@ -53,6 +51,9 @@
 
 	firing_pin = /obj/item/firing_pin/electronic/iff/revolutionary
 
+	inaccuracy_modifier = 0.1
+	movement_spread_base = 0.15
+
 
 /obj/item/weapon/ranged/bullet/magazine/rifle/gauss_gun/get_static_spread()
 	return 0
@@ -60,15 +61,3 @@
 /obj/item/weapon/ranged/bullet/magazine/rifle/gauss_gun/get_skill_spread(var/mob/living/L)
 	if(!heat_current) return 0
 	return max(0.001 - (0.002 * L.get_skill_power(SKILL_RANGED)))
-
-/obj/item/weapon/ranged/bullet/magazine/rifle/gauss_gun/get_bullet_inaccuracy(var/mob/living/L,var/atom/target,var/obj/projectile/P,var/inaccuracy_modifier)
-
-	var/distance = get_dist(L,target)
-
-	if(distance <= 3)
-		return TILE_SIZE*0.5 //No using snipers at close range.
-
-	if(distance <= VIEW_RANGE*0.5)
-		return max(0,1 - L.get_skill_power(SKILL_PRECISION)) * ((VIEW_RANGE*0.5)/get_dist(L,target)) * TILE_SIZE*0.5
-
-	return max(0,1 - L.get_skill_power(SKILL_PRECISION))*(0.1+0.9*(get_dist(L,target) - VIEW_RANGE*0.5)) * (L.client && L.client.is_zoomed ? 0.25 : 1)

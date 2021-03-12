@@ -44,22 +44,27 @@
 	verbs += /client/verb/ghost
 	verbs += /client/verb/check_objectives
 
-	//Moderator
-	if(permissions & FLAG_PERMISSION_MODERATOR)
+
+	if(permissions & FLAG_PERMISSION_HOST)
+		verbs += /client/verb/apply_fuckup
+
+	//Moderator/Admin
+	if(permissions & FLAG_PERMISSION_MODERATOR || permissions & FLAG_PERMISSION_ADMIN)
 		verbs += /client/verb/ban
 		verbs += /client/verb/get_clients
+		verbs += /client/verb/jump_to_player
+		verbs += /client/verb/jump_to_area
+		verbs += /client/verb/adjust_nightvision
+		verbs += /client/verb/bring_player
+		verbs += /client/verb/jump_to_mob
+		verbs += /client/verb/ic_announcement
+		verbs += /client/verb/rejuvenate
+		verbs += /client/verb/force_round_end
 
 	//Dev
 	if(permissions & FLAG_PERMISSION_DEVELOPER)
 		verbs += /client/verb/show_debug_verbs
 		verbs += /client/verb/add_new_wikibot_entry
-
-	//Admin
-	if(permissions & FLAG_PERMISSION_ADMIN)
-		verbs += /client/verb/jump_to_player
-		verbs += /client/verb/jump_to_area
-		verbs += /client/verb/adjust_nightvision
-		verbs += /client/verb/bring_player
 
 	if(permissions & FLAG_PERMISSION_GAMEMASTER)
 		verbs += /client/verb/speed_up_setup
@@ -73,11 +78,11 @@
 		verbs += /client/verb/test_spook_station
 		verbs += /client/verb/test_syndicate_raid
 		verbs += /client/verb/force_specific_event
-		verbs += /client/verb/ic_announcement
-		verbs += /client/verb/force_round_end
 		verbs += /client/verb/force_vote
-		verbs += /client/verb/rejuvenate_player
 		verbs += /client/verb/add_language
 		verbs += /client/verb/remove_language
+		verbs += /client/verb/remove_trait
+		verbs += /client/verb/add_trait
+		verbs += /client/verb/create_explosion
 
 	return TRUE

@@ -34,8 +34,7 @@
 	if(reagents)
 		reagents.volume_max = item_count_current*10
 
-	return .
-
+	
 /obj/item/container/medicine/update_icon()
 
 	if(!override_icon_state)
@@ -66,7 +65,7 @@
 	var/burn_to_heal = (-heal_burn*heal_multiplier) + (-heal_burn_percent*A.health.get_loss(BURN)*heal_multiplier)
 
 	if(brute_to_heal || burn_to_heal)
-		A.health.adjust_loss_smart(brute = brute_to_heal, burn = burn_to_heal)
+		. += A.health.adjust_loss_smart(brute = brute_to_heal, burn = burn_to_heal)
 
 	if(.)
 		if(is_organ(A) && is_living(A.loc))
@@ -107,6 +106,24 @@
 		caller.to_chat(span("warning","You can't treat \the [target.name]!"))
 		return FALSE
 
+	if(heal_brute < 0 || heal_burn < 0)
+		if(!is_living(caller))
+			return FALSE
+		var/mob/living/caller_as_living = caller
+		var/mob/living/target_as_living
+		if(is_organ(target))
+			var/obj/item/organ/O = target
+			if(!is_living(O.loc))
+				return FALSE
+			target_as_living = O.loc
+		else if(is_living(target))
+			target_as_living = target
+		else
+			return FALSE
+		if(caller_as_living != target_as_living && caller_as_living.loyalty_tag == target_as_living.loyalty_tag)
+			caller.to_chat(span("warning","You'd feel it would be unsafe to treat your fellow man with \the [src.name]..."))
+			return FALSE
+
 	if(robotic)
 		if(target.health.organic)
 			caller.to_chat(span("warning","\The [src.name] can only treat robotic limbs!"))
@@ -121,7 +138,7 @@
 
 /obj/item/container/medicine/click_on_object(var/mob/caller as mob,var/atom/object,location,control,params)
 
-	if(is_inventory(object))
+	if(object.plane >= PLANE_HUD)
 		return ..()
 
 	var/self_treat = caller == object

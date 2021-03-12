@@ -5,7 +5,7 @@
 	icon = 'icons/obj/item/weapons/ranged/smg/10mm_3.dmi'
 	icon_state = "inventory"
 
-	shoot_delay = 1.6
+	shoot_delay = 1.75
 
 	automatic = TRUE
 
@@ -69,6 +69,9 @@
 
 	dan_mode = TRUE
 
+	inaccuracy_modifier = 0.75
+	movement_spread_base = 0.015
+
 /obj/item/weapon/ranged/bullet/magazine/smg/tactical/get_static_spread()
 	return 0.001
 
@@ -110,4 +113,10 @@
 	update_attachment_stats()
 	update_sprite()
 
-	return .
+
+
+/obj/item/weapon/ranged/bullet/magazine/smg/tactical/nt
+	icon = 'icons/obj/item/weapons/ranged/smg/10mm_3_nt.dmi'
+
+	firing_pin = /obj/item/firing_pin/electronic/iff/nanotrasen
+

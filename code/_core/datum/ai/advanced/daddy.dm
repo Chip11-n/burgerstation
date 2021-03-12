@@ -1,7 +1,7 @@
 /ai/advanced/daddy
 	var/next_chat_time = 0
 
-/ai/advanced/daddy/handle_objectives(var/tick_rate=AI_TICK)
+/ai/advanced/daddy/handle_objectives(var/tick_rate)
 
 	. = ..()
 
@@ -15,8 +15,6 @@
 		)
 		owner.do_say(pick(possible_phrases))
 		next_chat_time = world.time + SECONDS_TO_DECISECONDS(5)
-
-	return .
 
 /ai/advanced/daddy/attack_message()
 	owner.do_say("POW.")

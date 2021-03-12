@@ -9,7 +9,7 @@
 	ranged_damage_type = /damagetype/ranged/laser/ion
 
 	projectile_speed = TILE_SIZE - 1
-	shoot_delay = 3
+	shoot_delay = 4
 
 	automatic = FALSE
 
@@ -34,6 +34,9 @@
 	dan_mode = TRUE
 
 	can_wield = TRUE
+
+	inaccuracy_modifier = 0.25
+	movement_spread_base = 0.05
 
 /obj/item/weapon/ranged/energy/iongun/get_static_spread()
 	if(wielded) return 0

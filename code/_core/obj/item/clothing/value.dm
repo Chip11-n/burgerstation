@@ -1,4 +1,4 @@
-https://www.desmos.com/calculator/lor9o5vzic
+// https://www.desmos.com/calculator/lor9o5vzic
 
 var/global/list/defense_rating_to_value = list(
 	BLADE = 8.1,
@@ -40,7 +40,7 @@ var/global/list/limbs_to_value = list(
 		var/defense_value = defense_rating[defense_type]
 		if(!defense_value || defense_value < 0)
 			continue
-		. += (min(200,defense_value)**2)/defense_rating_to_value[defense_type]
+		. += (min(400,defense_value)**2)/defense_rating_to_value[defense_type]
 
 	var/base_multiplier = 0
 
@@ -54,4 +54,4 @@ var/global/list/limbs_to_value = list(
 	if(is_container)
 		. += ((dynamic_inventory_count*container_max_size)**1.4)*0.35
 
-	return .
+	

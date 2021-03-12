@@ -7,8 +7,8 @@
 
 	var/turf/turf_whitelist
 
-	var/turf/list/valid_turfs = list()
-	var/turf/list/forbidden_turfs = list()
+	var/list/turf/valid_turfs = list()
+	var/list/turf/forbidden_turfs = list()
 
 	var/grow_amount_min = 2
 	var/grow_amount_max = 10
@@ -71,15 +71,13 @@
 		if(!grow(desired_grow))
 			break
 
-	. = ..()
+	return TRUE
 
-	return .
 
 
 /obj/marker/generation/PostInitialize()
 	. = ..()
 	qdel(src)
-	return .
 
 /obj/marker/generation/grass
 	object_to_place = /obj/structure/scenery/grass

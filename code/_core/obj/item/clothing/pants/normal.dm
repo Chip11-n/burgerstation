@@ -59,6 +59,14 @@
 		"pants" = COLOR_SECURITY_DARK
 	)
 
+/obj/item/clothing/pants/normal/wizard
+	name = "wizard pants"
+	desc = "Wizarding!"
+	desc_extended = "Standard issue Wizard pants."
+	polymorphs = list(
+		"pants" = COLOR_PURPLE
+	)
+
 /obj/item/clothing/pants/normal/security/ancient
 	name = "ancient security pants"
 	desc = "From a forgotten age."
@@ -109,6 +117,14 @@
 		"pants" = COLOR_GREY
 	)
 
+/obj/item/clothing/pants/normal/black
+	name = "fancy pants"
+	desc = "Eat pant."
+	desc_extended = "The signature black pants of someone fancy."
+	polymorphs = list(
+		"pants" = COLOR_BLACK
+	)
+
 /obj/item/clothing/pants/normal/military_green
 	name = "military pants"
 	desc = "Eat pant."
@@ -116,16 +132,6 @@
 	polymorphs = list(
 		"pants" = COLOR_GREEN_MILITARY
 	)
-
-	defense_rating = list(
-		BLADE = 20,
-		BLUNT = 15,
-		PIERCE = 20,
-		ARCANE = 10,
-		COLD = 25,
-	)
-
-	value = 70
 
 /obj/item/clothing/pants/normal/chemistry
 	name = "chemistry pants"
@@ -154,3 +160,35 @@
 		"stripes" = "#222F28"
 	)
 
+/obj/item/clothing/pants/normal/reinforced
+	name = "reinforced pants"
+	icon = 'icons/obj/item/clothing/pants/reinforced.dmi'
+
+	defense_rating = list(
+		BLADE = AP_SWORD,
+		BLUNT = AP_DAGGER,
+		PIERCE = AP_SWORD,
+		ARCANE = -AP_DAGGER,
+		COLD = AP_DAGGER,
+	)
+
+/obj/item/clothing/pants/normal/reinforced/ntops
+	name = "NT ops reinforced pants"
+	polymorphs = list(
+		"pants" = COLOR_WHITE,
+		"stripes" = COLOR_BLACK
+	)
+
+/obj/item/clothing/pants/normal/reinforced/merc
+	name = "mercenary reinforced pants"
+	polymorphs = list(
+		"pants" = COLOR_OLIVE_DRAB,
+		"kneepad" = COLOR_WHITE
+	)
+
+/obj/item/clothing/pants/normal/reinforced/merc_alt
+	name = "mercenary reinforced pants"
+	polymorphs = list(
+		"pants" = "#A39D86",
+		"kneepad" = COLOR_WHITE
+	)

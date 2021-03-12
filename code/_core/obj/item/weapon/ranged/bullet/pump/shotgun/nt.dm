@@ -61,7 +61,11 @@
 	attachment_undermount_offset_x = 28 - 16
 	attachment_undermount_offset_y = 15 - 16
 
+	inaccuracy_modifier = 1.25
+
 /obj/item/weapon/ranged/bullet/pump/shotgun/nt/get_static_spread()
+	if(!wielded)
+		return 0.1
 	return 0.004
 
 /obj/item/weapon/ranged/bullet/pump/shotgun/nt/get_skill_spread(var/mob/living/L)
