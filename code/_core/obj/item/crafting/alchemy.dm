@@ -17,11 +17,13 @@
 
 	value = 25
 
+	size = SIZE_4
+
 /obj/item/crafting/alchemy/attempt_to_craft(var/mob/living/advanced/caller)
 
 	var/obj/item/container/C //Final slot container.
 
-	for(var/obj/hud/inventory/crafting/result/R in caller.inventory)
+	for(var/obj/hud/inventory/crafting/result/R in src.inventories)
 		var/obj/item/top_object = R.get_top_object()
 		if(is_container(top_object))
 			C = top_object

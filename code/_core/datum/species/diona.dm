@@ -4,7 +4,7 @@
 	id = "diona"
 	flags_species = SPECIES_DIONA
 
-	bite_size = 20
+	bite_size = 100
 
 	flags_chargen = CHARGEN_SKIN | CHARGEN_DETAIL | CHARGEN_GLOW
 
@@ -15,8 +15,6 @@
 	default_color_glow = "#B2F861"
 
 	genderless = TRUE
-
-	flags_species_traits = TRAIT_NO_PAIN
 
 	spawning_organs_male = list(
 		BODY_TORSO = /obj/item/organ/torso/diona,
@@ -31,10 +29,22 @@
 		BODY_HAND_RIGHT = /obj/item/organ/hand/diona,
 		BODY_HAND_LEFT = /obj/item/organ/hand/diona/left,
 
+		BODY_EYE_RIGHT = /obj/item/organ/eye/diona,
+		BODY_EYE_LEFT = /obj/item/organ/eye/diona/left,
+
 		BODY_BRAIN = /obj/item/organ/internal/brain,
 		BODY_LUNGS = /obj/item/organ/internal/lungs,
 		BODY_STOMACH = /obj/item/organ/internal/stomach,
 		BODY_LIVER = /obj/item/organ/internal/liver,
 		BODY_INTESTINTES = /obj/item/organ/internal/intestines,
 		BODY_KIDNEYS = /obj/item/organ/internal/kidneys
+	)
+
+	inherent_traits = list(
+		/trait/pain_tolerant,
+		/trait/metabolism/slow,
+		/trait/flamability/flammable,
+		/trait/blood_regen/blood_regen,
+		/trait/general_regen/nerd,
+		/trait/speed/slow
 	)

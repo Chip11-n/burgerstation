@@ -39,8 +39,6 @@
 
 	var/immortal = FALSE //Is this object allowed to take damage?
 
-	var/ignore_incoming_collisons = FALSE //TODO: Replace with tiny.
-
 	var/initialize_type = INITIALIZE_NORMAL //TODO: Make this apply to turfs, mobs, and areas.
 
 	var/luck = 50 //The luck of the atom. Affects rolling against or for user luck.
@@ -87,6 +85,7 @@
 /atom/Destroy()
 
 	stop_thinking(src)
+	stop_advanced_thinking(src)
 
 	set_light(FALSE)
 
@@ -110,13 +109,6 @@
 
 	return ..()
 
-/atom/Cross(atom/movable/O)
-
-	if(!ignore_incoming_collisons && src.collision_flags & O.collision_flags)
-		return FALSE
-
-	return ..()
-
 /atom/PostInitialize()
 
 	if(health)
@@ -127,6 +119,10 @@
 	update_atom_light()
 
 	return ..()
+
+
+/atom/proc/get_base_transform()
+	return matrix()
 
 /atom/Initialize()
 
@@ -240,7 +236,9 @@
 /atom/Exit(atom/movable/O,atom/oldloc) //Override default
 	return TRUE
 
-/atom/Cross(atom/movable/O) //Override default
+/atom/Cross(atom/movable/O) //Override default.
+	if(O.collision_flags & src.collision_flags)
+		return FALSE
 	return TRUE
 
 /atom/Crossed(atom/movable/O) //Override default
@@ -248,7 +246,6 @@
 
 /atom/proc/on_listen(var/atom/speaker,var/datum/source,var/text,var/language_text,var/talk_type,var/frequency,var/language=LANGUAGE_BASIC,var/talk_range=TALK_RANGE)
 	return TRUE
-
 
 /atom/proc/do_say(var/text_to_say, var/should_sanitize = TRUE, var/talk_type_to_use = TEXT_TALK,var/talk_range=TALK_RANGE,var/language_to_use=null)
 

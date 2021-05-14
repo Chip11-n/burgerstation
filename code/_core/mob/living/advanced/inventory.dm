@@ -2,14 +2,17 @@
 
 	I.update_sprite()
 
-	if(I.id == BODY_HAND_LEFT)
+	if(I.id == BODY_HAND_LEFT_HELD)
 		left_hand = I
 
-	if(I.id == BODY_HAND_RIGHT)
+	if(I.id == BODY_HAND_RIGHT_HELD)
 		right_hand = I
 
 	if(I.id == BODY_TORSO_OB)
 		holster = I
+
+	if(I.id == BODY_FACE)
+		face = I
 
 	inventory += I
 
@@ -21,14 +24,17 @@
 
 /mob/living/advanced/proc/remove_inventory(var/obj/hud/inventory/I)
 
-	if(I.id == BODY_HAND_LEFT)
+	if(I.id == BODY_HAND_LEFT_HELD)
 		left_hand = null
 
-	if(I.id == BODY_HAND_RIGHT)
+	if(I.id == BODY_HAND_RIGHT_HELD)
 		right_hand = null
 
 	if(I.id == BODY_TORSO_OB)
 		holster = null
+
+	if(I.id == BODY_FACE)
+		face = null
 
 	inventory -= I
 
@@ -66,3 +72,13 @@
 	. = list()
 	if(left_hand) . += left_hand.drop_objects(T)
 	if(right_hand) . += right_hand.drop_objects(T)
+
+/mob/living/advanced/proc/strip_and_delete_items()
+
+	for(var/k in worn_objects)
+		var/obj/item/I = k
+		qdel(I)
+
+	for(var/k in held_objects)
+		var/obj/item/I = k
+		qdel(I)

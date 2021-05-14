@@ -5,6 +5,10 @@
 	screen_loc = "CENTER,BOTTOM+3"
 	max_slots = 1
 	worn = FALSE
+
+	item_slot = SLOT_NONE
+	item_slot_mod = SLOT_MOD_NONE
+
 	max_size = SIZE_2
 	//should_draw = FALSE
 	drag_to_take = FALSE
@@ -20,13 +24,13 @@
 /obj/hud/inventory/organs/groin/pocket/right
 	name = "left lower pocket"
 	id = "pocket01"
-	screen_loc = "CENTER+2,BOTTOM"
+	screen_loc = "CENTER+3,BOTTOM"
 
 	priority = 11
 
 /obj/hud/inventory/organs/groin/pocket/left
 	name = "right lower pocket"
 	id = "pocket02"
-	screen_loc = "CENTER+3,BOTTOM"
+	screen_loc = "CENTER+4,BOTTOM"
 
 	priority = 10

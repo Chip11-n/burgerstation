@@ -5,13 +5,18 @@
 	desc_extended = "The centerpiece of vampire attire."
 	worn_layer = LAYER_MOB_CLOTHING_ALL
 
+	item_slot = SLOT_NECK
+
+
 	protected_limbs = list(BODY_TORSO)
 
 	defense_rating = list(
-		ARCANE = AP_SWORD,
-		COLD = AP_SWORD,
-		DARK = AP_CLUB,
-		HOLY = -AP_CLUB
+		ARCANE = 20,
+		COLD = 20,
+		DARK = 60,
+		HOLY = -60
 	)
 
 	value = 200
+
+	item_slot_layer = 3

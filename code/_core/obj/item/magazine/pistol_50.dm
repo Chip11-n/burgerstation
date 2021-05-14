@@ -8,12 +8,13 @@
 
 	weapon_whitelist = list(
 		/obj/item/weapon/ranged/bullet/magazine/pistol/deagle = TRUE,
+		/obj/item/weapon/ranged/bullet/magazine/pistol/deagle/gold = TRUE,
 		/obj/item/weapon/ranged/bullet/magazine/pistol/deagle/mod = TRUE,
-		/obj/item/weapon/ranged/bullet/magazine/pistol/deagle/night = TRUE,
-		/obj/item/weapon/ranged/bullet/magazine/pistol/deagle/night/equipped = TRUE
+		/obj/item/weapon/ranged/bullet/magazine/pistol/deagle/mod/equipped = TRUE
 	)
 
 	ammo = /obj/item/bullet_cartridge/pistol_50
+	ammo_surplus = /obj/item/bullet_cartridge/pistol_50/surplus
 
 	bullet_length_min = 30
 	bullet_length_best = 33

@@ -15,10 +15,10 @@
 	container_max_size = SIZE_1
 
 	defense_rating = list(
-		BLUNT = AP_SWORD,
-		PIERCE = AP_SWORD,
-		LASER = -AP_SWORD,
-		ARCANE = -AP_SWORD
+		BLUNT = 20,
+		PIERCE = 20,
+		LASER = -20,
+		ARCANE = -20
 	)
 
 	protected_limbs = list(BODY_TORSO)
@@ -115,7 +115,7 @@
 	)
 
 /obj/item/clothing/overwear/coat/vest/poly/pockets_only
-	name = "webbing pcokets"
+	name = "webbing pockets"
 
 	polymorphs = list(
 		"pockets" = COLOR_BLACK

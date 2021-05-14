@@ -22,12 +22,12 @@ var/global/obj/item/device/signaller/all_signalers = list()
 
 /obj/item/device/signaller/save_item_data(var/save_inventory = TRUE)
 	. = ..()
-	SAVEVAR("frequency")
+	SAVEVAR("frequency_current")
 	SAVEVAR("signal_current")
 
 /obj/item/device/signaller/load_item_data_post(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
-	LOADVAR("frequency")
+	LOADVAR("frequency_current")
 	LOADVAR("signal_current")
 
 /obj/item/device/signaller/door
@@ -42,7 +42,7 @@ var/global/obj/item/device/signaller/all_signalers = list()
 	all_signalers -= src
 	return ..()
 
-/obj/item/device/signaller/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1) //The src attacks the victim, with the blamed taking responsibility
+/obj/item/device/signaller/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1,var/damagetype/damage_type_override)  //The src attacks the victim, with the blamed taking responsibility
 	trigger(attacker,src,-1,-1)
 	return TRUE
 

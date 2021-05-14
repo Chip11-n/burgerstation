@@ -10,18 +10,18 @@
 	rarity = RARITY_LEGENDARY
 
 	defense_rating = list(
-		BLADE = AP_AXE,
-		BLUNT = AP_AXE,
-		PIERCE = AP_AXE,
-		LASER = AP_SWORD,
-		ARCANE = -AP_GREATCLUB,
-		HEAT = AP_AXE,
-		COLD = AP_AXE,
-		BOMB = AP_AXE,
-		BIO = AP_AXE,
-		RAD = AP_AXE,
-		FATIGUE = AP_GREATCLUB,
-		PAIN = AP_GREATCLUB
+		BLADE = 40,
+		BLUNT = 40,
+		PIERCE = 40,
+		LASER = 20,
+		ARCANE = -120,
+		HEAT = 40,
+		COLD = 40,
+		BOMB = 40,
+		BIO = 40,
+		RAD = 40,
+		FATIGUE = 120,
+		PAIN = 120
 	)
 
 	protection_cold = list(
@@ -40,9 +40,9 @@
 	icon_state = "inventory_left"
 	icon_state_worn = "worn_left"
 
-	item_slot = SLOT_HAND_LEFT
+	item_slot = SLOT_HAND
+	item_slot_mod = SLOT_MOD_LEFT
 	protected_limbs = list(BODY_HAND_LEFT)
-	blocks_clothing = SLOT_HAND_LEFT
 
 	protection_cold = list(
 		BODY_HAND_LEFT = 1

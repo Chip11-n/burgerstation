@@ -21,6 +21,7 @@
 	var/obj/hud/inventory/left_hand
 	var/obj/hud/inventory/right_hand
 	var/obj/hud/inventory/holster
+	var/obj/hud/inventory/face
 
 	var/obj/item/left_item
 	var/obj/item/right_item
@@ -42,7 +43,7 @@
 
 	has_footprints = TRUE
 
-	var/slowdown_mul = 1
+	var/move_delay_multiplier = 1
 
 	var/has_hard_crit = FALSE
 
@@ -69,7 +70,7 @@
 
 	size = SIZE_HUMAN
 
-	max_level = 100 //Max level for skills and attributes of the mob.
+	max_level = 100 //Base max level for skills and attributes of the mob.
 
 	death_threshold = -50
 
@@ -105,6 +106,12 @@
 	enable_security_hud = TRUE
 	enable_medical_hud = TRUE
 
+	var/list/using_inventories = list() //A list of /obj/items with inventories this mob is using.
+
+	var/list/inventory_defers = list() //inventory ref to button
+
+	var/evasion_rating = 0
+
 /mob/living/advanced/Destroy()
 
 	remove_all_organs()
@@ -124,6 +131,14 @@
 	holster_item = null
 	active_inventory = null
 	driving = null
+
+	inventory_defers.Cut()
+
+	for(var/k in using_inventories)
+		var/obj/item/I = k
+		I.close_inventory(src)
+
+	using_inventories.Cut()
 
 	QDEL_NULL(stored_handcuffs)
 
@@ -204,7 +219,7 @@
 		if(holster && holster_item && holster_item.dan_mode)
 			holster.update_held_icon(holster_item)
 
-/mob/living/advanced/proc/update_items(var/force=FALSE,var/should_update_slowdown=TRUE,var/should_update_eyes=TRUE,var/should_update_protection=TRUE,var/should_update_clothes=TRUE) //Sent when an item needs to update.
+/mob/living/advanced/proc/update_items(var/force=FALSE,var/should_update_speed=TRUE,var/should_update_eyes=TRUE,var/should_update_protection=TRUE,var/should_update_clothes=TRUE) //Sent when an item needs to update.
 
 	if(qdeleting) //Bandaid fix.
 		return FALSE
@@ -212,8 +227,8 @@
 	if(!force && !finalized)
 		return FALSE //Don't want to call this too much during initializations.
 
-	if(should_update_slowdown)
-		update_slowdown()
+	if(should_update_speed) //Weight too.
+		update_speed()
 	if(should_update_eyes)
 		update_eyes()
 	if(should_update_protection)
@@ -223,16 +238,21 @@
 
 	return TRUE
 
-/mob/living/advanced/proc/update_slowdown()
+/mob/living/advanced/proc/update_speed()
 
-	. = 1
+	var/max_weight = 50 + get_attribute_power(ATTRIBUTE_ENDURANCE)*450
+
+	. = 1 //The lower the value, the faster you are.
 
 	for(var/obj/item/clothing/C in worn_objects)
 		. -= C.speed_bonus
+		. += C.weight * (1/max_weight)
 
-	. = FLOOR(.,0.01)
+	. = FLOOR(max(0.25,.),0.01)
 
-	slowdown_mul = .
+	move_delay_multiplier = .
+
+	evasion_rating = min(75,max(0,. - 0.5)*50*2)
 
 /mob/living/advanced/New(loc,desired_client,desired_level_multiplier)
 
@@ -253,16 +273,16 @@
 
 /mob/living/advanced/proc/drop_all_items(var/atom/drop_location = get_turf(src), var/exclude_soulbound=FALSE,var/exclude_containers=TRUE)
 
-	var/dropped_objects = list()
+	. = list()
 
 	for(var/obj/hud/inventory/organs/O in inventory)
 		if(exclude_containers && is_item(O.loc))
 			var/obj/item/I = O.loc
 			if(I.is_container)
 				continue
-		dropped_objects += O.drop_objects(drop_location,exclude_soulbound)
+		. += O.drop_objects(drop_location,exclude_soulbound)
 
-	return dropped_objects
+	return .
 
 /mob/living/advanced/proc/delete_all_items()
 	for(var/v in inventory)
@@ -426,10 +446,7 @@ mob/living/advanced/Login()
 
 /mob/living/advanced/can_sprint()
 
-	if(!health)
-		return ..()
-
-	if(health.stamina_current <= 0)
+	if(health?.stamina_current <= 0 || has_status_effect(STAMCRIT))
 		return FALSE
 
 	var/list/organs_to_check = list(

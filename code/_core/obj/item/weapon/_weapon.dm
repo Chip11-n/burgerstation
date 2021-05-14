@@ -20,13 +20,38 @@
 
 	var/enchantment/enchantment
 
-/obj/item/weapon/get_examine_list(var/mob/examiner)
+	can_wear = TRUE
+	item_slot = -1
 
+	//var/weapon_tier = 0
+
+	uses_until_condition_fall = 100
+
+
+/* Price calculation is hard.
+/obj/item/weapon/get_base_value()
+
+	if(!damage_type)
+		return ..()
+
+	var/damagetype/D = all_damage_types[damage_type]
+
+	if(!D)
+		return ..()
+
+	return D.calculate_value(src)
+*/
+
+/obj/item/weapon/can_feed(var/mob/caller,var/atom/target)
+	return FALSE
+
+/obj/item/weapon/PostInitialize()
 	. = ..()
-
-	if(enchantment)
-		. += div("notice","It's enchanted with [enchantment.name].")
-
+	if(can_wear && item_slot == -1)
+		if(size <= 3)
+			item_slot = SLOT_GROIN_BELT
+		else
+			item_slot = SLOT_TORSO_BACK
 
 /obj/item/weapon/update_icon()
 
@@ -73,28 +98,6 @@
 	. = ..()
 	if(length(polymorphs)) .["polymorphs"] = polymorphs
 
-	if(enchantment)
-		.["enchantment"] = list(
-			"name" = enchantment.name,
-			"type" = enchantment.type,
-			"strength" = enchantment.strength
-		)
-
-
-
-
 /obj/item/weapon/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	if(object_data["polymorphs"]) polymorphs = object_data["polymorphs"]
-
-/obj/item/weapon/load_item_data_post(var/mob/living/advanced/player/P,var/list/object_data)
-
-	. = ..()
-
-	if(length(object_data["enchantment"]))
-		var/list/enchant_data = object_data["enchantment"]
-		var/enchantment/type_to_create = text2path(enchant_data["type"])
-		enchantment = new type_to_create
-		enchantment.name = enchant_data["name"]
-		enchantment.strength = enchant_data["strength"]
-

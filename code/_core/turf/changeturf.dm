@@ -8,12 +8,16 @@
 	var/old_affecting_lights = affecting_lights
 	var/old_lighting_overlay = lighting_overlay
 	var/old_corners = corners
+	var/old_disallow_generation = disallow_generation
 
 	for(var/obj/effect/footprint/F in src.contents)
 		qdel(F)
 
 	for(var/obj/effect/cleanable/C in src.contents)
 		qdel(C)
+
+	for(var/obj/structure/scenery/S in src.contents)
+		qdel(S)
 
 	if(src in SSturfs.wet_turfs)
 		SSturfs.wet_turfs -= src
@@ -23,32 +27,35 @@
 	var/turf/W = new N(src)
 	W.initialized = FALSE
 	INITIALIZE(W)
+	W.finalized = FALSE
+	FINALIZE(W)
 	. = W
+	W.disallow_generation = old_disallow_generation
 
-	recalc_atom_opacity()
+	W.recalc_atom_opacity()
 	if(SSlighting && SSlighting.initialized)
-		lighting_overlay = old_lighting_overlay
-		affecting_lights = old_affecting_lights
-		corners = old_corners
-		if((old_opacity != opacity) || (dynamic_lighting != old_dynamic_lighting) || force_lighting_update)
-			//reconsider_lights()
-			force_update_lights()
-		if(dynamic_lighting != old_dynamic_lighting)
-			if(dynamic_lighting)
-				lighting_build_overlay()
+		W.lighting_overlay = old_lighting_overlay
+		W.affecting_lights = old_affecting_lights
+		W.corners = old_corners
+		if((old_opacity != W.opacity) || (W.dynamic_lighting != old_dynamic_lighting) || force_lighting_update)
+			W.reconsider_lights()
+			//force_update_lights()
+		if(W.dynamic_lighting != old_dynamic_lighting)
+			if(W.dynamic_lighting)
+				W.lighting_build_overlay()
 			else
-				lighting_clear_overlay()
+				W.lighting_clear_overlay()
 
 	if(force_edges_update)
 		update_edges()
 	else
 		queue_update_turf_edges(W)
 
-	W.post_change_turf(old_turf_type)
-
 	var/area/A = W.loc
 	if(A && A.sunlight_freq > 0 && A.sunlight_color)
 		A.setup_sunlight(W)
+
+	W.post_change_turf(old_turf_type)
 
 /turf/proc/post_change_turf(var/old_turf_type)
 	return TRUE

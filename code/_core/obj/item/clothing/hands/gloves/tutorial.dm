@@ -9,10 +9,8 @@
 
 	icon = 'icons/obj/item/clothing/gloves/tutorial_gloves.dmi'
 
-	item_slot = SLOT_HAND_RIGHT
-
 	defense_rating = list(
-		ARCANE = AP_GREATSWORD
+		ARCANE = 80
 	)
 
 	size = SIZE_0
@@ -27,6 +25,6 @@
 	icon_state = "inventory_left"
 	icon_state_worn = "worn_left"
 
-	item_slot = SLOT_HAND_LEFT
+	item_slot = SLOT_HAND
+	item_slot_mod = SLOT_MOD_LEFT
 	protected_limbs = list(BODY_HAND_LEFT)
-	blocks_clothing = SLOT_HAND_LEFT

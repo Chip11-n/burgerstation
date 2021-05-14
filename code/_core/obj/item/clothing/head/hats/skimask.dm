@@ -6,7 +6,8 @@
 	icon_state = "inventory"
 	slot_icons = TRUE
 
-	item_slot = SLOT_HEAD | SLOT_FACE_WRAP
+	item_slot = SLOT_HEAD | SLOT_FACE
+
 	ignore_other_slots = TRUE
 
 	flags_clothing = FLAG_CLOTHING_NOBEAST_HEAD
@@ -16,17 +17,15 @@
 	worn_layer = LAYER_MOB_CLOTHING_MASK
 
 	defense_rating = list(
-		ARCANE = AP_SWORD,
-		COLD = AP_AXE,
-		BIO = AP_SWORD
+		ARCANE = 20,
+		COLD = 40,
+		BIO = 20
 	)
 
 	hidden_organs = list(
 		BODY_HAIR_HEAD = TRUE,
 		BODY_HAIR_FACE = TRUE
 	)
-
-	blocks_clothing = SLOT_FACE_WRAP
 
 	value = 30
 
@@ -38,11 +37,11 @@
 		hidden_organs = list(BODY_HAIR_HEAD = TRUE, BODY_HAIR_FACE = FALSE)
 		worn_layer = LAYER_MOB_CLOTHING_HELMET
 
-	if(new_location.item_slot & SLOT_FACE_WRAP)
+	if(new_location.item_slot & SLOT_FACE)
 		hidden_organs = list(BODY_HAIR_HEAD = TRUE, BODY_HAIR_FACE = TRUE)
 		worn_layer = LAYER_MOB_CLOTHING_HEADWRAP
 
-	
+
 /obj/item/clothing/head/hat/skimask/black
 	color = COLOR_BLACK
 

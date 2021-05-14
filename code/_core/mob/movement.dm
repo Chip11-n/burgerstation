@@ -74,7 +74,6 @@
 		if(loc != old_loc)
 			post_move(old_loc)
 
-
 /mob/proc/update_rs_chat()
 	for(var/k in stored_chat_text)
 		var/obj/effect/chat_text/CT = k
@@ -131,6 +130,18 @@
 
 	update_z_position()
 
+	if(move_dir && observing)
+		observing.observers -= src
+		observing = null
+
+	for(var/k in observers)
+		var/mob/chosenObserver = k
+		if(chosenObserver.observing != src)
+			log_error("Warning: it was said that an observer was observing, but they actually weren't.")
+			observers -= k
+			continue
+		chosenObserver.glide_size = glide_size
+		chosenObserver.force_move(get_turf(loc))
 
 /mob/set_dir(var/desired_dir,var/force=FALSE)
 

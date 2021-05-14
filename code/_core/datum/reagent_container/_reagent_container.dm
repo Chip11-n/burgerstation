@@ -25,7 +25,7 @@
 
 	var/contains_lethal = FALSE
 
-	var/allow_recipie_processing = TRUE
+	var/allow_recipe_processing = TRUE
 
 /reagent_container/Destroy()
 	owner = null
@@ -69,6 +69,9 @@
 
 	var/trait/metabolism/M = living_owner.get_trait_by_category(/trait/metabolism/)
 	if(M) multiplier *= M.metabolism_multiplier
+
+	if(multiplier <= 0)
+		return FALSE
 
 	for(var/r_id in stored_reagents)
 
@@ -134,7 +137,6 @@
 		temperature_change *= 0.5 //This means it's slow to heat up, but fast to cool down.
 		average_temperature = min(desired_temperature,average_temperature + temperature_change)
 	 . = FALSE
-
 
 	for(var/r_id in stored_reagents_temperature)
 		var/reagent/R = REAGENT(r_id)
@@ -221,7 +223,7 @@
 
 /reagent_container/proc/process_recipes(var/mob/caller,var/from_temperature_change=FALSE)
 
-	if(!allow_recipie_processing)
+	if(!allow_recipe_processing)
 		return FALSE
 
 	if(!caller && is_item(src.owner))
@@ -415,7 +417,7 @@
 
 	return TRUE
 
-/reagent_container/proc/transfer_reagents_to(var/reagent_container/target_container,var/amount=0,var/should_update=TRUE,var/check_recipes = TRUE,var/mob/living/caller) //Transfer all the reagents.
+/reagent_container/proc/transfer_reagents_to(var/reagent_container/target_container,var/amount=src.volume_current,var/should_update=TRUE,var/check_recipes = TRUE,var/mob/living/caller) //Transfer all the reagents.
 
 	if(!target_container)
 		CRASH_SAFE("Tried to transfer reagents from [owner], but there was no target_container!")
@@ -513,7 +515,7 @@
 /reagent_container/proc/splash(var/mob/caller,var/atom/target,var/splash_amount = volume_current,var/silent = FALSE,var/strength_mod=1)
 
 	if(!splash_amount || !volume_current)
-		caller?.to_chat(span("warning","There is nothing to splash!"))
+		if(!silent) caller?.to_chat(span("warning","There is nothing to splash!"))
 		return FALSE
 
 	if(!target)
@@ -522,7 +524,7 @@
 
 	target = target.change_victim(caller,owner)
 
-	target.on_splash(caller,src,splash_amount,silent,strength_mod)
+	if(target) target.on_splash(caller,src,splash_amount,silent,strength_mod)
 
 	return TRUE
 

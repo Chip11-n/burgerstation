@@ -10,10 +10,11 @@
 		/obj/item/weapon/ranged/bullet/magazine/pistol/syndie = TRUE,
 		/obj/item/weapon/ranged/bullet/magazine/pistol/syndie/mod = TRUE,
 		/obj/item/weapon/ranged/bullet/magazine/pistol/high_power = TRUE,
-		/obj/item/weapon/ranged/bullet/magazine/pistol/high_power/old = TRUE
+		/obj/item/weapon/ranged/bullet/magazine/pistol/high_power/mod = TRUE
 	)
 
 	ammo = /obj/item/bullet_cartridge/pistol_10mm
+	ammo_surplus = /obj/item/bullet_cartridge/pistol_10mm/surplus
 
 	bullet_length_min = 25
 	bullet_length_best = 32

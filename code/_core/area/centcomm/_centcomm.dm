@@ -1,7 +1,7 @@
 /area/centcomm
 	name = "Central Command"
 	icon_state = "cmd"
-	flags_area = FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_NO_ROUND_INFORMATION | FLAGS_AREA_TUTORIAL
+	flags_area = FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_NO_ROUND_INFORMATION | FLAGS_AREA_TUTORIAL | FLAGS_AREA_NO_EVENTS | FLAGS_AREA_SAVEZONE
 
 	ambient_sound = 'sound/ambient/station_loop.ogg'
 	random_sounds = list(
@@ -23,3 +23,23 @@
 	area_identifier = "Central Command"
 
 	sound_environment = ENVIRONMENT_STONEROOM
+
+
+
+
+/area/debug
+	name = "!Pathfinding Debug"
+	icon_state = "cmd"
+	flags_area = FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_NO_ROUND_INFORMATION | FLAGS_AREA_NO_EVENTS
+
+	area_identifier = "Pathing Debug"
+
+	sound_environment = ENVIRONMENT_STONEROOM
+
+
+/area/surface
+	name = "Surface"
+	icon_state = "cmd"
+	flags_area = FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_NO_ROUND_INFORMATION | FLAGS_AREA_TUTORIAL | FLAGS_AREA_NO_EVENTS | FLAGS_AREA_SAVEZONE
+	sunlight_freq = 4
+	sunlight_color = "#2C4D59"

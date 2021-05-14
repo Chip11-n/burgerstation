@@ -7,6 +7,8 @@
 	if(dead)
 		return FALSE
 
+	is_moving = FALSE
+
 	if(boss)
 		SSbosses.living_bosses -= src
 
@@ -26,8 +28,7 @@
 		stand.linked_stand.set_enabled(FALSE)
 		remove_stand()
 
-	if(ai)
-		ai.on_death()
+	if(ai) ai.on_death()
 
 	var/turf/T = get_turf(src)
 
@@ -73,7 +74,7 @@
 	else if(!is_player_controlled() && soul_size && has_status_effect(SOULTRAP))
 		var/obj/effect/temp/soul/S = new(get_turf(src),SECONDS_TO_DECISECONDS(20))
 		S.appearance = src.appearance
-		S.transform = matrix()
+		S.transform = get_base_transform()
 		S.color = "#000000"
 		S.soul_size = soul_size
 		S.plane = PLANE_EFFECT
@@ -83,6 +84,13 @@
 		GENERATE(S)
 		FINALIZE(S)
 		remove_status_effect(SOULTRAP)
+
+	if(one_time_life)
+		dust()
+
+	if(drops_gold > 0)
+		create_gold_drop(T,CEILING(drops_gold,1))
+		drops_gold = 0
 
 	return TRUE
 
@@ -141,6 +149,13 @@
 	)
 	blood_volume = blood_volume_max
 	if(reagents) reagents.remove_all_reagents()
+	nutrition = initial(nutrition)
+	nutrition_fast = initial(nutrition_fast)
+	hydration = initial(hydration)
+	nutrition_quality = initial(nutrition_quality)
+	intoxication = initial(intoxication)
+	on_fire = initial(on_fire)
+	fire_stacks = initial(fire_stacks)
 	return TRUE
 
 /mob/living/proc/resurrect()
@@ -188,26 +203,30 @@
 
 	return ..()
 
+/mob/living/get_base_transform()
+	. = ..()
+	if(horizontal)
+		var/matrix/M = .
+		M.Turn(stun_angle)
+
 /mob/living/proc/handle_horizontal()
 
 	var/desired_horizontal = dead || has_status_effects(STUN,STAMCRIT,SLEEP,CRIT,REST,PAINCRIT)
 
 	if(desired_horizontal != horizontal)
-		if(desired_horizontal) //KNOCK DOWN
-			if(stun_angle != 0) animate(src,transform = turn(matrix(), stun_angle), pixel_z = 0, time = 1)
+		horizontal = desired_horizontal
+		if(horizontal)
+			animate(src,transform = get_base_transform(), pixel_z = 0, time = 1)
 			update_collisions(FLAG_COLLISION_CRAWLING)
 			play_sound(pick('sound/effects/impacts/bodyfall2.ogg','sound/effects/impacts/bodyfall3.ogg','sound/effects/impacts/bodyfall4.ogg'),get_turf(src), volume = 25,range_max=VIEW_RANGE*0.5)
-		else //GET UP
-			if(stun_angle != 0) animate(src,transform = matrix(), pixel_z = initial(src.pixel_z), time = 2)
+		else
+			animate(src,transform = get_base_transform(), pixel_z = initial(src.pixel_z), time = 2)
 			update_collisions(initial(collision_flags))
-		horizontal = desired_horizontal
+
 
 	return desired_horizontal
 
 /mob/living/proc/on_life() //TODO: Find out why this has so much self cpu
-
-	if(!initialized || qdeleting)
-		return FALSE
 
 	handle_status_effects()
 
@@ -221,42 +240,30 @@
 		health.update_health()
 		queue_health_update = FALSE
 
+	if(flash_overlay && flash_overlay.duration > 0)
+		flash_overlay.duration -= LIFE_TICK
+		if(flash_overlay.duration <= 0)
+			animate(flash_overlay,alpha=0,time=SECONDS_TO_DECISECONDS(5))
+			queue_delete(flash_overlay,SECONDS_TO_DECISECONDS(10))
+			flash_overlay = null
+
+
 	return TRUE
-
-/*
-/mob/living/proc/handle_charges(var/charge_gain = 0)
-
-	var/dodge_power = src.get_skill_power(SKILL_DODGE)
-	var/block_power = src.get_skill_power(SKILL_BLOCK)
-	var/parry_power = src.get_skill_power(SKILL_PARRY)
-
-	var/old_dodge = charge_dodge
-	var/old_block = charge_block
-	var/old_parry = charge_parry
-
-	charge_dodge = min(charge_dodge + charge_gain*dodge_power,CEILING(dodge_power*500,100))
-	charge_block = min(charge_block + charge_gain*block_power,CEILING(block_power*500,100))
-	charge_parry = min(charge_parry + charge_gain*parry_power,CEILING(parry_power*500,100))
-
-	if(!charge_gain || old_dodge != charge_dodge || old_block != charge_block || !old_parry != charge_parry)
-		for(var/obj/hud/button/evade/B in buttons)
-			B.update_overlays()
-		return TRUE
-
-	return FALSE
-*/
 
 /mob/living/proc/handle_hunger()
 
 	var/thirst_mod = health && (health.stamina_current <= health.stamina_max*0.5) ? 2 : 1
-	var/quality_mod = 1 + clamp(1 - get_nutrition_quality_mod(),0,1)*5
+	var/hunger_mod = 1 + clamp(1 - get_nutrition_quality_mod(),0,1)*5
 
 	var/trait/metabolism/M = get_trait_by_category(/trait/metabolism/)
-	if(M) quality_mod *= M.hunger_multiplier
+	if(M)
+		hunger_mod *= M.hunger_multiplier
+		thirst_mod *= M.thirst_multiplier
 
-	add_nutrition(-(LIFE_TICK_SLOW/10)*0.10*quality_mod)
-	add_nutrition_fast(-(LIFE_TICK_SLOW/10)*0.20*quality_mod)
-	add_hydration(-(LIFE_TICK_SLOW/10)*0.05*thirst_mod)
+	if(hunger_mod > 0)
+		add_nutrition(-(LIFE_TICK_SLOW/10)*0.10*hunger_mod)
+		add_nutrition_fast(-(LIFE_TICK_SLOW/10)*0.20*hunger_mod)
+		add_hydration(-(LIFE_TICK_SLOW/10)*0.05*thirst_mod)
 
 	if(client)
 		for(var/obj/hud/button/hunger/B in buttons)
@@ -266,9 +273,6 @@
 
 
 mob/living/proc/on_life_slow()
-
-	if(!initialized)
-		return FALSE
 
 	if(minion_remove_time && minion_remove_time <= world.time)
 		dust()
@@ -282,9 +286,6 @@ mob/living/proc/on_life_slow()
 	handle_fire()
 
 	if(dead)
-		return FALSE
-
-	if(ai && !ai.active)
 		return FALSE
 
 	if(blood_volume < blood_volume_max)
@@ -320,14 +321,19 @@ mob/living/proc/on_life_slow()
 	var/threshold_multiplier = 1
 	var/intoxication_to_remove = (0.025 + intoxication*0.0025)*(LIFE_TICK_SLOW/10)
 	var/should_apply_status_effects = TRUE
+	var/reverse_intoxication = FALSE
 
 	var/trait/intoxication_regen/IR = get_trait_by_category(/trait/intoxication_regen/)
 	if(IR)
 		intoxication_to_remove *= IR.intoxication_removal_multiplier
 		threshold_multiplier *= IR.alcohol_threshold_multiplier
 		should_apply_status_effects = IR.should_apply_drunk_status_effects
+		reverse_intoxication = IR.reverse_intoxication
 
-	intoxication = max(0,intoxication-intoxication_to_remove)
+	if(reverse_intoxication)
+		intoxication = min(1000,intoxication+(0.1*(LIFE_TICK_SLOW/10)))
+	else
+		intoxication = max(0,intoxication-intoxication_to_remove)
 
 	switch(intoxication/threshold_multiplier)
 		if(0 to 200)

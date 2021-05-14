@@ -29,12 +29,17 @@
 
 	damage_coefficient = 1
 
+	gib_icon_state = "gibtorso"
+
+	can_gib = FALSE
+
 /obj/item/organ/torso/unattach_from_parent(var/turf/T)
 	. = ..()
 	if(is_advanced(src.loc))
 		var/mob/living/advanced/A = src.loc
 		A.death()
-	
+		A.health?.update_health()
+
 /obj/item/organ/torso/female
 	desc = "A torso. Female variant"
 	icon_state = BODY_TORSO_FEMALE
@@ -125,4 +130,13 @@
 	defense_rating = GOBLIN_ARMOR
 
 /obj/item/organ/torso/goblin/female
+	icon_state = BODY_TORSO_FEMALE
+
+
+/obj/item/organ/torso/moth
+	name = "moth torso"
+	icon = 'icons/mob/living/advanced/species/moth.dmi'
+	desc = "An organ."
+
+/obj/item/organ/torso/moth/female
 	icon_state = BODY_TORSO_FEMALE

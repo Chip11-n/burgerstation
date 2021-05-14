@@ -9,18 +9,15 @@
 
 	icon = 'icons/obj/item/clothing/shoes/boots_miner.dmi'
 
-	item_slot = SLOT_FOOT_RIGHT
-	protected_limbs = list(BODY_FOOT_RIGHT)
-
 	defense_rating = list(
-		BLADE = AP_SWORD,
-		BLUNT = AP_SWORD,
-		PIERCE = AP_SWORD,
-		ARCANE = AP_SWORD,
-		HEAT = AP_SWORD,
-		COLD = AP_SWORD,
-		BOMB = AP_SWORD,
-		PAIN = AP_CLUB
+		BLADE = 20,
+		BLUNT = 20,
+		PIERCE = 20,
+		ARCANE = 20,
+		HEAT = 20,
+		COLD = 20,
+		BOMB = 20,
+		PAIN = 60
 	)
 
 	size = SIZE_2
@@ -28,14 +25,11 @@
 
 	value = 80
 
-
-
 /obj/item/clothing/feet/shoes/miner/left
 	name = "left mining boot"
 	icon_state = "inventory_left"
 	icon_state_worn = "worn_left"
 
-	item_slot = SLOT_FOOT_LEFT
+	item_slot = SLOT_FOOT
+	item_slot_mod = SLOT_MOD_LEFT
 	protected_limbs = list(BODY_FOOT_LEFT)
-	blocks_clothing = SLOT_FOOT_LEFT | SLOT_FOOT_LEFT_U
-

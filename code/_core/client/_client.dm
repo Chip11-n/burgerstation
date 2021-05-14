@@ -11,7 +11,7 @@ var/global/list/all_clients = list() //Assoc list
 	fps = FPS_CLIENT
 	preload_rsc = 1
 	view = VIEW_RANGE
-	perspective = MOB_PERSPECTIVE
+	perspective = EYE_PERSPECTIVE
 
 	var/list/obj/hud/inventory/known_inventory
 	var/list/obj/hud/button/known_buttons
@@ -22,7 +22,6 @@ var/global/list/all_clients = list() //Assoc list
 	var/savedata/client/connection_history/connection_data
 	var/savedata/client/settings/settings
 	var/savedata/client/controls/controls
-	var/savedata/client/globals/globals
 
 	//var/save_slot //The character slot that the client wishes to overwrite.
 	var/list/last_params
@@ -31,8 +30,6 @@ var/global/list/all_clients = list() //Assoc list
 
 	mouse_pointer_icon = 'icons/pointers/help.dmi'
 
-	perspective = EYE_PERSPECTIVE
-
 	var/current_music_track //Id of music track that last played.
 	var/next_music_track = 0 //When the next music track should be triggered.
 
@@ -40,6 +37,7 @@ var/global/list/all_clients = list() //Assoc list
 
 	var/disable_controls = FALSE
 
+	var/zoom_held = FALSE
 	var/is_zoomed = 0x0 //Takes a dir as a value.
 
 	var/next_allowed_topic = -1
@@ -87,6 +85,8 @@ var/global/list/all_clients = list() //Assoc list
 
 	var/restricted //Set to a string to prevent this person from making a character or joining as one.
 
+	var/list/icon_request_details
+
 /client/proc/is_player_controlled()
 	return TRUE //duh
 
@@ -116,9 +116,10 @@ var/global/list/all_clients = list() //Assoc list
 	last_location = null
 	last_object = null
 
+	QDEL_NULL(macros)
+
 	QDEL_NULL(connection_data)
 	QDEL_NULL(settings)
-	QDEL_NULL(macros)
 	QDEL_NULL(controls)
 
 	clear_mob(mob)
@@ -158,8 +159,17 @@ var/global/list/all_clients = list() //Assoc list
 	if(!connection_data)
 		connection_data = new(ckey)
 
-	if(!globals)
-		globals = new(ckey)
+	var/savedata/client/globals/GD = ckey_to_globaldata[ckey]
+	if(!GD)
+		new/savedata/client/globals(ckey)
+
+	var/savedata/client/death_box/deathbox_data = ckey_to_death_box_data[ckey]
+	if(!deathbox_data)
+		new/savedata/client/death_box(ckey)
+
+	var/savedata/client/bank/bankdata = ckey_to_bank_data[ckey]
+	if(!bankdata)
+		new/savedata/client/bank(ckey)
 
 	var/savedata/client/mob/mobdata = MOBDATA(ckey)
 	if(!mobdata)
@@ -174,15 +184,10 @@ var/global/list/all_clients = list() //Assoc list
 	if(SSadmin.initialized)
 		sync_permissions()
 
-	var/mob/found_mob = null
-	for(var/k in all_mobs)
-		var/mob/M = k
-		if(M.ckey_last == ckey)
-			found_mob = M
-			break
-
 	if(IsByondMember())
 		byond_member = TRUE
+
+	var/mob/found_mob = find_controlling_mob()
 
 	if(found_mob)
 		control_mob(found_mob)
@@ -221,7 +226,9 @@ var/global/list/all_clients = list() //Assoc list
 /client/proc/get_ranks()
 
 	var/list/rank/ranks = list(SSadmin.stored_ranks["user"])
-	if(world.port == 0) ranks |= SSadmin.stored_ranks["host"]
+	if(world.port == 0)
+		log_debug("Giving [src] the HOST rank as the world port is 0.")
+		ranks |= SSadmin.stored_ranks["host"]
 	if(SSadmin.stored_user_ranks[ckey])
 		for(var/k in SSadmin.stored_user_ranks[ckey])
 			var/rank/R = k

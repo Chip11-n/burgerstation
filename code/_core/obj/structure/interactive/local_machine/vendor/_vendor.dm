@@ -29,7 +29,7 @@ var/global/list/equipped_antags = list()
 
 	density = TRUE
 
-	var/markup = 1.25 //Cost multiplier from buying out of this vendor.
+	var/markup = 1.1 //Cost multiplier from buying out of this vendor.
 
 	desired_light_power = 0.25
 	desired_light_range = 2
@@ -61,6 +61,8 @@ var/global/list/equipped_antags = list()
 
 	return TRUE
 
+/obj/structure/interactive/vending/proc/modify_item(var/obj/item/I)
+	return TRUE
 
 /obj/structure/interactive/vending/proc/purchase_item(var/mob/living/advanced/player/P,var/obj/item/associated_item,var/item_value=0)
 
@@ -69,6 +71,7 @@ var/global/list/equipped_antags = list()
 
 	var/obj/item/new_item
 	new_item = new associated_item.type(get_turf(src))
+	modify_item(new_item)
 	INITIALIZE(new_item)
 	GENERATE(new_item)
 	FINALIZE(new_item)
@@ -92,6 +95,21 @@ var/global/list/equipped_antags = list()
 	stored_types.Cut()
 
 	return ..()
+
+/obj/structure/interactive/vending/proc/get_bullshit_price(var/desired_price)
+
+	if(accepts_item)
+		return desired_price
+
+	//Basically makes prices how they'd appear in stores.
+
+	switch(desired_price)
+		if(0 to 1)
+			return CEILING(desired_price,0.01)
+		if(1 to 100)
+			return CEILING(desired_price,1) - 0.01
+
+	return CEILING(desired_price,50) - 1
 
 /obj/structure/interactive/vending/Finalize()
 
@@ -117,7 +135,7 @@ var/global/list/equipped_antags = list()
 	for(var/obj/item/I in stored_objects)
 		if(stored_cost[I.type])
 			continue
-		stored_cost[I.type] = CEILING(I.get_value()*markup,1)
+		stored_cost[I.type] = get_bullshit_price(I.get_value()*markup)
 		if(price_max)
 			stored_cost[I.type] = min(price_max,stored_cost[I.type])
 		if(stored_cost[I.type] <= 0)

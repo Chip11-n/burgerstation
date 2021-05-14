@@ -12,7 +12,7 @@
 				params[PARAM_ICON_X] = rand(0,32)
 				params[PARAM_ICON_Y] = rand(0,32)
 				var/atom/object_to_damage = src.get_object_to_damage(src,src,params,TRUE,TRUE)
-				DT.hit(src,src,src,object_to_damage,src,damage_multiplier)
+				DT.process_damage(src,src,src,object_to_damage,src,damage_multiplier)
 		adjust_fire_stacks(-min(fire_stacks,LIFE_TICK_SLOW))
 
 	return TRUE
@@ -33,7 +33,7 @@
 			fire_overlay.icon_state = "[clamp(FLOOR(1 + (fire_stacks/MAX_FIRE_STACKS)*3,1),1,3)]"
 	return TRUE
 
-/mob/living/proc/ignite(var/added_fire_stacks = 0)
+/mob/living/proc/ignite(var/added_fire_stacks = 0,var/atom/source)
 
 	if(on_fire)
 		if(added_fire_stacks) adjust_fire_stacks(added_fire_stacks)
@@ -41,6 +41,9 @@
 
 	on_fire = TRUE
 	play_sound('sound/weapons/magic/fireball.ogg',get_turf(src),range_max=VIEW_RANGE)
+
+	if(ai)
+		ai.on_damage_received(null,source,null,null,added_fire_stacks*5,null,FALSE)
 
 	if(added_fire_stacks) adjust_fire_stacks(added_fire_stacks)
 

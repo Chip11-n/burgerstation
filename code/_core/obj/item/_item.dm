@@ -2,7 +2,7 @@
 	name = "item"
 	desc = "Oh my god it's an item."
 
-	vis_flags = VIS_INHERIT_ID | VIS_INHERIT_PLANE | VIS_INHERIT_LAYER
+	vis_flags = VIS_INHERIT_ID | VIS_INHERIT_PLANE
 
 	var/value_burgerbux
 
@@ -40,6 +40,10 @@
 	var/container_max_slots = 0 //How much each inventory slot can hold.
 	var/container_blacklist = list()
 	var/container_whitelist = list()
+	var/max_inventory_x = MAX_INVENTORY_X
+	var/inventory_category = "dynamic"
+	var/starting_inventory_y = "BOTTOM+1.25"
+	var/inventory_y_multiplier = 1
 
 	var/container_temperature = 0 //How much to add or remove from the ambient temperature for calculating reagent temperature. Use for coolers.
 	var/container_temperature_mod = 1 //The temperature mod of the inventory object. Higher values means faster temperature transition. Lower means slower.
@@ -57,7 +61,11 @@
 
 	var/worn_layer = 0
 
-	var/item_slot = SLOT_NONE
+	var/item_slot = SLOT_NONE //Items that can be worn in this slot. Applies to non-held slots only. See _defines/item.dm for info.
+	var/item_slot_additional = SLOT_NONE //For stuff like jumpsuits which take both the pant and shirt slot.
+	var/item_slot_mod = SLOT_MOD_NONE //The slot mod. See _defines/item.dm for info.
+	var/item_slot_layer = SLOT_LAYER_NORMAL //The layer of the clothing. See _defines/item.dm for info.
+
 
 	mouse_over_pointer = MOUSE_ACTIVE_POINTER
 
@@ -108,8 +116,6 @@
 	var/wielded = FALSE
 	var/can_wield = FALSE
 
-	ignore_incoming_collisons = TRUE
-
 	anchored = FALSE
 
 	var/block_power = 0.5 //Higher values means it blocks more. Normal weapons should have 1, while stronger items should have between 2-5
@@ -146,6 +152,27 @@
 	density = 1
 
 	value = -1
+
+	allow_path = TRUE
+
+	var/can_save = TRUE
+
+	var/uses_until_condition_fall = 0 //Uses until the quality degrades by 1%.
+
+/obj/item/proc/use_condition(var/amount_to_use=1)
+
+	if(!uses_until_condition_fall)
+		return FALSE
+
+	uses_until_condition_fall -= amount_to_use
+
+	if(uses_until_condition_fall <= 0)
+		var/highest = initial(uses_until_condition_fall)
+		var/quality_to_remove = 1 + FLOOR(-uses_until_condition_fall/highest,1)
+		adjust_quality(-quality_to_remove)
+		uses_until_condition_fall += highest*quality_to_remove
+
+	return TRUE
 
 /obj/item/proc/get_quality_bonus(var/minimum=0.5,var/maximum=2)
 	return min(minimum + FLOOR(quality/100,0.01)*(1-minimum),maximum)
@@ -184,10 +211,10 @@
 	)
 	return target.add_item_count(-src.add_item_count(-amount_to_transfer,TRUE),TRUE)
 
-/obj/item/get_inaccuracy(var/atom/source,var/atom/target,var/inaccuracy_modifier) //Only applies to melee. For ranged, see projectile.
+/obj/item/get_inaccuracy(var/atom/source,var/atom/target,var/inaccuracy_modifier) //Only applies to melee. For ranged, see /obj/item/weapon/ranged/proc/get_bullet_inaccuracy(var/mob/living/L,var/atom/target)
 	if(is_living(source))
 		var/mob/living/L = source
-		return (1 - L.get_skill_power(SKILL_PRECISION))*inaccuracy_modifier*8
+		return (1 - L.get_skill_power(SKILL_PRECISION,0,0.5,1))*inaccuracy_modifier*8
 	return 0
 
 /obj/item/proc/add_item_count(var/amount_to_add,var/bypass_checks = FALSE)
@@ -209,24 +236,6 @@
 		update_value()
 
 	return amount_to_add
-
-/*
-/obj/item/can_block(var/atom/attacker,var/atom/attacking_weapon,var/atom/victim,var/damagetype/DT)
-
-	if(is_living(victim))
-		var/mob/living/V = victim
-		return (V.get_skill_power(SKILL_BLOCK)) >= block_difficulty[DT.get_attack_type()] ? src : null
-
-	return src
-
-/obj/item/can_parry(var/atom/attacker,var/atom/attacking_weapon,var/atom/victim,var/damagetype/DT)
-
-	if(is_living(victim))
-		var/mob/living/V = victim
-		return (V.get_skill_power(SKILL_PARRY)) >= block_difficulty[DT.get_attack_type()] ? src : null
-
-	return src
-*/
 
 
 /obj/item/Destroy()
@@ -334,6 +343,7 @@
 		//Doesn't need to be initialized as it's done later.
 		D.id = "dynamic_[i]"
 		D.slot_num = i
+		D.inventory_category = inventory_category
 		if(container_max_slots)
 			D.max_slots = container_max_slots
 		if(container_max_size)
@@ -346,6 +356,9 @@
 			D.inventory_temperature_mod = container_temperature
 		if(container_temperature_mod)
 			D.inventory_temperature_mod_mod = container_temperature_mod
+		if(i==1)
+			D.assoc_button = new /obj/hud/button/close_inventory
+			D.assoc_button.inventory_category = inventory_category
 		inventories += D
 
 	return ..()
@@ -392,7 +405,7 @@
 	else if(luck > 50)
 		. += div("rarity good","<b>Luck</b>: +[luck-50]")
 
-	. += div("rarity","Value: [CEILING(value,1)]cr.")
+	. += div("rarity","Value: [value]cr.")
 	. += div("weightsize","Size: [size], Weight: [weight]")
 
 	if(item_count_current > 1) . += div("weightsize","Quantity: [item_count_current].")
@@ -417,6 +430,15 @@
 
 /obj/item/post_move(var/atom/old_loc)
 
+	if(is_container && inventory_user)
+		if(is_inventory(old_loc) && is_inventory(loc))
+			var/obj/hud/inventory/I1 = old_loc
+			var/obj/hud/inventory/I2 = loc
+			if(I1.owner != I2.owner)
+				close_inventory(null)
+		else if(!can_interact_with_inventory(inventory_user))
+			close_inventory(null)
+
 	if(isturf(loc) && is_inventory(old_loc))
 		if(delete_on_drop)
 			qdel(src)
@@ -429,11 +451,6 @@
 	return ..()
 
 /obj/item/proc/on_pickup(var/atom/old_location,var/obj/hud/inventory/new_location) //When the item is picked up or worn.
-
-	if(is_container)
-		for(var/k in inventories)
-			var/obj/hud/inventory/I = k
-			I.update_owner(new_location.owner)
 
 	if(old_location && new_location)
 		var/turf/OL = get_turf(old_location)
@@ -572,7 +589,7 @@
 
 	if(is_living(caller) && allow_reagent_transfer_from)
 		var/mob/living/L = caller
-		if(L.attack_flags & CONTROL_MOD_ALT) //SPLASH
+		if(L.attack_flags & CONTROL_MOD_DISARM) //SPLASH
 			reagents.splash(caller,object,reagents.volume_current,FALSE,0.75)
 			return TRUE
 
@@ -580,7 +597,6 @@
 		PROGRESS_BAR(caller,src,self_feed ? BASE_FEED_TIME_SELF : BASE_FEED_TIME,.proc/feed,caller,object)
 		PROGRESS_BAR_CONDITIONS(caller,src,.proc/can_feed,caller,object)
 		return TRUE
-
 
 	if(object.reagents)
 		//Find out the behavior.
@@ -623,12 +639,11 @@
 
 	if(is_living(caller))
 		var/mob/living/C = caller
-		if(C.attack_flags & CONTROL_MOD_ALT) //Splash
+		if(C.attack_flags & CONTROL_MOD_DISARM) //Splash
 			return FALSE
 		if(reagents.contains_lethal && L != C && L.loyalty_tag == C.loyalty_tag)
 			caller.to_chat(span("warning","Your loyalties prevent you from feeding dangerous reagents to your allies!"))
 			return FALSE
-
 
 	if(L.dead)
 		caller.to_chat(span("warning","\The [L.name] is dead!"))
@@ -652,7 +667,7 @@
 			x_mod *= 1/max
 			y_mod *= 1/max
 
-		throw_self(owner,null,null,null,x_mod*magnitude*2,y_mod*magnitude*2)
+		throw_self(owner,null,null,null,max(TILE_SIZE-1,x_mod*magnitude*2),max(TILE_SIZE-1,y_mod*magnitude*2))
 
 	return ..()
 
@@ -677,6 +692,6 @@
 		return FALSE
 	return ..()
 
-/obj/item/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1) //The src attacks the victim, with the blamed taking responsibility
+/obj/item/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1,var/damagetype/damage_type_override)  //The src attacks the victim, with the blamed taking responsibility
 	damage_multiplier *= FLOOR(quality/100,0.01)
 	return ..()

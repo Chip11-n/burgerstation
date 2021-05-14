@@ -6,7 +6,7 @@
 	rarity = RARITY_UNCOMMON
 
 	defense_rating = list(,
-		ARCANE = -AP_SWORD
+		ARCANE = -20
 	)
 
 	size = SIZE_1
@@ -14,3 +14,5 @@
 	sight_mod = SEE_OBJS
 
 	value = 100
+
+	item_slot_layer = 2

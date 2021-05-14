@@ -17,7 +17,8 @@
 /status_effect/proc/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
 
 	if(ENABLE_DAMAGE_NUMBERS && !stealthy)
-		new/obj/effect/temp/damage_number(owner.loc,clamp(duration,10,100),"[uppertext(name)]!")
+		var/turf/T = get_turf(owner)
+		if(T) new/obj/effect/temp/status_effect(T,clamp(duration,10,100),"[uppertext(name)]!")
 
 	return TRUE
 
@@ -53,6 +54,15 @@
 
 	affects_dead = FALSE
 
+
+/status_effect/stun/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
+	. = ..()
+	owner.remove_status_effect(STAGGER)
+	owner.remove_status_effect(PARRIED)
+	owner.remove_status_effect(SHOVED)
+
+
+
 /status_effect/sleeping
 	name = "Sleeping"
 	desc = "You're sleeping!"
@@ -84,7 +94,7 @@
 
 	var/initial_fire = owner.on_fire
 
-	if(owner.ignite(magnitude) && !initial_fire)
+	if(owner.ignite(magnitude,source) && !initial_fire)
 		owner.visible_message(span("danger","\The [owner.name] is set on fire!"),span("danger","You're set on fire!"))
 
 /status_effect/parried
@@ -114,6 +124,36 @@
 				owner.add_status_effect(STUN,stun_time,stun_time)
 				animate(owner,pixel_x = 0, pixel_y = 0,time = max(0,stun_time - 1))
 
+
+/status_effect/shoved
+	name = "Shoved"
+	desc = "You're shoved!"
+	id = SHOVED
+	minimum = 1
+	maximum = 10
+
+	affects_dead = FALSE
+
+/status_effect/shoved/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
+
+	. = ..()
+
+	if(source && !owner.horizontal)
+		var/desired_move_dir = get_dir(source,owner)
+		var/old_dir = owner.dir
+		var/result = owner.Move(get_step(owner,desired_move_dir))
+		owner.dir = old_dir
+		owner.move_delay = max(owner.move_delay,duration)
+		var/list/movement = direction_to_pixel_offset(desired_move_dir)
+		if(!result) //We can move.
+			animate(owner,pixel_x = movement[1] * TILE_SIZE, pixel_y = movement[2] * TILE_SIZE,time = 1)
+			spawn(1)
+				var/stun_time = max(duration,10)
+				owner.add_status_effect(STUN,stun_time,stun_time)
+				animate(owner,pixel_x = 0, pixel_y = 0,time = max(0,stun_time - 1))
+
+
+
 /status_effect/staggered
 	name = "Staggered"
 	desc = "You're staggered!"
@@ -131,11 +171,8 @@
 	return ..()
 
 /status_effect/staggered/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
-
 	. = ..()
-
-	if(source)
-		owner.move_delay = max(owner.move_delay,duration)
+	owner.move_delay = max(owner.move_delay,duration)
 
 /status_effect/slip
 	name = "Slipped"
@@ -318,3 +355,26 @@
 	if(owner && owner.client)
 		owner.remove_color_mod("stressed")
 	return TRUE
+
+
+
+/status_effect/mana_void
+	name = "Mana Void"
+	desc = "You've been mana voided!"
+	id = MANAVOID
+	minimum = 10
+	maximum = 100
+
+
+/status_effect/mana_void/on_effect_added(var/mob/living/owner,var/atom/source,var/magnitude,var/duration,var/stealthy)
+	owner.mana_regen_buffer = -1000
+
+/status_effect/stressed/on_effect_removed(var/mob/living/owner,var/magnitude,var/duration)
+	owner.mana_regen_buffer = max(0,owner.mana_regen_buffer)
+
+/status_effect/slow
+	name = "Slowed"
+	desc = "You've been slowed!"
+	id = SLOW
+	minimum = 10
+	maximum = 300

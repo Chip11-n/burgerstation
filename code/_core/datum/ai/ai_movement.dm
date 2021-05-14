@@ -5,32 +5,40 @@
 
 	return TRUE
 
-/ai/proc/handle_movement_checks() //Stops crowding/stacking/grouping.
+/ai/proc/post_move(var/mob/living/L,args)
 
-	var/turf/T
+	var/atom/old_loc = args[1]
 
-	if(owner.move_dir) //Checking safety, like lava.
-		T = get_step(owner,owner.move_dir)
-		var/turf/T2 = get_turf(owner)
-		if(!can_enter_turf(T) && can_enter_turf(T2))
-			owner.move_dir = 0x0
-			owner.movement_flags = MOVEMENT_NORMAL
-			return TRUE
-	else
-		T = get_turf(owner)
+	var/turf/old_turf = get_turf(old_loc)
+	var/turf/new_turf = get_turf(L.loc)
 
-	for(var/mob/living/L in T.contents)
-		if(L == owner || L.dead)
-			continue
-		if(owner.move_dir && !L.move_dir)
-			owner.move_dir = 0x0
-			owner.movement_flags = MOVEMENT_NORMAL
-			return TRUE
+	if(old_turf && new_turf)
+		if(old_turf == new_turf)
+			frustration_move++
+			if(length(current_path))
+				frustration_path++
+			if(frustration_move >= frustration_move_threshold)
+				sidestep_next = TRUE
+				frustration_move = 0
+			if(debug) log_debug("[src.get_debug_name()] post_move'd to the same loc")
+		else
+			frustration_move = 0
+			if(debug) log_debug("[src.get_debug_name()] post_move'd to a different loc.")
 
-	return FALSE
+	if(!new_turf || new_turf.z != last_z)
+		if(active)
+			if(last_z) remove_from_active_list(last_z)
+			if(new_turf) add_to_active_list(new_turf.z)
+		else
+			if(last_z) remove_from_inactive_list(last_z)
+			if(new_turf) add_to_inactive_list(new_turf.z); set_active(TRUE) //Wake up the AI if we can.
+		if(new_turf) last_z = new_turf.z
+
+	return TRUE
 
 /ai/proc/set_move_objective(var/atom/desired_objective,var/follow = FALSE) //Set follow to true if it should constantly follow the person.
-	if(desired_objective) set_active(TRUE)
+	if(desired_objective)
+		set_active(TRUE)
 	objective_move = desired_objective
 	should_follow_objective_move = follow
 	return TRUE
@@ -93,6 +101,30 @@
 
 	return TRUE
 
+/*
+/ai/proc/handle_movement_burger_star()
+
+	if(current_burger_star_path && length(current_burger_star_path))
+		owner.movement_flags = MOVEMENT_NORMAL
+		var/turf/T = get_turf(owner)
+		var/turf/desired_turf = current_burger_star_path[1]
+		if(T == desired_turf)
+			current_burger_star_path -= desired_turf
+			if(length(current_burger_star_path))
+				desired_turf = current_burger_star_path[1]
+			else
+				desired_turf = null
+		if(desired_turf)
+			owner.move_dir = get_dir(owner,desired_turf)
+		else
+			owner.move_dir = 0x0
+			set_burger_star_path(null)
+		return TRUE
+
+	return FALSE
+*/
+
+
 /ai/proc/handle_movement_path()
 	if(current_path && length(current_path))
 		owner.movement_flags = MOVEMENT_NORMAL
@@ -121,10 +153,11 @@
 
 		var/obj/marker/map_node/N_start = find_closest_node(owner,check_view=TRUE)
 		if(!N_start)
-			SSai.path_stuck_ai |= src
 			set_path(null)
 			if(delete_on_no_path)
 				queue_delete(owner,0,TRUE)
+			else
+				SSai.path_stuck_ai |= src
 			return FALSE
 
 		var/obj/marker/map_node/N_end = find_closest_node(path_end_turf)
@@ -133,6 +166,8 @@
 			set_path(null)
 			if(delete_on_no_path)
 				queue_delete(owner,0,TRUE)
+			else
+				SSai.path_stuck_ai |= src
 			return FALSE
 
 		var/list/obj/marker/map_node/found_path = N_start.find_path(N_end)
@@ -141,8 +176,11 @@
 			set_path(null)
 			if(delete_on_no_path)
 				queue_delete(owner,0,TRUE)
+			else
+				SSai.path_stuck_ai |= src
 			return FALSE
 
+		//set_burger_star_path(get_turf(N_start))
 		set_path(found_path)
 
 		return TRUE
@@ -210,6 +248,11 @@
 
 /ai/proc/handle_movement()
 
+	/*
+	if(handle_movement_burger_star())
+		return TRUE
+	*/
+
 	if(handle_movement_sidestep())
 		return TRUE
 
@@ -231,30 +274,20 @@
 	if(handle_movement_roaming())
 		return TRUE
 
+	handle_movement_reset()
+
 	return FALSE
-
-
-/ai/proc/on_move(var/success,var/atom/NewLoc,Dir=0)
-
-	if(!success)
-		frustration_move += 1
-		if(length(current_path))
-			frustration_path++
-		if(frustration_move >= frustration_move_threshold)
-			sidestep_next = TRUE
-			frustration_move = 0
-
-	return TRUE
 
 /ai/proc/Bump(var/atom/obstacle,var/trigger_other_bump=TRUE)
 
 	if(obstacle && is_living(obstacle))
 		var/mob/living/L = obstacle
-		if(is_enemy(L)) set_alert_level(ALERT_LEVEL_CAUTION,FALSE,L,L)
+		if(is_enemy(L))
+			set_alert_level(ALERT_LEVEL_CAUTION,FALSE,L,L)
+			if(attack_on_block)
+				spawn do_attack(obstacle,prob(left_click_chance))
+
 		if(trigger_other_bump && L.ai)
 			L.ai.Bump(owner,FALSE)
-
-		if(attack_on_block)
-			spawn do_attack(obstacle,prob(left_click_chance))
 
 	return TRUE

@@ -7,11 +7,14 @@
 
 	worn_layer = LAYER_MOB_CLOTHING_NECK_OVER
 
+	item_slot = SLOT_NECK
+
+
 	protected_limbs = list(BODY_TORSO)
 
 	defense_rating = list(
-		ARCANE = AP_AXE,
-		COLD = AP_SWORD
+		ARCANE = 40,
+		COLD = 20
 	)
 
 	size = SIZE_3
@@ -20,6 +23,8 @@
 	value = 15
 
 	dyeable = TRUE
+
+	item_slot_layer = 3
 
 
 /obj/item/clothing/neck/mantle/purple

@@ -13,19 +13,24 @@
 	pixel_z = TILE_SIZE*VIEW_RANGE*2
 	pixel_w = TILE_SIZE*VIEW_RANGE
 
-	var/matrix/M = matrix()
+	var/matrix/M = get_base_transform()
 	M.Scale(2,2)
 	src.transform = M
 
 	animate(src, alpha=255, time=meteor_time*0.5)
-	animate(src, pixel_z=0, pixel_w=0, time=meteor_time*0.95, transform = matrix())
+	animate(src, pixel_z=0, pixel_w=0, time=meteor_time, transform = get_base_transform())
+
+	CALLBACK("meteor_telegraph_\ref[src]",meteor_time-20,src,.proc/create_telegraph)
 
 	CALLBACK("meteor_land_\ref[src]",meteor_time,src,.proc/land)
 
 	return ..()
 
+/obj/effect/falling_meteor/proc/create_telegraph()
+	new/obj/effect/temp/target(loc,20)
+
 /obj/effect/falling_meteor/proc/land()
-	explode(get_turf(src),40,src,src)
+	explode(get_turf(src),20,src,src,multiplier = 5)
 	src.alpha = 0
 	queue_delete(src,10)
 	return TRUE
@@ -42,12 +47,12 @@
 	alpha = 0
 	pixel_z = TILE_SIZE*VIEW_RANGE*2
 
-	var/matrix/M = matrix()
+	var/matrix/M = get_base_transform()
 	M.Scale(2,2)
 	src.transform = M
 
 	animate(src, alpha=255, time=meteor_time*0.5)
-	animate(src, pixel_z=0, pixel_w=0, time=meteor_time*0.95, transform = matrix())
+	animate(src, pixel_z=0, pixel_w=0, time=meteor_time*0.95, transform = get_base_transform())
 
 	CALLBACK("fireball_land_\ref[src]",meteor_time,src,.proc/land)
 

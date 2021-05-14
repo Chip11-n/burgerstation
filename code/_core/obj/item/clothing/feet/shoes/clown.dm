@@ -8,14 +8,11 @@
 
 	icon = 'icons/obj/item/clothing/shoes/clown.dmi'
 
-	item_slot = SLOT_FOOT_RIGHT
-	protected_limbs = list(BODY_FOOT_RIGHT)
-
 	defense_rating = list(
-		BLUNT = AP_SWORD,
-		ARCANE = AP_SWORD,
-		HOLY = -AP_CLUB,
-		DARK = AP_CLUB
+		BLUNT = 20,
+		ARCANE = 20,
+		HOLY = -60,
+		DARK = 60
 	)
 
 	size = SIZE_2
@@ -36,6 +33,6 @@
 	icon_state = "inventory_left"
 	icon_state_worn = "worn_left"
 
-	item_slot = SLOT_FOOT_LEFT
+	item_slot = SLOT_FOOT
+	item_slot_mod = SLOT_MOD_LEFT
 	protected_limbs = list(BODY_FOOT_LEFT)
-	blocks_clothing = SLOT_FOOT_LEFT | SLOT_FOOT_LEFT_U

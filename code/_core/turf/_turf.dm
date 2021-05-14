@@ -16,7 +16,7 @@
 	var/density_east  = FALSE
 	var/density_west  = FALSE
 	var/density_up    = FALSE
-	var/density_down  = FALSE
+	var/density_down  = TRUE
 	var/allow_bullet_pass = FALSE
 
 	var/footstep/footstep //The footstep sounds that play.
@@ -32,6 +32,12 @@
 	var/lightness = 0 //Calculated tile darkness.
 
 	var/list/stored_shuttle_items
+
+	var/safe_fall = FALSE //Set to true if it's safe to fall on this tile.
+
+	vis_flags = VIS_INHERIT_PLANE | VIS_INHERIT_LAYER | VIS_INHERIT_ID
+
+	var/disallow_generation = FALSE
 
 /turf/proc/on_step()
 	return TRUE
@@ -50,6 +56,11 @@
 	return TRUE
 
 /turf/proc/is_safe_teleport(var/check_contents=TRUE)
+
+	var/area/A = loc
+	if(A && A.flags_area & FLAG_AREA_NO_LOYALTY)
+		return FALSE
+
 	return !is_space()
 
 /turf/New(loc)
@@ -92,7 +103,7 @@
 			var/mob/living/L = k
 			if(attacker == L)
 				continue
-			if(L.mouse_opacity > 0 && !L.dead && L.move_delay > 0)
+			if(L.mouse_opacity > 0 && !L.dead && L.move_delay > 0 && get_dist(L,src) <= 1)
 				return L
 
 	return src
@@ -118,6 +129,10 @@
 	if(!enterer.qdeleting && is_living(enterer))
 		do_footstep(enterer,TRUE)
 
+	if(!density_down)
+		var/turf/T = locate(x,y,z-1)
+		if(T && !T.density_up && enterer.Move(T) && !T.safe_fall)
+			enterer.on_fall(src)
 
 /turf/Exited(var/atom/movable/exiter,var/atom/new_loc)
 
@@ -136,14 +151,17 @@
 /turf/Enter(var/atom/movable/enterer,var/atom/oldloc)
 
 	if(density && (enterer.collision_flags && src.collision_flags) && (enterer.collision_flags & src.collision_flags))
-		var/enter_direction = get_dir(oldloc,src)
-		if((enter_direction & NORTH) && density_north)
-			return FALSE
-		if((enter_direction & EAST) && density_east)
-			return FALSE
-		if((enter_direction & SOUTH) && density_south)
-			return FALSE
-		if((enter_direction & WEST) && density_west)
+		if(oldloc)
+			var/enter_direction = get_dir(oldloc,src)
+			if((enter_direction & NORTH) && density_north)
+				return FALSE
+			if((enter_direction & EAST) && density_east)
+				return FALSE
+			if((enter_direction & SOUTH) && density_south)
+				return FALSE
+			if((enter_direction & WEST) && density_west)
+				return FALSE
+		else if(density_west || density_east || density_south || density_north)
 			return FALSE
 
 	return ..()
@@ -151,8 +169,9 @@
 
 /turf/act_explode(var/atom/owner,var/atom/source,var/atom/epicenter,var/magnitude,var/desired_loyalty)
 
-	for(var/atom/A in src.contents)
-		A.act_explode(owner,source,epicenter,magnitude,desired_loyalty)
+	for(var/k in src.contents)
+		var/atom/movable/M = k
+		M.act_explode(owner,source,epicenter,magnitude,desired_loyalty)
 
 	return ..()
 
@@ -183,3 +202,8 @@
 /turf/proc/can_construct_on(var/mob/caller)
 	caller.to_chat(span("warning","You cannot deploy on this turf!"))
 	return FALSE
+
+
+/turf/Finalize()
+	. = ..()
+	update_sprite()

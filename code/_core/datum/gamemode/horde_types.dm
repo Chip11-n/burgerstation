@@ -11,9 +11,10 @@
 	name = "Horde Mode (Xenos)"
 	desc = "Fight off an endless wave of Acid-Spitting and Leaping Xenos while attempting to complete objectives."
 	enemy_types_to_spawn = list(
-		/mob/living/simple/xeno/drone = 1,
-		/mob/living/simple/xeno/hunter = 3,
-		/mob/living/simple/xeno/sentinel = 2
+		/mob/living/simple/xeno/drone = 2,
+		/mob/living/simple/xeno/hunter = 4,
+		/mob/living/simple/xeno/sentinel = 3,
+		/mob/living/simple/xeno/predatorian = 1
 	)
 	hidden = FALSE
 
@@ -108,10 +109,11 @@
 		/mob/living/simple/cult/construct/chosen = 1,
 		/mob/living/simple/cult/construct/floating = 25,
 		/mob/living/advanced/npc/cultist = 70,
-		/mob/living/advanced/npc/cultist/hard = 30
+		/mob/living/advanced/npc/cultist/hard = 30,
+		/mob/living/simple/cult/construct/proteon = 10
 	)
 	hidden = FALSE
-
+/*
 /gamemode/horde/space_goblins
 	name = "Horde Mode (Space Goblins)"
 	desc = "Fight off an endless wave of Space Goblins while attempting to complete objectives."
@@ -124,7 +126,7 @@
 
 	enemies_to_spawn_base = 10
 	enemies_to_spawn_per_player = 1.5
-
+*/
 /gamemode/horde/boss_rush
 	name = "Horde Mode (Boss Rush)"
 	desc = "Oh god oh fuck."

@@ -30,14 +30,14 @@
 	boss = TRUE
 
 	armor_base = list(
-		BLADE = AP_SWORD,
-		BLUNT = AP_SWORD,
-		LASER = AP_GREATSWORD,
-		HEAT = AP_SWORD,
-		COLD = AP_DAGGER,
-		HOLY = -AP_SWORD,
-		DARK = AP_CLUB,
-		FATIGUE = AP_CLUB,
+		BLADE = 20,
+		BLUNT = 20,
+		LASER = 80,
+		HEAT = 20,
+		COLD = 10,
+		HOLY = -20,
+		DARK = 60,
+		FATIGUE = 60,
 		ION = INFINITY,
 		PAIN = INFINITY
 	)
@@ -148,7 +148,7 @@
 		params[PARAM_ICON_Y] = rand(0,32)
 		var/atom/object_to_damage = Obstacle.get_object_to_damage(src,src,params,TRUE,TRUE)
 		visible_message(span("danger","\The [src.name] rams into \the [Obstacle.name]!"))
-		DT.hit(src,Obstacle,src,object_to_damage,src,1)
+		DT.process_damage(src,Obstacle,src,object_to_damage,src,1)
 
 	return ..()
 

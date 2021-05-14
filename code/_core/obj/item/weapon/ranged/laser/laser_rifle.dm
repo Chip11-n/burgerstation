@@ -3,6 +3,7 @@
 	desc = "Pew pew pew!"
 	desc_extended = "A modular model of laser rifle, capable of using different crystals to shoot beams with different effects. This one is the standard beam."
 	icon = 'icons/obj/item/weapons/ranged/laser/modular.dmi'
+	value = 2000
 
 	projectile = /obj/projectile/bullet/laser
 	ranged_damage_type = /damagetype/ranged/laser/rifle
@@ -19,11 +20,8 @@
 
 	charge_cost = CELL_SIZE_BASIC / 60
 
-	view_punch = 16
-
 	shoot_sounds = list('sound/weapons/laser_rifle/shoot.ogg')
 
-	heat_per_shot = 0.005
 	heat_max = 0.1
 
 	polymorphs = list(
@@ -33,8 +31,6 @@
 
 	size = SIZE_4
 	weight = 14
-
-	value = 900
 
 	attachment_whitelist = list(
 		/obj/item/attachment/barrel/charger = FALSE,
@@ -69,10 +65,10 @@
 	attachment_undermount_offset_y = 12 - 16
 
 	inaccuracy_modifier = 0.5
+	movement_inaccuracy_modifier = 0.5
 	movement_spread_base = 0.04
 
 /obj/item/weapon/ranged/energy/rifle/get_static_spread()
-	if(wielded) return 0
 	return 0.0005
 
 /obj/item/weapon/ranged/energy/rifle/get_skill_spread(var/mob/living/L)
@@ -107,14 +103,14 @@
 
 	charge_cost = CELL_SIZE_BASIC / 50
 
-	view_punch = 20
+
 
 	polymorphs = list(
 		"base" = COLOR_WHITE,
 		"barrel" = "#FFFF00"
 	)
 
-	value = 1100
+	value = 2200
 
 /obj/item/weapon/ranged/energy/rifle/xray
 	name = "AER13c X-Ray Rifle"
@@ -126,14 +122,14 @@
 
 	charge_cost = CELL_SIZE_BASIC / 50
 
-	view_punch = 24
+
 
 	polymorphs = list(
 		"base" = COLOR_WHITE,
 		"barrel" = "#00FF00"
 	)
 
-	value = 1500
+	value = 2800
 
 /obj/item/weapon/ranged/energy/rifle/xray/deathsquad
 	name = "AER13c-D X-Ray Rifle"
@@ -142,7 +138,7 @@
 	projectile_speed = TILE_SIZE - 1
 	shoot_delay = 4
 
-	view_punch = 30
+
 
 	polymorphs = list(
 		"base" = "#EEEEEE",
@@ -151,7 +147,7 @@
 
 	battery = /obj/item/powercell/recharging
 
-	value = 2000
+	value = 3500
 
 /obj/item/weapon/ranged/energy/rifle/xray/deathsquad/Generate()
 

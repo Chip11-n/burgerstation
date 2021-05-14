@@ -6,15 +6,17 @@
 	icon = 'icons/obj/item/clothing/glasses/sunglasses.dmi'
 
 	defense_rating = list(
-		BLADE = AP_DAGGER,
-		BLUNT = AP_DAGGER,
-		PIERCE = AP_DAGGER,
-		LASER = AP_CLUB,
-		ARCANE = -AP_CLUB,
-		HEAT = AP_SWORD
+		BLADE = 10,
+		BLUNT = 10,
+		PIERCE = 10,
+		LASER = 60,
+		ARCANE = -60,
+		HEAT = 20
 	)
 
 	value = 30
+
+	item_slot_layer = 2
 
 /obj/item/clothing/glasses/sun/pre_pickup(var/atom/old_location,var/obj/hud/inventory/new_location)
 
@@ -22,9 +24,9 @@
 
 	if(is_inventory(old_location))
 		var/obj/hud/inventory/I = old_location
-		I.owner.remove_color_mod("eyes")
+		I.owner?.remove_color_mod("eyes")
 
-	if(new_location.item_slot & SLOT_EYES)
+	if(new_location.item_slot & SLOT_FACE)
 		var/list/desired_color = list(
 			0.9,0,0,0,
 			0,0.9,0,0,
@@ -34,7 +36,7 @@
 		)
 		new_location.owner.add_color_mod("eyes",desired_color)
 
-	
+
 /obj/item/clothing/glasses/sun/big
 	name = "big shades"
 	icon = 'icons/obj/item/clothing/glasses/sunglasses_big.dmi'
@@ -43,28 +45,31 @@
 	name = "gar shades"
 	icon = 'icons/obj/item/clothing/glasses/gar.dmi'
 	defense_rating = list(
-		BLADE = AP_SWORD,
-		BLUNT = AP_SWORD,
-		PIERCE = AP_SWORD,
-		LASER = AP_GREATSWORD,
-		ARCANE = -AP_CLUB,
-		HEAT = AP_GREATSWORD
+		BLADE = 20,
+		BLUNT = 20,
+		PIERCE = 20,
+		LASER = 80,
+		ARCANE = -60,
+		HEAT = 80
 	)
 	damage_type = /damagetype/melee/sword/grazer
+
+	value = 1000
 
 /obj/item/clothing/glasses/sun/gar/giga
 	name = "gigagar shades"
 	icon = 'icons/obj/item/clothing/glasses/gigagar.dmi'
 	defense_rating = list(
-		BLADE = AP_AXE,
-		BLUNT = AP_AXE,
-		PIERCE = AP_AXE,
-		LASER = AP_GREATCLUB,
-		ARCANE = -AP_CLUB,
-		HEAT = AP_GREATCLUB
+		BLADE = 60,
+		BLUNT = 60,
+		PIERCE = 60,
+		LASER = 120,
+		ARCANE = -60,
+		HEAT = 120
 	)
 	damage_type = /damagetype/melee/sword/grazer
 
+	value = 2500
 
 /obj/item/clothing/glasses/sun/augmented
 	name = "augmented shades"
@@ -73,13 +78,13 @@
 	icon = 'icons/obj/item/clothing/glasses/abomb_shades.dmi'
 	rarity = RARITY_MYTHICAL
 	defense_rating = list(
-		BLADE = AP_SWORD,
-		BLUNT = AP_SWORD,
-		PIERCE = AP_SWORD,
-		LASER = AP_CLUB,
-		ARCANE = -AP_CLUB,
-		HEAT = AP_SWORD,
-		BOMB = -AP_GREATCLUB
+		BLADE = 20,
+		BLUNT = 20,
+		PIERCE = 20,
+		LASER = 60,
+		ARCANE = -60,
+		HEAT = 20,
+		BOMB = -120
 	)
 
 	sight_mod = SEE_MOBS
@@ -100,7 +105,7 @@
 	value = 160
 
 	defense_rating = list(
-		ARCANE = -AP_SWORD,
+		ARCANE = -20,
 	)
 
 /obj/item/clothing/glasses/sun/security/red
@@ -110,10 +115,10 @@
 	value = 1000
 
 	defense_rating = list(
-		BLUNT = AP_DAGGER,
-		PIERCE = AP_DAGGER,
-		BLADE = AP_DAGGER,
-		ARCANE = -AP_DAGGER
+		BLUNT = 10,
+		PIERCE = 10,
+		BLADE = 10,
+		ARCANE = -10
 	)
 
 	sight_mod = SEE_MOBS

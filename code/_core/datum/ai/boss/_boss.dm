@@ -16,18 +16,4 @@
 
 	ignore_hazard_turfs = TRUE
 
-/ai/boss/set_active(var/desired_active=TRUE,var/force=FALSE)
-
-	if(!force && active == desired_active)
-		return FALSE
-
-	active = desired_active
-
-	if(active)
-		SSbossai.active_ai |= src
-		SSbossai.inactive_ai -= src
-	else
-		SSbossai.active_ai -= src
-		SSbossai.inactive_ai |= src
-
-	return TRUE
+	boss = TRUE

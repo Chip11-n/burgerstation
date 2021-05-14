@@ -35,6 +35,8 @@
 
 	damage_coefficient = 2
 
+	gib_icon_state = "gibhead"
+
 /obj/item/organ/head/initialize_blends()
 	add_blend("blush", desired_color = "#00FF00", desired_blend = ICON_MULTIPLY, desired_icon = 'icons/mob/living/advanced/species/human.dmi', desired_icon_state = "none", desired_type = ICON_BLEND_OVERLAY, desired_should_save = TRUE, desired_layer = worn_layer)
 	add_blend("lips", desired_color = "#00FF00", desired_blend = ICON_MULTIPLY, desired_icon = 'icons/mob/living/advanced/species/human.dmi', desired_icon_state = "none", desired_type = ICON_BLEND_OVERLAY, desired_should_save = TRUE, desired_layer = worn_layer)
@@ -129,4 +131,13 @@
 	defense_rating = GOBLIN_ARMOR
 
 /obj/item/organ/head/goblin/female
+	icon_state = BODY_HEAD_FEMALE
+
+
+/obj/item/organ/head/moth
+	name = "moth head"
+	icon = 'icons/mob/living/advanced/species/moth.dmi'
+	desc = "An organ."
+
+/obj/item/organ/head/moth/female
 	icon_state = BODY_HEAD_FEMALE

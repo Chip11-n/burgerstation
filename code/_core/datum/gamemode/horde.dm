@@ -55,7 +55,9 @@
 			create_horde_mob(T)
 
 	for(var/obj/structure/interactive/computer/console/remote_flight/O in world)
-		if(O.z != Z_LEVEL_MISSION)
+		var/turf/T = get_turf(O)
+		var/area/A = T.loc
+		if(A.flags_area & FLAGS_AREA_NO_DAMAGE)
 			continue
 		horde_targets += O
 
@@ -130,7 +132,6 @@
 	var/time_to_display = round_time_next - round_time
 	set_status_display("mission","PREP\n[get_clock_time(time_to_display)]")
 	if(time_to_display >= 0)
-		set_message("Round starts in: [get_clock_time(time_to_display)]",TRUE)
 		return TRUE
 	state = GAMEMODE_GEARING
 	round_time = 0
@@ -150,7 +151,6 @@
 	var/time_to_display = round_time_next - round_time
 	set_status_display("mission","GEAR\n[get_clock_time(time_to_display)]")
 	if(time_to_display >= 0)
-		set_message("Loadout Period: [get_clock_time(time_to_display)]",TRUE)
 		return TRUE
 	state = GAMEMODE_BOARDING
 	round_time = 0
@@ -168,7 +168,6 @@
 	var/time_to_display = round_time_next - round_time
 	set_status_display("mission","BRDN\n[get_clock_time(time_to_display)]")
 	if(time_to_display >= 0)
-		set_message("Boarding Period: [get_clock_time(time_to_display)]",TRUE)
 		return TRUE
 	state = GAMEMODE_LAUNCHING
 	round_time = 0
@@ -182,7 +181,6 @@
 	var/time_to_display = round_time_next - round_time
 	set_status_display("mission","LNCH\n[get_clock_time(time_to_display)]")
 	if(time_to_display >= 0)
-		set_message("Launch Period: [get_clock_time(time_to_display)]",TRUE)
 		return TRUE
 	state = GAMEMODE_FIGHTING
 	round_time = 0
@@ -254,8 +252,6 @@
 		CHECK_TICK(50,FPS_SERVER*5)
 		var/mob/living/L = create_horde_mob(T)
 		L.ai.set_path(found_path)
-		for(var/k in priority_targets)
-			L.ai.obstacles[k] = TRUE
 		tracked_enemies += L
 		points -= 0.1
 
@@ -343,14 +339,15 @@
 		picks_remaining--
 		CHECK_TICK(50,FPS_SERVER*10)
 		var/turf/chosen_target
-
 		if(length(priority_targets))
 			chosen_target = get_turf(pick(priority_targets))
-			if(chosen_target.z != Z_LEVEL_MISSION)
+			var/area/A = chosen_target.loc
+			if(A.flags_area & FLAGS_AREA_NO_DAMAGE)
 				continue
 		else if(length(horde_targets))
 			chosen_target = get_turf(pick(horde_targets))
-			if(chosen_target.z != Z_LEVEL_MISSION)
+			var/area/A = chosen_target.loc
+			if(A.flags_area & FLAGS_AREA_NO_DAMAGE)
 				continue
 		else
 			return null

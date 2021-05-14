@@ -1,8 +1,10 @@
-/mob/living/proc/add_status_effect(var/status_type,var/magnitude,var/duration,var/atom/source,var/force=FALSE,var/stealthy=FALSE)
+/mob/living/proc/add_status_effect(var/status_type,var/magnitude,var/duration,var/atom/source,var/force=FALSE,var/stealthy=FALSE,var/bypass_limits=FALSE)
 
 	if(!force && length(status_immune) && status_immune[status_type])
 		if(isnum(status_immune[status_type]))
-			if(ENABLE_DAMAGE_NUMBERS && !stealthy) new/obj/effect/temp/damage_number(src.loc,duration,"IMMUNE!")
+			if(ENABLE_DAMAGE_NUMBERS && !stealthy)
+				var/turf/T = get_turf(src)
+				if(T) new/obj/effect/temp/status_effect(T,duration,"IMMUNE!")
 			return FALSE
 		else
 			status_type = status_immune[status_type]
@@ -36,11 +38,12 @@
 	else
 		status_effects[status_type]["magnitude"] = max(status_effects[status_type]["magnitude"],magnitude)
 
-	if(S.minimum != -1 && status_effects[status_type]["duration"] != -1)
-		status_effects[status_type]["duration"] = max(status_effects[status_type]["duration"],S.minimum)
+	if(!bypass_limits)
+		if(S.minimum != -1 && status_effects[status_type]["duration"] != -1)
+			status_effects[status_type]["duration"] = max(status_effects[status_type]["duration"],S.minimum)
 
-	if(S.maximum != -1 && status_effects[status_type]["duration"] != -1)
-		status_effects[status_type]["duration"] = min(status_effects[status_type]["duration"],S.maximum)
+		if(S.maximum != -1 && status_effects[status_type]["duration"] != -1)
+			status_effects[status_type]["duration"] = min(status_effects[status_type]["duration"],S.maximum)
 
 	if(.)
 		S.on_effect_added(src,source,magnitude,duration,stealthy)

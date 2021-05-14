@@ -3,8 +3,14 @@
 	if(health)
 		health.update_health(attacker,damage_amount)
 
-	if(ENABLE_DAMAGE_NUMBERS && !stealthy && damage_amount > 0)
-		if(isturf(src.loc)) new/obj/effect/temp/damage_number(src.loc,null,damage_amount)
+	if(ENABLE_DAMAGE_NUMBERS && !stealthy && damage_amount > 0 && isturf(src.loc))
+		var/turf/T = src.loc
+		if(T)
+			var/obj/effect/damage_number/DN = locate() in T.contents
+			if(DN)
+				DN.add_value(damage_amount)
+			else
+				new /obj/effect/damage_number(T,damage_amount)
 
 	return TRUE
 
@@ -14,7 +20,7 @@
 /atom/proc/should_cleave(var/atom/attacker,var/atom/victim,var/list/params)
 	return FALSE
 
-/atom/proc/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1) //The src attacks the victim, with the blamed taking responsibility
+/atom/proc/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1,var/damagetype/damage_type_override) //The src attacks the victim, with the blamed taking responsibility
 
 	if(!attacker)
 		attacker = src
@@ -92,7 +98,7 @@
 			last_turf = next_turf
 			step_check--
 
-	var/desired_damage_type = object_to_damage_with.get_damage_type(attacker,victim)
+	var/desired_damage_type = damage_type_override ? damage_type_override : object_to_damage_with.get_damage_type(attacker,victim)
 	if(!desired_damage_type)
 		return FALSE
 

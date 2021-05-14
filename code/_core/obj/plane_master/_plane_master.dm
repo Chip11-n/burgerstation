@@ -35,7 +35,7 @@
 
 /obj/plane_master/walls/New(var/desired_loc)
 	. = ..()
-	filters += filter(type="drop_shadow", x=0, y=-4, size=2, offset=0, color=rgb(0,0,0))
+	filters += filter(type="drop_shadow", x=0, y=0, size=4, offset=0, color=rgb(0,0,0,200))
 
 //MOBS
 /obj/plane_master/mobs
@@ -44,18 +44,22 @@
 /obj/plane_master/mobs/New(var/desired_loc)
 	. = ..()
 	filters += filter(type="drop_shadow", x=0, y=2, size=1, offset=0, color=rgb(200,200,200,120))
-	filters += filter(type="drop_shadow", x=0, y=-1, size=2, offset=0, color=rgb(0,0,0,225))
+	filters += filter(type="drop_shadow", x=0, y=-1, size=4, offset=0, color=rgb(0,0,0,200))
 
 
 //DARKNESS
 /obj/plane_master/darkness
-	plane = PLANE_DARKNESS
-	mouse_opacity = 0
-	blend_mode = BLEND_MULTIPLY
+	plane = 0
 
 /obj/plane_master/darkness/New(var/desired_loc)
 	. = ..()
-	//filters += filter(type="drop_shadow", x=0, y=0, size=6, offset=0, color=rgb(0,0,0))
+	var/darkness_size = 2
+	filters += filter(type="radial_blur", size=0.05)
+	filters += filter(type="drop_shadow", x=darkness_size, y=0, size=darkness_size*3, offset=0, color=rgb(0,0,0,255))
+	filters += filter(type="drop_shadow", x=0, y=darkness_size, size=darkness_size*3, offset=0, color=rgb(0,0,0,255))
+	filters += filter(type="drop_shadow", x=-darkness_size, y=0, size=darkness_size*3, offset=0, color=rgb(0,0,0,255))
+	filters += filter(type="drop_shadow", x=0, y=-darkness_size, size=darkness_size*3, offset=0, color=rgb(0,0,0,255))
+
 
 //Objects
 /obj/plane_master/objs
@@ -64,7 +68,7 @@
 
 /obj/plane_master/objs/New(var/desired_loc)
 	. = ..()
-	filters += filter(type="drop_shadow", x=0, y=-1, size=1, offset=0, color=rgb(0,0,0))
+	filters += filter(type="drop_shadow", x=0, y=-2, size=2, offset=0, color=rgb(0,0,0))
 
 //SHUTTLE
 /obj/plane_master/shuttle
@@ -87,8 +91,43 @@
 
 //Lighting
 /obj/plane_master/lighting
-	name = "plane master"
 	plane = PLANE_LIGHTING
 	blend_mode = BLEND_MULTIPLY
 	mouse_opacity = 0
 	appearance_flags = PLANE_MASTER|NO_CLIENT_COLOR
+
+//Openspace
+/obj/plane_master/openspace
+	plane = PLANE_FLOOR_BELOW
+	appearance_flags = PLANE_MASTER
+	color = "#333333"
+
+/obj/plane_master/openspace/New(var/desired_loc)
+	. = ..()
+	filters += filter(type="outline",size=TILE_SIZE*0.5,color="#000000",flags=OUTLINE_SQUARE)
+	filters += filter(type="blur", size=1)
+	filters += filter(type="drop_shadow", x=0, y=0, size=-4, offset=0, color=rgb(0,0,0))
+
+//Currency
+/obj/plane_master/currency
+	plane = PLANE_CURRENCY
+
+/obj/plane_master/currency/New(var/desired_loc)
+	. = ..()
+	//filters += filter(type="bloom",threshold="#FFFFFF",size=8,offset=2,alpha=255)
+
+	#if DM_VERSION >= 514
+	filters += filter(type="bloom",threshold="#888888",size=2,offset=0,alpha=255)
+	animate(filters[length(filters)],alpha=150,loop=-1,time=8)
+	animate(alpha=255,time=8)
+	#endif
+
+//HUD
+/obj/plane_master/hud
+	plane = PLANE_HUD
+	appearance_flags = PLANE_MASTER | NO_CLIENT_COLOR | PIXEL_SCALE
+
+/obj/plane_master/hud/New(var/desired_loc)
+	. = ..()
+	//filters += filter(type="bloom",threshold="#888888",size=TILE_SIZE*0.5,offset=2,alpha=200)
+

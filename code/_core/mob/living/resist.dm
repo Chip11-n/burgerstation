@@ -8,11 +8,11 @@
 		if(messages) to_chat(span("warning","You can't resist while dead!"))
 		return FALSE
 
-	if(health.stamina_current < 20)
+	if(health?.stamina_current < 20)
 		if(messages) to_chat(span("warning","You're too exhausted to resist!"))
 		return FALSE
 
-	if(has_status_effects(PARALYZE,SLEEP,PARRIED,FATIGUE,STUN))
+	if(has_status_effects(STAMCRIT,PARALYZE,SLEEP,PARRIED,FATIGUE,STUN))
 		if(messages) to_chat(span("warning","You can't resist in this state!"))
 		return FALSE
 
@@ -26,8 +26,8 @@
 	if(grabbing_hand)
 		var/mob/living/advanced/attacker = grabbing_hand.owner
 		if(attacker)
-			var/attacker_power = attacker.get_attribute_power(ATTRIBUTE_STRENGTH)*10
-			var/src_power = src.get_attribute_power(ATTRIBUTE_STRENGTH)*5
+			var/attacker_power = attacker.get_attribute_power(ATTRIBUTE_STRENGTH,0,1)*10
+			var/src_power = src.get_attribute_power(ATTRIBUTE_STRENGTH,0.25,1,2)*5
 			var/difficulty = (attacker_power - src_power) * (get_dir(attacker,src) == src.dir) ? 5 : 1
 			if(resist_counter >= difficulty)
 				src.visible_message(
@@ -89,7 +89,7 @@
 
 	if(. && handcuffed && !horizontal && !grabbing_hand)
 
-		var/counter_to_add = src.get_attribute_power(ATTRIBUTE_STRENGTH)*10*(client ? 3 : 1)
+		var/counter_to_add = src.get_attribute_power(ATTRIBUTE_STRENGTH,0.5,1,2)*10*(client ? 3 : 1)
 
 		var/trait/handcuffs/H = get_trait_by_category(/trait/handcuffs/)
 		if(H) counter_to_add *= H.handcuff_escape_multiplier

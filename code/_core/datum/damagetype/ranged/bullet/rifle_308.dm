@@ -3,17 +3,21 @@
 
 	//The base attack damage of the weapon. It's a flat value, unaffected by any skills or attributes.
 	attack_damage_base = list(
-		BLUNT = DAMAGE_CLUB*0.5,
-		PIERCE = DAMAGE_CLUB*0.5
+		BLUNT = 50,
+		PIERCE = 20
 	)
 
 	//How much armor to penetrate. It basically removes the percentage of the armor using these values.
 	attack_damage_penetration = list(
-		BLUNT = DAMAGE_CLUB*0.5,
-		PIERCE = DAMAGE_CLUB*0.5
+		BLUNT = 25,
+		PIERCE = 25
 	)
 
 	falloff = VIEW_RANGE + ZOOM_RANGE*3
+
+/damagetype/ranged/bullet/rifle_308/surplus
+	damage_mod = SURPLUS_MUL
+	penetration_mod = SURPLUS_MUL
 
 
 /damagetype/ranged/bullet/rifle_308/ap
@@ -21,12 +25,12 @@
 
 	//The base attack damage of the weapon. It's a flat value, unaffected by any skills or attributes.
 	attack_damage_base = list(
-		PIERCE = DAMAGE_CLUB*0.75
+		PIERCE = 60
 	)
 
 	//How much armor to penetrate. It basically removes the percentage of the armor using these values.
 	attack_damage_penetration = list(
-		PIERCE = AP_CLUB*3
+		PIERCE = 100
 	)
 
 	falloff = VIEW_RANGE + ZOOM_RANGE*3
@@ -37,63 +41,73 @@
 
 	//The base attack damage of the weapon. It's a flat value, unaffected by any skills or attributes.
 	attack_damage_base = list(
-		BLUNT = DAMAGE_CLUB*0.25,
-		PIERCE = DAMAGE_CLUB*0.75
+		BLUNT = 20,
+		PIERCE = 50
 	)
 
 	//How much armor to penetrate. It basically removes the percentage of the armor using these values.
 	attack_damage_penetration = list(
-		BLUNT = AP_CLUB*0.5,
-		PIERCE = AP_CLUB*0.5
+		BLUNT = 25,
+		PIERCE = 25
 	)
 
 	falloff = VIEW_RANGE + ZOOM_RANGE*3
+
+/damagetype/ranged/bullet/rifle_762mm/surplus
+	damage_mod = SURPLUS_MUL
+	penetration_mod = SURPLUS_MUL
 
 /damagetype/ranged/bullet/rifle_762mm/ap
 	name = "AP 7.62mm rifle bullet"
 
 	//The base attack damage of the weapon. It's a flat value, unaffected by any skills or attributes.
 	attack_damage_base = list(
-		PIERCE = DAMAGE_CLUB*0.75
+		PIERCE = 60
 	)
 
 	//How much armor to penetrate. It basically removes the percentage of the armor using these values.
 	attack_damage_penetration = list(
-		PIERCE = AP_CLUB*3
+		PIERCE = 100
 	)
-
-
 
 /damagetype/ranged/bullet/rifle_762mm/short
 	name = "7.62mm short rifle bullet"
 
 	//The base attack damage of the weapon. It's a flat value, unaffected by any skills or attributes.
 	attack_damage_base = list(
-		BLUNT = DAMAGE_CLUB*0.75,
-		PIERCE = DAMAGE_CLUB*0.25
+		BLUNT = 30,
+		PIERCE = 35
 	)
 
 	//How much armor to penetrate. It basically removes the percentage of the armor using these values.
 	attack_damage_penetration = list(
-		BLUNT = AP_CLUB*0.75,
-		PIERCE = AP_CLUB*0.25
+		BLUNT = 25,
+		PIERCE = 25
 	)
 
 	falloff = VIEW_RANGE + ZOOM_RANGE
+
+/damagetype/ranged/bullet/rifle_762mm/short/surplus
+	damage_mod = SURPLUS_MUL
+	penetration_mod = SURPLUS_MUL
 
 /damagetype/ranged/bullet/rifle_762mm/long
 	name = "7.62mm long rifle bullet"
 
 	//The base attack damage of the weapon. It's a flat value, unaffected by any skills or attributes.
 	attack_damage_base = list(
-		BLUNT = DAMAGE_CLUB*0.75,
-		PIERCE = DAMAGE_CLUB*0.25
+		BLUNT = 30,
+		PIERCE = 40
 	)
 
 	//How much armor to penetrate. It basically removes the percentage of the armor using these values.
 	attack_damage_penetration = list(
-		BLUNT = AP_CLUB*0.5,
-		PIERCE = AP_CLUB*0.5
+		BLUNT = 30,
+		PIERCE = 30
 	)
 
 	falloff = VIEW_RANGE + ZOOM_RANGE*3
+
+/damagetype/ranged/bullet/rifle_762mm/long/surplus
+	damage_mod = SURPLUS_MUL
+	penetration_mod = SURPLUS_MUL

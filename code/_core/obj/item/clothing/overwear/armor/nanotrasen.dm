@@ -5,11 +5,9 @@
 	desc_extended = "A suit of extremely expensive Jaeger prototype armor made by Space Germany. Offers the best protection possible."
 	icon = 'icons/obj/item/clothing/suit/armor_modular.dmi'
 
-	item_slot = SLOT_TORSO_A
 	protected_limbs = list(BODY_TORSO,BODY_GROIN,BODY_ARM_LEFT,BODY_ARM_RIGHT,BODY_LEG_LEFT,BODY_LEG_RIGHT,BODY_FOOT_LEFT,BODY_FOOT_RIGHT)
 	worn_layer = LAYER_MOB_CLOTHING_HARDSUIT
 	rarity = RARITY_MYTHICAL
-	blocks_clothing = SLOT_TORSO_A
 
 	drop_sound = 'sound/items/drop/metalboots.ogg'
 
@@ -25,12 +23,12 @@
 	)
 
 	defense_rating = list(
-		BLADE = AP_SWORD,
-		BLUNT = AP_SWORD,
-		PIERCE = AP_SWORD,
-		LASER = AP_AXE,
-		ARCANE = -AP_AXE,
-		BOMB = AP_AXE
+		BLADE = 20,
+		BLUNT = 20,
+		PIERCE = 20,
+		LASER = 40,
+		ARCANE = -40,
+		BOMB = 40
 	)
 
 	value = 300
@@ -52,12 +50,12 @@
 	)
 
 	defense_rating = list(
-		BLADE = AP_AXE,
-		BLUNT = AP_AXE,
-		PIERCE = AP_AXE,
-		LASER = AP_AXE,
-		ARCANE = -AP_CLUB,
-		BOMB = AP_AXE
+		BLADE = 40,
+		BLUNT = 40,
+		PIERCE = 40,
+		LASER = 40,
+		ARCANE = -60,
+		BOMB = 40
 	)
 
 	value = 600
@@ -78,12 +76,12 @@
 	)
 
 	defense_rating = list(
-		BLADE = AP_CLUB,
-		BLUNT = AP_CLUB,
-		PIERCE = AP_CLUB,
-		LASER = AP_AXE,
-		ARCANE = -AP_GREATSWORD,
-		BOMB = AP_AXE
+		BLADE = 60,
+		BLUNT = 60,
+		PIERCE = 60,
+		LASER = 40,
+		ARCANE = -80,
+		BOMB = 40
 	)
 
 	value = 1200

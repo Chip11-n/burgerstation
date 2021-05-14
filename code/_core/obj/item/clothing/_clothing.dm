@@ -52,7 +52,6 @@
 	var/list/obj/item/additional_clothing = list()
 	var/list/obj/item/additional_clothing_stored
 
-	var/blocks_clothing = 0x0 //Flags of Clothing slots that are blocked from being equipped when this object is equipped.
 	var/hidden_clothing = 0x0 //Flags of Clothing slots that it should hide when this object is equipped.
 	var/list/hidden_organs = list() //List of organ IDs that are hidden when this object is equipped.
 
@@ -65,6 +64,8 @@
 	var/speed_bonus = 0
 
 	var/loyalty_tag //Set to a loyalty tag here to restrict this to those who have this tag.
+
+	var/list/ench/clothing_enchantments = list()
 
 /obj/item/clothing/can_be_worn(var/mob/living/advanced/owner,var/obj/hud/inventory/I,var/messages=FALSE)
 
@@ -80,17 +81,29 @@
 /obj/item/clothing/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	if(length(polymorphs)) .["polymorphs"] = polymorphs
-	
+
+	if(length(clothing_enchantments))
+		.["clothing_enchantments"] = list()
+		for(var/k in clothing_enchantments)
+			var/ench/E = k
+			.["clothing_enchantments"][E.type] = E.magnitude
+
+
 /obj/item/clothing/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	if(object_data["polymorphs"]) polymorphs = object_data["polymorphs"]
-	
+	if(object_data["clothing_enchantments"])
+		for(var/k in object_data["clothing_enchantments"])
+			var/ench/E = new k
+			E.magnitude = object_data["clothing_enchantments"][k]
+			clothing_enchantments += E
+
 /obj/item/clothing/New(var/desired_loc)
 	additional_clothing_stored = list()
 	weight = calculate_weight()
 	. = ..()
 	initialize_blends()
-	
+
 /obj/item/clothing/Destroy()
 	additional_clothing_stored.Cut()
 	return ..()
@@ -129,6 +142,6 @@
 /obj/item/clothing/on_drop(var/obj/hud/inventory/old_inventory,var/atom/new_loc,var/silent=FALSE)
 	. = ..()
 	remove_additonal_clothing()
-	
+
 /obj/item/clothing/proc/get_footsteps(var/list/original_footsteps,var/enter=TRUE)
 	return original_footsteps

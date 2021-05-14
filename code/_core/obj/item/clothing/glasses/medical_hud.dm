@@ -10,8 +10,10 @@
 	value = 120
 
 	defense_rating = list(
-		ARCANE = -AP_SWORD,
+		ARCANE = -20,
 	)
+
+	item_slot_layer = 2
 
 /obj/item/clothing/glasses/medical_hud/advanced
 	name = "advanced medical hud"
@@ -24,5 +26,5 @@
 	value = 200
 
 	defense_rating = list(
-		ARCANE = -AP_CLUB,
+		ARCANE = -60,
 	)

@@ -6,7 +6,7 @@
 	rarity = RARITY_UNCOMMON
 
 	defense_rating = list(,
-		ARCANE = -AP_SWORD
+		ARCANE = -20
 	)
 
 	size = SIZE_1
@@ -14,6 +14,8 @@
 	sight_mod = SEE_TURFS
 
 	value = 100
+
+	item_slot_layer = 2
 
 /obj/item/clothing/glasses/meson/night_vision
 	name = "night vision meson goggles"
@@ -25,7 +27,7 @@
 	see_in_dark = VIEW_RANGE + ZOOM_RANGE
 
 	defense_rating = list(,
-		ARCANE = -AP_SWORD
+		ARCANE = -20
 	)
 
 	size = SIZE_1
@@ -40,10 +42,10 @@
 
 	if(is_inventory(old_location))
 		var/obj/hud/inventory/I = old_location
-		I.owner.remove_color_mod("\ref[src]")
-		I.owner.remove_lighting_mod("\ref[src]")
+		I.owner?.remove_color_mod("\ref[src]")
+		I.owner?.remove_lighting_mod("\ref[src]")
 
-	if(new_location.item_slot & SLOT_EYES)
+	if(new_location.item_slot & SLOT_FACE)
 		var/list/desired_color = list(
 			1,1,0,0,
 			0,1,0,0,
@@ -54,4 +56,3 @@
 		new_location.owner.add_color_mod("\ref[src]",desired_color)
 		new_location.owner.add_lighting_mod("\ref[src]",100)
 
-	

@@ -11,6 +11,8 @@
 
 	value = 2
 
+	particle_size = 0.1
+
 
 /reagent/lube/on_splash(var/reagent_container/container,var/mob/caller,var/atom/target,var/volume_to_splash,var/strength_mod=1)
 
@@ -71,6 +73,16 @@
 	alpha = 255
 
 	flavor = "steel"
+
+	liquid = -0.25
+
+/reagent/copper
+	name = "Copper"
+	desc = "What most lifeforms build low-level currency out of."
+	color = "#DD842F"
+	alpha = 255
+
+	flavor = "copper"
 
 	liquid = -0.25
 
@@ -293,3 +305,61 @@
 	flavor_strength = 5
 
 	liquid = -0.5
+
+/reagent/phosphorous
+	name = "phosphorous"
+	desc = ""
+	color = "#FFFFFF"
+	alpha = 250
+
+	flavor = "bitterness"
+	flavor_strength = 5
+
+	liquid = -0.5
+
+/reagent/tobacco
+	name = "Tobacco"
+	desc = "Space Tobacco grown on space plantations."
+	color = "#63391C"
+	alpha = 255
+
+	flavor = "tobacco"
+	flavor_strength = 10
+
+	liquid = -0.75
+
+	var/hidden_chance = 0
+	var/list/hidden_reagents = list()
+
+	metabolism_blood = 0.5
+	metabolism_stomach = 0.5
+	metabolism_skin = 10
+
+/reagent/tobacco/on_metabolize_blood(var/mob/living/owner,var/reagent_container/container,var/starting_volume=0,var/multiplier=1)
+
+	. = ..()
+
+	if(container)
+		var/reagent/R = /reagent/medicine/nicotine
+		if(hidden_chance && prob(hidden_chance))
+			R = pickweight(hidden_reagents)
+		container.add_reagent(R,.)
+
+/reagent/tobacco/cigarette
+	name = "Low-grade Tobacco"
+	flavor = "cheap tobacco"
+	hidden_chance = 25
+	hidden_reagents = list(
+		/reagent/fuel/welding = 25,
+		/reagent/fuel/acetone = 10,
+		/reagent/ammonia = 10,
+		/reagent/toxin/spider_toxin = 1,
+		/reagent/toxin/xeno_acid = 1
+	)
+
+/reagent/hydrogen_peroxide
+	name = "hydrogen peroxide"
+	color = "#FFFFFF"
+
+	alpha = 100
+

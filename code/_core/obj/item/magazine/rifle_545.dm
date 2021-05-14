@@ -7,11 +7,12 @@
 	bullet_count_max = 30
 
 	weapon_whitelist = list(
-		/obj/item/weapon/ranged/bullet/magazine/rifle/abakan = TRUE,
+		/obj/item/weapon/ranged/bullet/magazine/rifle/an94 = TRUE,
 		/obj/item/weapon/ranged/bullet/magazine/rifle/ak12 = TRUE,
 	)
 
 	ammo = /obj/item/bullet_cartridge/rifle_545mm
+	ammo_surplus = /obj/item/bullet_cartridge/rifle_545mm/surplus
 
 	bullet_length_min = 38
 	bullet_length_best = 39
@@ -36,7 +37,7 @@
 	bullet_count_max = 30
 
 	weapon_whitelist = list(
-		/obj/item/weapon/ranged/bullet/magazine/rifle/abakan = TRUE,
+		/obj/item/weapon/ranged/bullet/magazine/rifle/an94 = TRUE,
 		/obj/item/weapon/ranged/bullet/magazine/rifle/ak12 = TRUE,
 	)
 

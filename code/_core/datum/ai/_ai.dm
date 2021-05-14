@@ -4,6 +4,7 @@
 
 	var/atom/objective_move
 	var/should_follow_objective_move = FALSE
+	var/should_burger_star_objective_move = FALSE
 
 	var/mob/living/objective_attack
 	var/atom/objective_investigate
@@ -35,7 +36,7 @@
 
 	var/left_click_chance = 90
 
-	var/night_vision = 0.25 //What level of darkness the mob can see in.
+	var/night_vision = 0.25 //What level of darkness the mob can see in. Basically if light is above this value, it can see it.
 
 	var/timeout_threshold = 600 //Amount of deciseconds of inactivty is required to ignore players. Set to 0 to disable.
 
@@ -59,6 +60,8 @@
 
 	var/path_steps = 1
 	var/list/Vector3D/current_path = list()
+
+	var/list/current_burger_star_path = list()
 
 	var/list/obstacles = list()
 
@@ -111,7 +114,20 @@
 
 	var/ignore_hazard_turfs = FALSE
 
+	var/boss = FALSE
+	var/list/active_ai_list
+	var/list/inactive_ai_list
+	var/last_z = null
+
 /ai/Destroy()
+
+	var/turf/T = get_turf(owner)
+	if(T)
+		remove_from_active_list(T.z)
+		remove_from_inactive_list(T.z)
+	else
+		log_error("Warning: [src.get_debug_name()] couldn't be cleared properly as it had a null turf.")
+
 	if(owner) owner.ai = null
 	owner = null
 	objective_move = null
@@ -133,15 +149,27 @@
 		current_path.Cut()
 		current_path = null
 
-	SSai.active_ai -= src
-	SSai.inactive_ai -= src
-
 	SSai.path_stuck_ai -= src
 
-	SSbossai.active_ai -= src
-	SSbossai.inactive_ai -= src
-
 	return ..()
+
+/ai/proc/add_to_active_list(var/z)
+	if(!active_ai_list["[z]"])
+		active_ai_list["[z]"] = list()
+	active_ai_list["[z]"] |= src
+
+/ai/proc/remove_from_active_list(var/z)
+	if(active_ai_list["[z]"])
+		active_ai_list["[z]"] -= src
+
+/ai/proc/add_to_inactive_list(var/z)
+	if(!inactive_ai_list["[z]"])
+		inactive_ai_list["[z]"] = list()
+	inactive_ai_list["[z]"] |= src
+
+/ai/proc/remove_from_inactive_list(var/z)
+	if(inactive_ai_list["[z]"])
+		inactive_ai_list["[z]"] -= src
 
 /ai/proc/set_active(var/desired_active=TRUE,var/force=FALSE)
 
@@ -150,18 +178,24 @@
 
 	active = desired_active
 
-	if(active)
-		SSai.active_ai |= src
-		SSai.inactive_ai -= src
-	else
-		SSai.active_ai -= src
-		SSai.inactive_ai |= src
+	var/turf/T = get_turf(owner)
 
+	if(active)
+		add_to_active_list(T.z)
+		remove_from_inactive_list(T.z)
+		HOOK_ADD("post_move","\ref[src]_post_move",owner,src,.proc/post_move)
+		HOOK_ADD("post_death","\ref[src]_post_death",owner,src,.proc/post_death)
+	else
+		add_to_inactive_list(T.z)
+		remove_from_active_list(T.z)
+		set_alert_level(ALERT_LEVEL_NONE,TRUE)
 		set_objective(null)
 		set_move_objective(null)
 		CALLBACK_REMOVE("set_new_objective_\ref[src]")
 		attackers.Cut()
 		obstacles.Cut()
+		HOOK_REMOVE("post_move","\ref[src]_post_move",owner)
+		HOOK_REMOVE("post_death","\ref[src]_post_death",owner)
 
 	return TRUE
 
@@ -173,12 +207,24 @@
 
 	start_turf = get_turf(owner)
 
+	if(boss)
+		active_ai_list = SSbossai.active_ai_by_z
+		inactive_ai_list = SSbossai.inactive_ai_by_z
+	else
+		active_ai_list = SSai.active_ai_by_z
+		inactive_ai_list = SSai.inactive_ai_by_z
+
 	if(!stored_sneak_power && is_living(owner))
 		var/mob/living/L = owner
-		stored_sneak_power = L.get_skill_power(SKILL_SURVIVAL)
+		stored_sneak_power = L.get_skill_power(SKILL_SURVIVAL,0,1,2)
 
 	return ..()
 
 /ai/PostInitialize()
 	. = ..()
 	set_active(active,TRUE)
+
+/ai/proc/post_death(var/mob/living/L,args)
+	set_active(FALSE)
+	return TRUE
+

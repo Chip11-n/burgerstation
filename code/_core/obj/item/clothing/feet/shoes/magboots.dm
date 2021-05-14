@@ -9,18 +9,19 @@
 
 	icon = 'icons/obj/item/clothing/shoes/magboots.dmi'
 
-	item_slot = SLOT_FOOT_RIGHT_O
+	item_slot = SLOT_FOOT
+	item_slot_mod = SLOT_MOD_LEFT
 	protected_limbs = list(BODY_FOOT_RIGHT)
 
 	defense_rating = list(
-		BLADE = AP_SWORD,
-		BLUNT = AP_CLUB,
-		PIERCE = AP_AXE,
-		ARCANE = -AP_CLUB,
-		HEAT = AP_CLUB,
-		COLD = AP_CLUB,
-		FATIGUE = AP_CLUB,
-		PAIN = AP_GREATCLUB
+		BLADE = 20,
+		BLUNT = 60,
+		PIERCE = 40,
+		ARCANE = -60,
+		HEAT = 60,
+		COLD = 60,
+		FATIGUE = 60,
+		PAIN = 120
 	)
 
 	size = SIZE_2
@@ -29,14 +30,16 @@
 
 	speed_bonus = -0.2
 
+	item_slot_layer = 3
+
 /obj/item/clothing/feet/shoes/magboot/left
 	name = "left magboot"
 	icon_state = "inventory_left"
 	icon_state_worn = "worn_left"
 
-	item_slot = SLOT_FOOT_LEFT_O
+	item_slot = SLOT_FOOT
+	item_slot_mod = SLOT_MOD_LEFT
 	protected_limbs = list(BODY_FOOT_LEFT)
-	blocks_clothing = SLOT_FOOT_LEFT | SLOT_FOOT_LEFT_U
 
 
 

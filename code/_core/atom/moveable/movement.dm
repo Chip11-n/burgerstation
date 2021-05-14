@@ -17,6 +17,7 @@
 /atom/movable/proc/handle_movement(var/adjust_delay = 1) //Measured in ticks
 
 	if(anchored)
+		is_moving = FALSE
 		return FALSE
 
 	var/final_move_dir = move_dir
@@ -50,7 +51,8 @@
 
 		move_delay = CEILING(max(final_movement_delay,move_delay + final_movement_delay), adjust_delay ? adjust_delay : 1) //Round to the nearest tick. Counting decimal ticks is dumb.
 
-		glide_size = move_delay ? step_size/move_delay : 1
+		glide_size = move_delay ? CEILING(step_size/move_delay,0.01) : 1
+		glide_size = max(glide_size,2)
 
 		//Handling intercardinal collisions.
 		if(intercardinal)
@@ -82,7 +84,7 @@
 			else
 				acceleration_value *= 0.5
 
-	if(move_delay < 0)
+	if(move_delay <= 0)
 		is_moving = FALSE
 
 	if(adjust_delay)
@@ -118,8 +120,7 @@
 					continue
 				M.Crossed(src)
 
-	if(old_loc != loc)
-		post_move(old_loc)
+	post_move(old_loc)
 
 	return TRUE
 
@@ -146,7 +147,7 @@
 
 	if(ismovable(Obstacle) && src.loc != Obstacle)
 		var/atom/movable/M = Obstacle
-		if(!M.anchored && (!grabbing_hand || Obstacle != grabbing_hand.owner))
+		if(!M.anchored && (!grabbing_hand || Obstacle != grabbing_hand.owner) && M.can_be_bumped)
 			M.glide_size = src.glide_size
 			return M.Move(get_step(M,get_dir(src,Obstacle)))
 
@@ -166,12 +167,12 @@
 	if(change_dir_on_move && Dir)
 		set_dir(Dir)
 
-	//Try: Enter the new turf.
-	if(src.density && !NewLoc.Enter(src,OldLoc) && !src.Bump(NewLoc))
-		return FALSE
-
 	//Try: Exit the old turf.
 	if(src.density && OldLoc && !OldLoc.Exit(src,NewLoc))
+		return FALSE
+
+	//Try: Enter the new turf.
+	if(src.density && !NewLoc.Enter(src,OldLoc) && !src.Bump(NewLoc))
 		return FALSE
 
 	//Try: Cross the Contents
@@ -198,10 +199,7 @@
 	if(src.density) NewLoc.Entered(src,OldLoc)
 
 	//Do: Exit the turf.
-	if(src.density) NewLoc.Exited(src,NewLoc)
-
-	if(!OldLoc || OldLoc == loc)
-		loc = NewLoc
+	if(src.density) OldLoc.Exited(src,NewLoc)
 
 	//Do: Crossed the contents
 	if(src.density)
@@ -225,8 +223,14 @@
 				continue
 			M.Uncrossed(src)
 
+	if(!OldLoc || OldLoc == loc)
+		loc = NewLoc
+
 	post_move(OldLoc)
 
+	return TRUE
+
+/atom/movable/proc/on_fall(var/turf/old_turf)
 	return TRUE
 
 

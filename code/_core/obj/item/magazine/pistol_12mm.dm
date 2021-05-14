@@ -10,11 +10,12 @@
 		/obj/item/weapon/ranged/bullet/magazine/pistol/high_calibre = TRUE,
 		/obj/item/weapon/ranged/bullet/magazine/pistol/high_calibre/mod = TRUE,
 		/obj/item/weapon/ranged/bullet/magazine/pistol/overseer = TRUE,
-		/obj/item/weapon/ranged/bullet/magazine/pistol/overseer/prototype = TRUE,
-		/obj/item/weapon/ranged/bullet/magazine/pistol/overseer/prototype/equipped = TRUE
+		/obj/item/weapon/ranged/bullet/magazine/pistol/overseer/mod = TRUE,
+		/obj/item/weapon/ranged/bullet/magazine/pistol/overseer/mod/silenced = TRUE
 	)
 
 	ammo = /obj/item/bullet_cartridge/pistol_12mm
+	ammo_surplus = /obj/item/bullet_cartridge/pistol_12mm/surplus
 
 	bullet_length_min = 27
 	bullet_length_best = 33

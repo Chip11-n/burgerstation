@@ -4,14 +4,16 @@
 	desc = "A sorcerer's cape. Frequently dyed to show one's proficiency in a specific magical art."
 	desc_extended = "A cape donning colors that represent one's proficiency in a specific magical art."
 
+	item_slot = SLOT_NECK
+
 
 	protected_limbs = list(BODY_TORSO)
 
 	defense_rating = list(
-		ARCANE = AP_GREATSWORD,
-		COLD = AP_SWORD,
-		HOLY = -AP_AXE,
-		DARK = AP_AXE
+		ARCANE = 80,
+		COLD = 20,
+		HOLY = -40,
+		DARK = 40
 	)
 
 	rarity = RARITY_RARE
@@ -26,3 +28,5 @@
 	dyeable = TRUE
 
 	value = 200
+
+	item_slot_layer = 3

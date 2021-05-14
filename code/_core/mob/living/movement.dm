@@ -51,12 +51,6 @@
 
 	. = ..()
 
-	if(ai)
-		ai.on_move(.,NewLoc,Dir)
-
-	if(stand)
-		stand.on_move(.,NewLoc,Dir)
-
 /mob/living/post_move(var/atom/old_loc)
 
 	. = ..()
@@ -78,16 +72,15 @@
 	if(is_sneaking)
 		on_sneak()
 
+	if(old_turf && length(old_turf.old_living))
+		old_turf.old_living -= src
+
 	if(isturf(old_loc))
 		var/turf/T = old_loc
-		if(T.old_living)
-			T.old_living -= src
-
-	if(isturf(loc))
-		var/turf/T = loc
 		if(!T.old_living)
 			T.old_living = list()
 		T.old_living |= src
+		src.old_turf = T
 
 	handle_tabled()
 
@@ -119,29 +112,19 @@
 
 /mob/living/handle_movement(var/adjust_delay = 1)
 
-
 	if(move_dir) //If you're actuall moving.
-
 		if(!can_move())
 			return FALSE
-
 		if(grabbing_hand)
 			resist()
 			return FALSE
-
 		if(get_status_effect_magnitude(SLEEP) == -1)
 			remove_status_effect(SLEEP)
 			return FALSE
 
-		if(has_status_effect(CONFUSED))
-			move_dir = turn(move_dir,180)
-
 	. = ..()
 
-	if(.)
 
-		if(has_status_effect(CONFUSED))
-			move_dir = turn(move_dir,180)
 
 /mob/living/get_stance_movement_mul()
 
@@ -169,6 +152,9 @@
 	var/trait/speed/S = get_trait_by_category(/trait/speed/)
 	if(S) . *= S.move_delay_mul
 
+	if(has_status_effect(SLOW))
+		. *= 2
+
 	if(horizontal)
 		. = max(.,SECONDS_TO_TICKS(1))
 
@@ -182,7 +168,7 @@
 			S.update_sprite()
 
 	if(on && !dead)
-		stealth_mod = get_skill_power(SKILL_SURVIVAL)
+		stealth_mod = get_skill_power(SKILL_SURVIVAL,0,1,2)
 		is_sneaking = TRUE
 		return TRUE
 	else
@@ -203,15 +189,17 @@
 
 	if(O.density && is_living(O))
 		var/mob/living/L = O
-		if(L.loyalty_tag == src.loyalty_tag)
-			if(!src.ai || L.is_moving || !L.ai)
-				return ..()
 		if(L.horizontal || src.horizontal)
+			//If the crosser is horizontal, or the src is horizontal, who cares.
 			return ..()
-		if(L.size >= size && L.size >= SIZE_ANIMAL)
+		if(L.loyalty_tag == src.loyalty_tag && !L.ai)
+			//If the crosser is not an AI, who cares.
+			return ..()
+		if(L.size >= SIZE_ANIMAL)
+			//Can't cross bud. You're an AI. No AI clogging.
 			return FALSE
 
-	return ..()
+	. = ..()
 
 
 /mob/living/on_thrown(var/atom/owner,var/atom/hit_atom,var/atom/hit_wall) //What happens after the person is thrown.

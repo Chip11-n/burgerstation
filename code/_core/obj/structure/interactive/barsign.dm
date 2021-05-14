@@ -2,7 +2,7 @@ obj/structure/interactive/bar_sign
 	name = "bar sign"
 	desc = "Come on in!"
 	icon = 'icons/obj/structure/store_signs.dmi'
-	icon_state = null
+	icon_state = "blank"
 	plane = PLANE_WALL
 	layer = 99
 
@@ -22,6 +22,10 @@ obj/structure/interactive/bar_sign/traitor
 	desc = "For all your traitor needs!"
 	icon_state = "traitor"
 
+obj/structure/interactive/bar_sign/bawse_loot
+	name = "Bawse Loot"
+	desc = "Nothing is stolen*! We promise!"
+	icon_state = "bawse_loot"
 
 obj/structure/interactive/bar_sign/dan
 	name = "Discount Dan's"
@@ -55,3 +59,40 @@ obj/structure/interactive/bar_sign/debug
 	name = "Coderbus"
 	desc = "Wait what?"
 	icon_state = "thecoderbus"
+
+obj/structure/interactive/bar_sign/outer_space
+	name = "The Outer Space"
+	desc = "Wait what?"
+	icon_state = "theouterspess"
+
+obj/structure/interactive/bar_sign/adminbus
+	name = "The adminbus"
+	desc = "Wait what?"
+	icon_state = "theadminbus"
+
+obj/structure/interactive/bar_sign/the_lightbulb
+	name = "The lightbulb"
+	desc = "Wait what?"
+	icon_state = "the_lightbulb"
+
+obj/structure/interactive/bar_sign/thenet
+	name = "The net"
+	desc = "Wait what?"
+	icon_state = "thenet"
+
+obj/structure/interactive/bar_sign/combocafe
+	name = "combo cafe"
+	desc = "Wait what?"
+	icon_state = "combocafe"
+
+obj/structure/interactive/bar_sign/thenest
+	name = "The Nest"
+	desc = "Wait what?"
+	icon_state = "thenest"
+
+obj/structure/interactive/bar_sign/scotchservinwill
+	name = "Scotch Servin' Willy's"
+	desc = "Wait what?"
+	icon_state = "scotchservinwill"
+
+

@@ -41,7 +41,7 @@ mob/living/advanced/get_movement_delay()
 		stamina_mul = clamp(0.75 + ((health.stamina_current + pain_bonus)/health.stamina_max),0.75,1)
 		pain_mul = clamp(0.1 + (1 - ((health.get_loss(PAIN) - pain_bonus)/health.health_max))*0.9,0.1,1)
 
-	. *= slowdown_mul * (1/adrenaline_bonus) * (1/pain_mul) * (1/stamina_mul) * (1/health_mul)
+	. *= move_delay_multiplier * (1/adrenaline_bonus) * (1/pain_mul) * (1/stamina_mul) * (1/health_mul)
 
 /mob/living/advanced/toggle_sneak(var/on = TRUE)
 
@@ -77,21 +77,17 @@ mob/living/advanced/get_movement_delay()
 
 	return original_footsteps
 
-
-/mob/living/advanced/Move(NewLoc,Dir=0,step_x=0,step_y=0)
-
-	var/OldLoc = loc
-
-	if(right_hand && right_hand.grabbed_object)
-		right_hand.check_grab()
-
-	if(left_hand && left_hand.grabbed_object)
-		left_hand.check_grab()
+/mob/living/advanced/post_move(var/atom/old_loc)
 
 	. = ..()
 
-	if(. && isturf(OldLoc))
-		var/turf/T = OldLoc
+	for(var/k in using_inventories)
+		var/obj/item/I = k
+		if(get_dist(src,I) > 1)
+			I.close_inventory(src)
+
+	if(. && isturf(old_loc))
+		var/turf/T = old_loc
 		//Right hand
 		if(right_hand && right_hand.grabbed_object)
 			var/distance = get_dist(src,right_hand.grabbed_object)
@@ -104,7 +100,7 @@ mob/living/advanced/get_movement_delay()
 			if(distance > 1)
 				if(bypass_safe || T.is_safe_teleport(FALSE) || !grabbed_turf.is_safe_teleport(FALSE))
 					right_hand.grabbed_object.glide_size = glide_size
-					right_hand.grabbed_object.Move(OldLoc)
+					right_hand.grabbed_object.Move(T)
 				else
 					right_hand.release_object()
 
@@ -120,8 +116,17 @@ mob/living/advanced/get_movement_delay()
 			if(distance > 1)
 				if(bypass_safe || T.is_safe_teleport(FALSE) || !grabbed_turf.is_safe_teleport(FALSE))
 					left_hand.grabbed_object.glide_size = glide_size
-					left_hand.grabbed_object.Move(OldLoc)
+					left_hand.grabbed_object.Move(T)
 				else
 					left_hand.release_object()
 
-	
+/mob/living/advanced/Move(NewLoc,Dir=0,step_x=0,step_y=0)
+
+	if(right_hand && right_hand.grabbed_object)
+		right_hand.check_grab()
+
+	if(left_hand && left_hand.grabbed_object)
+		left_hand.check_grab()
+
+	. = ..()
+

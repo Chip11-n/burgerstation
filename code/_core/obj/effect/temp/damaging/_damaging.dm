@@ -75,7 +75,7 @@ obj/effect/temp/hazard/New(var/desired_location,var/desired_time,var/desired_own
 	if(!victim.can_be_attacked(owner,src,params,DT))
 		return FALSE
 	var/atom/object_to_damage = victim.get_object_to_damage(owner,src,params,TRUE,TRUE)
-	return DT.hit(owner,victim,src,object_to_damage,owner,1)
+	return DT.process_damage(owner,victim,src,object_to_damage,owner,1)
 
 /obj/effect/temp/hazard/proc/do_hazard()
 
@@ -144,7 +144,7 @@ obj/effect/temp/hazard/tentacle/New(var/desired_location,var/desired_time,var/de
 	. = ..()
 	CALLBACK("deactivate_hazard_\ref[src]",9,src,.proc/deactivate_hazard)
 
-obj/effect/temp/hazard/tentacle/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1)
+obj/effect/temp/hazard/tentacle/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1,var/damagetype/damage_type_override)
 	if(istype(victim,/mob/living/simple/goliath/)) //This bug is hilarious but we don't want to have it.
 		return FALSE
 	return ..()
@@ -180,7 +180,7 @@ obj/effect/temp/hazard/bubblefist/New(var/desired_location,var/desired_time,var/
 	CALLBACK("deactivate_hazard_\ref[src]",7,src,.proc/deactivate_hazard)
 	update_sprite()
 
-obj/effect/temp/hazard/bubblefist/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1)
+obj/effect/temp/hazard/bubblefist/attack(var/atom/attacker,var/atom/victim,var/list/params=list(),var/atom/blamed,var/ignore_distance = FALSE, var/precise = FALSE,var/damage_multiplier=1,var/damagetype/damage_type_override)
 	if(istype(victim,/mob/living/simple/bubblegum)) //This bug is hilarious but we don't want to have it.
 		return FALSE
 	return ..()

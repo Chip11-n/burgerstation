@@ -32,6 +32,8 @@
 
 	damage_coefficient = 0.9
 
+	gib_icon_state = "gibtorso"
+
 /obj/item/organ/groin/female
 	desc = "A groin. Female variant"
 	icon_state = BODY_GROIN_FEMALE
@@ -112,4 +114,13 @@
 	defense_rating = GOBLIN_ARMOR
 
 /obj/item/organ/groin/goblin/female
+	icon_state = BODY_GROIN_FEMALE
+
+
+//Monkey
+/obj/item/organ/groin/moth
+	name = "moth groin"
+	icon = 'icons/mob/living/advanced/species/moth.dmi'
+
+/obj/item/organ/groin/moth/female
 	icon_state = BODY_GROIN_FEMALE

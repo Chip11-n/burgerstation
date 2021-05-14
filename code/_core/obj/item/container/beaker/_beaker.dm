@@ -29,6 +29,26 @@
 /obj/item/container/beaker/get_examine_list(var/mob/examiner)
 	return ..() + div("notice",reagents.get_contents_english())
 
+/obj/item/container/beaker/click_on_object(var/mob/caller,var/atom/object,location,control,params)
+
+	if(istype(object,/obj/item/weapon/melee))
+		var/obj/item/weapon/melee/M = object
+		if(!M.reagents)
+			caller.to_chat(span("warning","\The [M.name] cannot be coated!"))
+			return FALSE
+		var/reagent_transfer = min(5,reagents.volume_current)
+		if(reagent_transfer <= 0)
+			caller.to_chat(span("warning","\The [src.name] is empty!"))
+			return TRUE
+		if(M.reagents.volume_current >= M.reagents.volume_max)
+			caller.to_chat(span("warning","\The [M.name] is already coated!"))
+			return TRUE
+		reagents.transfer_reagents_to(M.reagents,reagent_transfer, caller = caller)
+		caller.visible_message(span("warning","\The [caller.name] coats \the [M.name] with liquid from \the [src.name]."),span("notice","You carefully coat \the [M.name] with liquid from \the [src.name]."))
+		return TRUE
+
+	. = ..()
+
 /obj/item/container/beaker/click_self(var/mob/caller,location,control,params)
 
 	INTERACT_CHECK
@@ -67,4 +87,26 @@
 
 /obj/item/container/beaker/potassium/Generate()
 	reagents.add_reagent(/reagent/potassium,reagents.volume_max)
+	return ..()
+
+/obj/item/container/beaker/smoke_01/Generate()
+	reagents.add_reagent(/reagent/nutrition/sugar,20)
+	reagents.add_reagent(/reagent/potassium,40)
+	return ..()
+
+/obj/item/container/beaker/smoke_02/Generate()
+	reagents.add_reagent(/reagent/nutrition/sugar,20)
+	reagents.add_reagent(/reagent/phosphorous,40)
+	return ..()
+
+/obj/item/container/beaker/large/lube_smoke_01/Generate()
+	reagents.add_reagent(/reagent/nutrition/sugar,20)
+	reagents.add_reagent(/reagent/potassium,40)
+	reagents.add_reagent(/reagent/lube,60)
+	return ..()
+
+/obj/item/container/beaker/large/lube_smoke_02/Generate()
+	reagents.add_reagent(/reagent/nutrition/sugar,20)
+	reagents.add_reagent(/reagent/phosphorous,40)
+	reagents.add_reagent(/reagent/lube,60)
 	return ..()

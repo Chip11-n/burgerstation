@@ -24,7 +24,7 @@
 
 	trackable = TRUE
 
-	area_identifier = "Burgerstation"
+	area_identifier = "Mission"
 
 /area/burgerstation/hall
 	name = "\improper Hallway"
@@ -93,6 +93,24 @@
 	flags_area = FLAGS_AREA_NO_TELEPORT | FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_SAVEZONE
 
 	sound_environment = ENVIRONMENT_ROOM
+
+/area/burgerstation/prestige
+	name = "\improper Prestige Center"
+	icon_state = "dorm"
+
+	flags_area = FLAGS_AREA_NO_TELEPORT | FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_NO_EVENTS
+
+/area/burgerstation/soccer
+	name = "\improper Soccer Field"
+	icon_state = "dorm"
+
+	flags_area = FLAGS_AREA_NO_TELEPORT | FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_NO_EVENTS
+
+/area/burgerstation/vr
+	name = "\improper VR Rooms"
+	icon_state = "dorm"
+
+	flags_area = FLAGS_AREA_NO_TELEPORT | FLAGS_AREA_NO_DAMAGE | FLAGS_AREA_NO_CONSTRUCTION | FLAGS_AREA_NO_EVENTS
 
 /area/burgerstation/help_desk
 	name = "\improper Help Desk"
@@ -167,6 +185,10 @@
 
 /area/burgerstation/bait_shop
 	name = "\improper Bait Shop"
+	icon_state = "bait"
+
+/area/burgerstation/goblin_shop
+	name = "\improper Bawse Loot"
 	icon_state = "bait"
 
 /area/burgerstation/mining

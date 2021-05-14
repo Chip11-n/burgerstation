@@ -111,14 +111,26 @@ var/global/allow_loading = TRUE
 		return FALSE
 
 	var/list/loaded_data = A.get_mob_data(save_inventory,force,died)
-	if(write_json_data_to_id(loaded_data["id"],loaded_data))
+
+
+	if(!length(loaded_data))
+		A.to_chat(span("danger","FATAL ERROR: COULD NOT SAVE! Your character had no data! Contact burger on how this happened with error code: 01."))
+		return FALSE
+	else if(!length(loaded_data["organs"]))
+		A.to_chat(span("danger","FATAL ERROR: COULD NOT SAVE! Your character had no organ data! Contact burger on how this happened with error code: 02."))
+		return FALSE
+	else if(!length(loaded_data["skills"]))
+		A.to_chat(span("danger","FATAL ERROR: COULD NOT SAVE! Your character had no skill data! Contact burger on how this happened with error code: 03."))
+		return FALSE
+	else if(!length(loaded_data["attributes"]))
+		A.to_chat(span("danger","FATAL ERROR: COULD NOT SAVE! Your character had no attribute data! Contact burger on how this happened with error code: 04."))
+		return FALSE
+	else if(write_json_data_to_id(loaded_data["id"],loaded_data))
 		if(died)
 			A.to_chat(span("notice","Your mind and body was backed up in the NanoTrasen cloning network..."))
 		else
 			A.to_chat(span("notice","Sucessfully saved character [A.name]."))
 	else
 		A.to_chat(span("danger","<h2>Save failed. Please contact the server owner with error code: 99.</h2>"))
-
-	A.client?.globals?.save() //Save globals too. TODO: FIX THIS
 
 	return TRUE

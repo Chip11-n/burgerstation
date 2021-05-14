@@ -6,11 +6,13 @@
 	rarity = RARITY_MYTHICAL
 
 	defense_rating = list(,
-		ARCANE = AP_SWORD,
-		PAIN = AP_SWORD
+		ARCANE = 20,
+		PAIN = 20
 	)
 
 	size = SIZE_1
 
 
 	value = 10
+
+	item_slot_layer = 2

@@ -4,6 +4,7 @@
 	desc_extended = "A fancier version of the laser rifle that self-charges. It has become innacurate due to its age."
 	icon = 'icons/obj/item/weapons/ranged/laser/captain.dmi'
 	rarity = RARITY_MYTHICAL
+	value = 4000
 
 	projectile = /obj/projectile/bullet/laser
 	ranged_damage_type = /damagetype/ranged/laser/carbine
@@ -19,19 +20,15 @@
 
 	override_icon_state = TRUE
 
-	view_punch = 4
-
-	heat_per_shot = 0.01
 	heat_max = 0.05
 
 	size = SIZE_3
 	weight = 10
 
-	value = 2000
-
 	battery = /obj/item/powercell/recharging
 
-	inaccuracy_modifier = 0.75
+	inaccuracy_modifier = 0.25
+	movement_inaccuracy_modifier = 0.5
 	movement_spread_base = 0.02
 
 /obj/item/weapon/ranged/energy/captain/update_overlays()

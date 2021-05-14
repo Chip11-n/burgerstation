@@ -4,6 +4,8 @@
 	stamina_base = 50
 	mana_base = 50
 
+	vis_flags = VIS_INHERIT_ID
+
 	var/rarity = RARITY_COMMON
 
 	var/list/experience/attribute/attributes
@@ -29,10 +31,6 @@
 	mouse_over_pointer = MOUSE_ACTIVE_POINTER
 
 	var/death_threshold = 0 //If you're below this health, then you're dead.
-
-	var/charge_block = 500
-	var/charge_parry = 500
-	var/charge_dodge = 500
 
 	var/nutrition = 1000
 	var/nutrition_fast = 0
@@ -70,6 +68,7 @@
 	var/is_sneaking = FALSE
 	var/stealth_mod = 0
 
+	var/selected_intent = INTENT_HELP
 	var/intent = INTENT_HELP
 
 	var/level = 0
@@ -127,6 +126,8 @@
 		PAIN = 0,
 		SANITY = 0
 	)
+
+	var/list/mob_value
 
 	var/list/status_immune = list() //What status effects area they immune to?
 	//STATUS = TRUE //Means it's immune.
@@ -228,13 +229,16 @@
 		"cry",
 		"clap",
 		"salute",
-		"spin"
+		"spin",
+		"inhale",
+		"drag",
+		"help"
 	)
 
 	var/tabled = FALSE
 	var/currently_tabled = FALSE
 
-	density = 1
+	density = TRUE
 
 	var/list/defense_bonuses = list() //From perks, powers, and whatever.
 
@@ -247,6 +251,33 @@
 	var/list/traits = list() //Assoc list. This is saved.
 	var/list/traits_by_category = list() //Assoc list. This isn't saved.
 
+	can_be_bumped = FALSE
+
+	var/one_time_life = FALSE
+
+	var/drops_gold = 0 //Set to a value to make this mob drop this amount of gold when it dies.
+
+	var/obj/hud/flash/flash_overlay
+
+/mob/living/proc/flash(var/duration=100)
+
+	if(!client)
+		return FALSE
+
+	if(duration <= 0)
+		return FALSE
+
+	if(flash_overlay)
+		flash_overlay.duration = max(duration,flash_overlay.duration)
+		return TRUE
+
+	flash_overlay = new
+	flash_overlay.owner = src
+	flash_overlay.duration = duration
+	client.screen += flash_overlay
+
+	return TRUE
+
 /mob/living/on_crush() //What happens when this object is crushed by a larger object.
 	. = ..()
 	play_sound(pick('sound/effects/impacts/flesh_01.ogg','sound/effects/impacts/flesh_02.ogg','sound/effects/impacts/flesh_03.ogg'),get_turf(src))
@@ -255,8 +286,13 @@
 		var/reagent/R = REAGENT(blood_type)
 		for(var/i=1,i<=9,i++)
 			create_blood(/obj/effect/cleanable/blood/splatter,get_turf(src),R.color,rand(-32,32),rand(-32,32))
-	death()
+	death(TRUE)
 	if(!qdeleting) qdel(src)
+
+/mob/living/on_fall(var/turf/old_loc)
+	. = ..()
+	health?.adjust_loss_smart(brute=100)
+	add_status_effect(STUN,40,40)
 
 /mob/living/get_base_value()
 	. = ..()
@@ -291,17 +327,25 @@
 		following.followers -= src
 		following = null
 
-	for(var/k in attributes)
-		var/experience/E = attributes[k]
-		qdel(E)
+	if(linked_mobs)
+		for(var/k in linked_mobs)
+			var/mob/M = k
+			qdel(M)
+		linked_mobs.Cut()
 
-	attributes.Cut()
-
-	for(var/k in skills)
-		var/experience/E = skills[k]
-		qdel(E)
-
-	skills.Cut()
+	if(fallback_mob)
+		fallback_mob.linked_mobs -= src
+		attributes = null
+		skills = null
+	else
+		for(var/k in attributes)
+			var/experience/E = attributes[k]
+			qdel(E)
+		attributes.Cut()
+		for(var/k in skills)
+			var/experience/E = skills[k]
+			qdel(E)
+		skills.Cut()
 
 	QDEL_NULL(ai)
 
@@ -340,12 +384,6 @@
 
 	return ..()
 
-/mob/living/proc/get_brute_color()
-	return "#FF0000"
-
-/mob/living/proc/get_burn_color()
-	return "#444444"
-
 /mob/living/New(loc,desired_client,desired_level_multiplier)
 
 	blood_volume_max = blood_volume
@@ -362,19 +400,19 @@
 	if(enable_medical_hud)
 		medical_hud_image = new/image('icons/hud/medihud.dmi',"0")
 		medical_hud_image.loc = src
-		medical_hud_image.layer = PLANE_HUD_VISION
+		medical_hud_image.layer = PLANE_AUGMENTED
 		medical_hud_image.pixel_y = 4
 		medical_hud_image.appearance_flags = RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 
 		medical_hud_image_advanced = new/image('icons/hud/damage_hud.dmi',"000")
 		medical_hud_image_advanced.loc = src
-		medical_hud_image_advanced.layer = PLANE_HUD_VISION
+		medical_hud_image_advanced.layer = PLANE_AUGMENTED
 		medical_hud_image_advanced.appearance_flags = RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 
 	if(enable_security_hud)
 		security_hud_image = new/image('icons/hud/sechud.dmi',"unknown")
 		security_hud_image.loc = src
-		security_hud_image.layer = PLANE_HUD_VISION
+		security_hud_image.layer = PLANE_AUGMENTED
 		security_hud_image.appearance_flags = RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 
 	. = ..()
@@ -401,7 +439,7 @@
 	initialize_attributes()
 	initialize_skills()
 	update_level(TRUE)
-	set_intent(intent,TRUE)
+	update_intent(TRUE)
 
 	. = ..()
 
@@ -522,7 +560,7 @@
 	params[PARAM_ICON_Y] = 16
 	var/atom/object_to_damage = src.get_object_to_damage(owner,source,params,FALSE,TRUE)
 	var/damagetype/D = all_damage_types[/damagetype/explosion/]
-	D.hit(source,src,source,object_to_damage,owner,magnitude)
+	D.process_damage(source,src,source,object_to_damage,owner,magnitude)
 	return TRUE
 
 /mob/living/advanced/do_explosion_damage(var/atom/owner,var/atom/source,var/atom/epicenter,var/magnitude,var/desired_loyalty)
@@ -532,7 +570,7 @@
 		params[PARAM_ICON_Y] = rand(0,32)
 		var/atom/object_to_damage = src.get_object_to_damage(owner,source,params,FALSE,TRUE)
 		var/damagetype/D = all_damage_types[/damagetype/explosion/]
-		D.hit(source,src,source,object_to_damage,owner,magnitude*(1/5))
+		D.process_damage(source,src,source,object_to_damage,owner,magnitude*(1/5))
 	return TRUE
 
 /mob/living/proc/draw_blood(var/mob/caller,var/atom/needle,var/amount=0,var/messages = TRUE)

@@ -5,12 +5,18 @@
 			var/obj/hud/inventory/I = k
 			I.delete_objects()
 			I.remove_from_owner()
-
-	if(is_tail(O))
+	if(istype(O,/obj/item/organ/antennae))
+		remove_overlay("antennae_behind")
+		remove_overlay("antennae_front")
+	else if(istype(O,/obj/item/organ/wings))
+		remove_overlay("natural_wings_behind")
+		remove_overlay("natural_wings_front")
+	else if(istype(O,/obj/item/organ/tail))
 		remove_overlay("tail_behind")
 		remove_overlay("tail_front")
 	else
 		remove_overlay("\ref[O]")
+
 	organs -= O
 	labeled_organs -= O.id
 
@@ -33,7 +39,7 @@
 		log_error("WARNING: INVALID SPECIES: [species].")
 		return FALSE
 
-	var/obj/hud/screen/B
+	var/obj/hud/flash/B
 	var/initially_disabled = FALSE
 	if(client)
 		initially_disabled = client.disable_controls
@@ -42,7 +48,6 @@
 		B.icon = 'icons/hud/discovery.dmi' //320x320
 		B.icon_state = "black"
 		B.screen_loc = "CENTER-4.5,CENTER-4.5"
-		B.client = src.client
 		B.maptext = "<font size='4'>Loading...</font>"
 		B.maptext_width = 320
 		B.maptext_height = 300
@@ -55,14 +60,14 @@
 		for(var/key in S.spawning_organs_female)
 			add_organ(S.spawning_organs_female[key])
 			if(world_state == STATE_RUNNING)
-				sleep(world.tick_lag)
+				CHECK_TICK(50,FPS_SERVER)
 			else
 				sleep(-1)
 	else
 		for(var/key in S.spawning_organs_male)
 			add_organ(S.spawning_organs_male[key])
 			if(world_state == STATE_RUNNING)
-				sleep(world.tick_lag)
+				CHECK_TICK(50,FPS_SERVER)
 			else
 				sleep(-1)
 
@@ -92,7 +97,13 @@
 		INITIALIZE(O)
 		FINALIZE(O)
 
-	if(is_tail(O))
+	if(istype(O,/obj/item/organ/antennae))
+		add_overlay_tracked("antennae_behind",O,desired_layer = LAYER_MOB_ANTENNAE_BEHIND, desired_icon_state = "[O.icon_state]_BEHIND",desired_pixel_x = O.worn_pixel_x,desired_pixel_y = O.worn_pixel_y)
+		add_overlay_tracked("antennae_front",O,desired_layer = LAYER_MOB_ANTENNAE_FRONT, desired_icon_state = "[O.icon_state]_FRONT",desired_pixel_x = O.worn_pixel_x,desired_pixel_y = O.worn_pixel_y)
+	else if(istype(O,/obj/item/organ/wings))
+		add_overlay_tracked("natural_wings_behind",O,desired_layer = LAYER_MOB_WINGS_BEHIND, desired_icon_state = "[O.icon_state]_BEHIND",desired_pixel_x = O.worn_pixel_x,desired_pixel_y = O.worn_pixel_y)
+		add_overlay_tracked("natural_wings_front",O,desired_layer = LAYER_MOB_WINGS_FRONT, desired_icon_state = "[O.icon_state]_FRONT",desired_pixel_x = O.worn_pixel_x,desired_pixel_y = O.worn_pixel_y)
+	else if(istype(O,/obj/item/organ/tail))
 		add_overlay_tracked("tail_behind",O,desired_layer = LAYER_MOB_TAIL_BEHIND, desired_icon_state = "tail_behind")
 		add_overlay_tracked("tail_front",O,desired_layer = LAYER_MOB_TAIL_FRONT, desired_icon_state = "tail_front")
 	else

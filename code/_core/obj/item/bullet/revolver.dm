@@ -21,6 +21,12 @@
 	size = 0.02
 	value = 1.1
 
+/obj/item/bullet_cartridge/revolver_38/surplus
+	name = "\improper surplus .38 revolver cartridge"
+	damage_type_bullet = /damagetype/ranged/bullet/revolver_38/surplus
+	jam_chance = 1
+	value = 0
+
 /obj/item/bullet_cartridge/revolver_38/Generate()
 	item_count_current = 6
 	update_sprite()
@@ -49,6 +55,12 @@
 	size = 0.03
 	value = 1.5
 
+/obj/item/bullet_cartridge/revolver_357/surplus
+	name = "\improper surplus .357 revolver cartridge"
+	damage_type_bullet = /damagetype/ranged/bullet/revolver_357/surplus
+	jam_chance = 1
+	value = 0
+
 /obj/item/bullet_cartridge/revolver_44
 	name = "\improper .44 revolver cartridge"
 	desc = "I'm feeling lucky"
@@ -72,13 +84,18 @@
 	size = 0.035
 	value = 2
 
+/obj/item/bullet_cartridge/revolver_44/surplus
+	name = "\improper surplus .44 revolver cartridge"
+	damage_type_bullet = /damagetype/ranged/bullet/revolver_44/surplus
+	jam_chance = 1
+	value = 0
+
 /obj/item/bullet_cartridge/pistol_22
 	name = "\improper .22 pistol cartridge"
 	desc = "For when you need to mildly bother someone."
 	desc_extended = "For pistols and revolvers that require .22 ammo."
 	rarity = RARITY_COMMON
 	icon = 'icons/obj/item/bullet/22.dmi'
-
 
 	bullet_diameter = 5.6
 	bullet_length = 17.7
@@ -94,6 +111,12 @@
 
 	size = 0.01
 	value = 0.5
+
+/obj/item/bullet_cartridge/pistol_22/surplus
+	name = "\improper surplus .22 pistol cartridge"
+	damage_type_bullet = /damagetype/ranged/bullet/revolver_22/surplus
+	jam_chance = 1
+	value = 0
 
 /obj/item/bullet_cartridge/revolver_300
 	name = "\improper .300 revolver cartridge"
@@ -149,3 +172,9 @@
 	item_count_current = 7
 	update_sprite()
 	return ..()
+
+/obj/item/bullet_cartridge/revolver_762/surplus
+	name = "\improper surplus .22 pistol cartridge"
+	damage_type_bullet = /damagetype/ranged/bullet/revolver_762/surplus
+	jam_chance = 1
+	value = 0

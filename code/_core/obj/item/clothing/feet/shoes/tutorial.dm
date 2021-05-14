@@ -9,16 +9,13 @@
 
 	icon = 'icons/obj/item/clothing/shoes/tutorial_shoes.dmi'
 
-	item_slot = SLOT_FOOT_RIGHT
-	protected_limbs = list(BODY_FOOT_RIGHT)
-
 	defense_rating = list(
-		BLADE = AP_AXE,
-		BLUNT = AP_AXE,
-		PIERCE = AP_AXE,
-		LASER = -AP_AXE,
-		ARCANE = AP_AXE,
-		COLD = AP_AXE
+		BLADE = 40,
+		BLUNT = 40,
+		PIERCE = 40,
+		LASER = -40,
+		ARCANE = 40,
+		COLD = 40
 	)
 
 	size = SIZE_2
@@ -33,7 +30,7 @@
 	icon_state = "inventory_left"
 	icon_state_worn = "worn_left"
 
-	item_slot = SLOT_FOOT_LEFT
+	item_slot = SLOT_FOOT
+	item_slot_mod = SLOT_MOD_LEFT
 	protected_limbs = list(BODY_FOOT_LEFT)
-	blocks_clothing = SLOT_FOOT_LEFT | SLOT_FOOT_LEFT_U
 

@@ -79,3 +79,9 @@
 #define PARRIED "parried"
 
 #define STRESSED "stressed"
+
+#define SHOVED "shoved"
+
+#define SLOW "slow"
+
+#define MANAVOID "manavoid"

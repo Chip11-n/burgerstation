@@ -18,6 +18,9 @@
 	name = "sandstone wall"
 	color = "#FFC68C"
 
+/turf/simulated/wall/brick/sand/ish
+	color = "#9E866E"
+
 /turf/simulated/wall/brick/marble
 	name = "marble wall"
 	color = "#E1DFD2"
@@ -34,5 +37,12 @@
 	name = "uranium brick wall"
 	color = COLOR_URANIUM
 	//material = /material/uranium
+
+
+/turf/simulated/wall/brick/grey
+	color = COLOR_GREY
+
+/turf/simulated/wall/brick/grey/dark
+	color = COLOR_GREY_DARK
 
 

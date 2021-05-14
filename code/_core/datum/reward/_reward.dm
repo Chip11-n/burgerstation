@@ -11,12 +11,13 @@
 /reward/proc/can_reward(var/client/C)
 
 	if(flags_reward & FLAG_REWARD_ONCE)
-		if(C.globals.loaded_data["redeemed_rewards"] && (src.type in C.globals.loaded_data["redeemed_rewards"]))
+		var/savedata/client/globals/GD = GLOBALDATA(C.ckey)
+		if(!GD || GD.loaded_data["redeemed_rewards"] && ("[src.type]" in GD.loaded_data["redeemed_rewards"]))
 			C.to_chat(span("warning","You already redeemed this reward!"))
 			return FALSE
 
 	if(flags_reward & FLAG_REWARD_ONCE_PER_ROUND)
-		if(SSreward.redeemed_rewards_by_ckey[C.ckey] && SSreward.redeemed_rewards_by_ckey[C.ckey][type])
+		if(SSreward.redeemed_rewards_by_ckey[C.ckey] && SSreward.redeemed_rewards_by_ckey[C.ckey]["[src.type]"])
 			C.to_chat(span("warning","You already redeemed this reward this round!"))
 			return FALSE
 
@@ -25,14 +26,15 @@
 /reward/proc/on_reward(var/client/C)
 
 	if(flags_reward & FLAG_REWARD_ONCE)
-		if(!C.globals.loaded_data["redeemed_rewards"])
-			C.globals.loaded_data["redeemed_rewards"] = list()
-		C.globals.loaded_data["redeemed_rewards"] |= src.type
+		var/savedata/client/globals/GD = GLOBALDATA(C.ckey)
+		if(!GD || !GD.loaded_data["redeemed_rewards"])
+			GD.loaded_data["redeemed_rewards"] = list()
+		GD.loaded_data["redeemed_rewards"] |= "[src.type]"
 
 	if(flags_reward & FLAG_REWARD_ONCE_PER_ROUND)
 		if(!SSreward.redeemed_rewards_by_ckey[C.ckey])
 			SSreward.redeemed_rewards_by_ckey[C.ckey] = list()
-		SSreward.redeemed_rewards_by_ckey[C.ckey] += src.type
+		SSreward.redeemed_rewards_by_ckey[C.ckey] |= "[src.type]"
 
 	return TRUE
 
@@ -83,5 +85,11 @@
 /reward/burgerbux/survey_oct_2020
 	name = "October 2020 Survey Reward"
 	desc = "A 20 burgerbux reward for completing the October 2020 Player Survey"
+	flags_reward = FLAG_REWARD_ONCE
+	burgerbux_to_give = 20
+
+/reward/burgerbux/survey_mar_2021
+	name = "March 2021 Survey Reward"
+	desc = "A 20 burgerbux reward for completing the March 2021 Player Survey"
 	flags_reward = FLAG_REWARD_ONCE
 	burgerbux_to_give = 20

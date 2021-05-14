@@ -7,11 +7,11 @@
 	bullet_count_max = 10
 
 	weapon_whitelist = list(
-		/obj/item/weapon/ranged/bullet/magazine/rifle/svt = TRUE,
-		/obj/item/weapon/ranged/bullet/magazine/rifle/svd = TRUE
+		/obj/item/weapon/ranged/bullet/magazine/rifle/svt = TRUE
 	)
 
 	ammo = /obj/item/bullet_cartridge/rifle_308/long
+	ammo_surplus = /obj/item/bullet_cartridge/rifle_308/long/surplus
 
 	bullet_length_min = 46
 	bullet_length_best = 54

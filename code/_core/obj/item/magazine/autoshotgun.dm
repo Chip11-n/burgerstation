@@ -12,6 +12,7 @@
 	)
 
 	ammo = /obj/item/bullet_cartridge/shotgun_20/slug
+	ammo_surplus = /obj/item/bullet_cartridge/shotgun_20/slug/surplus
 
 	bullet_length_min = 17
 	bullet_length_best = 17.5
@@ -33,6 +34,7 @@
 /obj/item/magazine/shotgun_auto/buckshot
 	name = "\improper 20g bulldog magazine (buckshot)"
 	ammo = /obj/item/bullet_cartridge/shotgun_20/buckshot
+	ammo_surplus = /obj/item/bullet_cartridge/shotgun_20/buckshot/surplus
 
 /obj/item/magazine/shotgun_auto/slug
 	name = "\improper 20g bulldog magazine magazine (slug)"

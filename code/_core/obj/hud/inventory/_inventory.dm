@@ -14,7 +14,7 @@
 	icon_state = "square"
 
 	plane = PLANE_HUD
-	layer = -1 //Needs to be low.
+	layer = 1
 
 	value = 0
 
@@ -31,7 +31,8 @@
 
 	var/worn_allow_duplicate = FALSE //Can you wear more than one item of the same slot at once?
 
-	var/item_slot = SLOT_NONE //Items that can be worn in this slot. Applies to clothing only.
+	var/item_slot = SLOT_NONE //Items that can be worn in this slot. Applies to non-held slots only. See _defines/item.dm for info.
+	var/item_slot_mod = SLOT_MOD_NONE //The slot mod. See _defines/item.dm for info.
 
 	var/priority = 0 //The priority level of the inventory. Item transfer favors inventories with higher values.
 
@@ -77,6 +78,10 @@
 
 	interaction_flags = FLAG_INTERACTION_LIVING | FLAG_INTERACTION_NO_DISTANCE | FLAG_INTERACTION_NO_DISTANCE
 
+	var/inventory_category = "none"
+
+	var/obj/hud/button/close_inventory/assoc_button //The associated close button for this inventory object.
+
 /obj/hud/inventory/proc/is_occupied(var/ignore_contents=FALSE)
 
 	if(!ignore_contents && length(contents))
@@ -113,6 +118,8 @@
 	child_inventory = null
 	grabbed_object = null
 
+	QDEL_NULL(assoc_button)
+
 	return ..()
 
 /obj/hud/inventory/proc/show(var/should_show,var/speed)
@@ -142,7 +149,6 @@
 
 	if(parent_inventory)
 		color = "#ff0000"
-		add_overlay(parent_inventory.overlays)
 	else if(grabbed_object)
 		color = "#ffff00"
 		var/image/I = new/image(initial(icon),"grab")
@@ -167,9 +173,9 @@
 	var/desired_pixel_x = item_to_update.held_pixel_x
 	var/desired_pixel_y = item_to_update.held_pixel_y
 	var/desired_layer = LAYER_MOB_HELD
-	var/matrix/desired_transform = matrix()
+	var/matrix/desired_transform = get_base_transform()
 
-	if(item_to_update.dan_mode && (id == BODY_HAND_LEFT || id == BODY_HAND_RIGHT || id == BODY_TORSO_OB) )
+	if(item_to_update.dan_mode && (id == BODY_HAND_LEFT_HELD || id == BODY_HAND_RIGHT_HELD || id == BODY_TORSO_OB) )
 		if(id == BODY_TORSO_OB)
 			desired_icon_state = item_to_update.dan_icon_state_back
 		else
@@ -247,9 +253,9 @@
 							desired_pixel_x = -item_to_update.dan_offset_pixel_x[4]
 							desired_pixel_y = -item_to_update.dan_offset_pixel_y[4]
 
-	else if(id == BODY_HAND_LEFT)
+	else if(id == BODY_HAND_LEFT_HELD)
 		desired_icon_state = item_to_update.icon_state_held_left
-	else if(id == BODY_HAND_RIGHT)
+	else if(id == BODY_HAND_RIGHT_HELD)
 		desired_icon_state = item_to_update.icon_state_held_right
 
 	if(desired_icon_state == null)
@@ -397,24 +403,27 @@
 	return TRUE
 
 
-/obj/hud/inventory/proc/drop_objects(var/turf/T,var/exclude_soulbound=FALSE)
-	var/list/dropped_objects = list()
+/obj/hud/inventory/proc/drop_objects(var/turf/T)
+
+	. = list()
+
 	for(var/k in contents)
 		var/obj/item/I = k
-		if(exclude_soulbound && I.soul_bound && I.soul_bound == owner.ckey)
-			continue
 		if(remove_object(I,T))
-			dropped_objects += I
-
-	return dropped_objects
+			. += I
 
 /obj/hud/inventory/proc/delete_objects()
+	var/turf/T = get_turf(src)
 	for(var/k in contents)
 		var/obj/item/I = k
 		I.delete_on_drop = TRUE
-		remove_object(I,owner.loc)
+		remove_object(I,T)
 
 /obj/hud/inventory/proc/remove_object(var/obj/item/I,var/turf/drop_loc,var/pixel_x_offset=0,var/pixel_y_offset=0,var/silent=FALSE) //Removes the object from both worn and held objects, just in case.
+
+	if(!I)
+		log_error("Error: Tried to remove null object from an inventory!")
+		return null
 
 	I.force_move(drop_loc ? drop_loc : get_turf(src.loc)) //THIS SHOULD NOT BE ON DROP
 	I.pixel_x = pixel_x_offset
@@ -422,24 +431,24 @@
 
 	update_stats()
 
-	if(owner && is_advanced(owner))
-		var/mob/living/advanced/A = owner
-		if(worn && is_wings(I))
-			A.remove_overlay("wings_behind")
-			A.remove_overlay("wings_front")
-			A.remove_overlay("wings_side")
-		else
-			A.remove_overlay("\ref[I]")
-
-	if(owner && !owner.qdeleting)
-		I.set_dir(owner.dir)
+	if(owner)
 		if(is_advanced(owner))
 			var/mob/living/advanced/A = owner
-			if(worn)
-				A.worn_objects -= I
+			if(worn && is_wings(I))
+				A.remove_overlay("wings_behind")
+				A.remove_overlay("wings_front")
+				A.remove_overlay("wings_side")
 			else
-				A.held_objects -= I
-			A.update_items(should_update_eyes = worn, should_update_protection = worn, should_update_clothes = worn)
+				A.remove_overlay("\ref[I]")
+
+			if(!A.qdeleting)
+				if(worn)
+					A.worn_objects -= I
+				else
+					A.held_objects -= I
+				A.update_items(should_update_eyes = worn, should_update_protection = worn, should_update_clothes = worn)
+
+		I.set_dir(owner.dir)
 
 	vis_contents -= I
 
@@ -466,9 +475,11 @@
 		I2.update_inventory()
 
 /obj/hud/inventory/proc/can_unslot_object(var/obj/item/I,var/messages = FALSE)
+	return TRUE
 
-	if(!I.item_slot)
-		return FALSE
+	/* Slot overhaul, might need this.
+	if(!I.item_slot || !(I.item_slot & item_slot))
+		return TRUE
 
 	if(!is_advanced(owner))
 		return TRUE
@@ -484,6 +495,7 @@
 			return FALSE
 
 	return TRUE
+	*/
 
 /obj/hud/inventory/proc/can_slot_object(var/obj/item/I,var/messages = FALSE)
 
@@ -557,17 +569,25 @@
 								owner.to_chat(span("warning","You cannot seem to fit \the [I.name] on your non-human head..."))
 							return FALSE
 				if(C.item_slot)
-					var/list/list_to_check = C.ignore_other_slots ? src.contents : A.worn_objects
-					for(var/obj/item/clothing/C2 in list_to_check)
-						if(C2.blocks_clothing && (C.item_slot & C2.blocks_clothing)) //DON'T LET YOUR EYES FOOL YOU AS THEY DID MINE.
-							if(messages) owner.to_chat(span("notice","\The [C2.name] prevents you from wearing \the [C.name]!"))
-							return FALSE
-
+					for(var/obj/item/clothing/existing_clothing in src.contents)
+						if(existing_clothing.item_slot_layer < C.item_slot_layer)
+							continue
+						if(messages)
+							owner.to_chat(span("warning","\The [existing_clothing.name] prevents you from wearing \the [C.name]!"))
+						return FALSE
 
 		if(!(I.item_slot & item_slot))
 			if(messages)
-				owner.to_chat(span("notice","You cannot wear \the [I.name] like this!"))
+				owner.to_chat(span("notice","\The [I.name] doesn't fit on \the [src.loc.name]!"))
 			return FALSE
+
+		if(item_slot_mod & (SLOT_MOD_LEFT | SLOT_MOD_RIGHT) && !((I.item_slot_mod & SLOT_MOD_RIGHT) && (I.item_slot_mod & SLOT_MOD_LEFT)))
+			var/is_right_hand = item_slot_mod & SLOT_MOD_RIGHT
+			var/is_right_item = I.item_slot_mod & SLOT_MOD_RIGHT
+			if(is_right_hand != is_right_item)
+				if(messages)
+					owner.to_chat(span("notice","\The [I.name] doesn't fit on \the [src.loc.name]!"))
+				return FALSE
 
 	if(!(I.type in item_bypass) && !(src.type in I.inventory_bypass) && max_size >= 0)
 		if(max_size >= 0 && I.size > max_size)
@@ -576,6 +596,8 @@
 			return FALSE
 
 	return TRUE
+
+
 
 /atom/proc/get_top_object()
 

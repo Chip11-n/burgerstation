@@ -36,7 +36,7 @@
 
 	var/click_flags = get_click_flags(new_params,TRUE)
 
-	if(!object || object.plane < PLANE_HUD)
+	if(!object || object.plane < PLANE_HUD || object.qdeleting)
 		return FALSE
 
 	object = object.defer_click_on_object(mob,location,control,new_params)
@@ -74,7 +74,7 @@
 	if(click_flags & CLICK_RIGHT)
 		mob.attack_flags |= CONTROL_MOD_RIGHT
 
-	if(!object || object.plane >= PLANE_HUD)
+	if(!object || object.plane >= PLANE_HUD || object.qdeleting)
 		return FALSE
 
 	object = object.defer_click_on_object(mob,location,control,new_params)
@@ -101,6 +101,9 @@
 				FINALIZE(A)
 				mob.visible_message("<b>\The [mob.name]</b> points to <b>\the [object.name]</b>.")
 				spam_protection_interact += 10
+		else if(is_advanced(mob) && mob.attack_flags & CONTROL_MOD_GRAB && is_advanced(object))
+			var/mob/living/advanced/A = object
+			A.examine_body_inventory(mob)
 		else
 			examine(object)
 
@@ -124,7 +127,7 @@
 			click_and_drag_icon.stored_inventory = null
 			click_and_drag_icon.alpha = 0
 
-	if(!object || object.plane >= PLANE_HUD)
+	if(!object || object.plane >= PLANE_HUD || object.qdeleting)
 		return FALSE
 
 	object = object.defer_click_on_object(mob,location,control,new_params)
@@ -141,7 +144,7 @@
 
 	var/list/new_params = params2list(params)
 
-	if(!src_object || !over_object)
+	if(!src_object || !over_object || src_object.qdeleting || over_object.qdeleting)
 		return FALSE
 
 	src_object = src_object.defer_click_on_object(mob,src_location,src_control,new_params)
@@ -168,7 +171,10 @@
 	return ..()
 
 
-/client/MouseDrag(src_object,over_object,src_location,over_location,src_control,over_control,params)
+/client/MouseDrag(var/atom/src_object,var/atom/over_object,src_location,over_location,src_control,over_control,params)
+
+	if(!src_object || !over_object || src_object.qdeleting || over_object.qdeleting)
+		return FALSE
 
 	MouseEntered(over_object,over_location,over_control,params) //God I hate this.
 

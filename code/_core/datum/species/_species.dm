@@ -10,7 +10,6 @@
 	var/flags_flavor_hate = 0x0
 
 	var/flags_species = SPECIES_NONE //The identifier of the species.
-	var/flags_species_traits = TRAIT_NONE
 	var/flags_chargen = CHARGEN_NONE
 
 	var/default_color_eye = "#FF0000"
@@ -46,9 +45,16 @@
 		"deathgasp" = list('sound/voice/human/human_male_deathgasp_1.ogg','sound/voice/human/human_male_deathgasp_2.ogg'),
 		"gasp" = list('sound/voice/human/human_male_gasp_1.ogg','sound/voice/human/human_male_gasp_2.ogg','sound/voice/human/human_male_gasp_3.ogg'),
 		"grenade" = list('sound/voice/human/human_male_grenadethrow_1.ogg','sound/voice/human/human_male_grenadethrow_2.ogg','sound/voice/human/human_male_grenadethrow_3.ogg'),
-		"medic" = list('sound/voice/human/human_male_medic_1.ogg','sound/voice/human/human_male_medic_2.ogg'),
+		"medic" = list('sound/voice/human/human_male_medic_1.ogg'),
 		"pain" = list('sound/voice/human/human_male_pain_1.ogg','sound/voice/human/human_male_pain_2.ogg','sound/voice/human/human_male_pain_3.ogg','sound/voice/human/human_male_pain_4.ogg','sound/voice/human/human_male_pain_5.ogg','sound/voice/human/human_male_pain_6.ogg','sound/voice/human/human_male_pain_7.ogg','sound/voice/human/human_male_pain_8.ogg'),
-		"scream" = list('sound/voice/human/human_male_scream_1.ogg','sound/voice/human/human_male_scream_2.ogg','sound/voice/human/human_male_scream_3.ogg','sound/voice/human/human_male_scream_4.ogg','sound/voice/human/human_male_scream_5.ogg','sound/voice/human/human_male_scream_6.ogg','sound/voice/human/human_male_scream_special.ogg')
+		"scream" = list('sound/voice/human/human_male_scream_1.ogg','sound/voice/human/human_male_scream_2.ogg','sound/voice/human/human_male_scream_3.ogg','sound/voice/human/human_male_scream_4.ogg','sound/voice/human/human_male_scream_5.ogg','sound/voice/human/human_male_scream_6.ogg')
+	)
+
+	var/list/emote_sounds_male_meme = list(
+		"scream" = list('sound/voice/human/human_male_scream_special_1.ogg','sound/voice/human/human_male_scream_special_2.ogg'),
+		"pain" = list('sound/voice/human/human_male_pain_special_1.ogg','sound/voice/human/human_male_pain_special_2.ogg'),
+		"deathgasp" = list('sound/voice/human/human_male_deathgasp_special_1.ogg','sound/voice/human/human_male_deathgasp_special_2.ogg'),
+		"medic" = list('sound/voice/human/human_male_medic_special_1.ogg')
 	)
 
 	var/list/emote_sounds_female = list(
@@ -60,6 +66,10 @@
 		"medic" = list('sound/voice/human/human_female_medic_1.ogg'),
 		"pain" = list('sound/voice/human/human_female_pain_1.ogg','sound/voice/human/human_female_pain_2.ogg','sound/voice/human/human_female_pain_3.ogg'),
 		"scream" = list('sound/voice/human/human_female_scream_1.ogg','sound/voice/human/human_female_scream_2.ogg','sound/voice/human/human_female_scream_3.ogg','sound/voice/human/human_female_scream_4.ogg','sound/voice/human/human_female_scream_5.ogg')
+	)
+
+	var/list/emote_sounds_female_meme = list(
+
 	)
 
 	var/list/accent = null
@@ -81,21 +91,18 @@
 		/obj/hud/button/intent/disarm,
 		/obj/hud/button/intent/grab,
 		/obj/hud/button/sneak,
-		/obj/hud/button/close_inventory,
 		/obj/hud/button/resist,
 
-		#ifdef ENABLE_SLOTS
-			/obj/hud/button/slot/A,
-			/obj/hud/button/slot/B,
-			/obj/hud/button/slot/C,
-			/obj/hud/button/slot/D,
-			/obj/hud/button/slot/E,
-			/obj/hud/button/slot/F,
-			/obj/hud/button/slot/G,
-			/obj/hud/button/slot/H,
-			/obj/hud/button/slot/I,
-			/obj/hud/button/slot/J,
-		#endif
+		/obj/hud/button/slot/A,
+		/obj/hud/button/slot/B,
+		/obj/hud/button/slot/C,
+		/obj/hud/button/slot/D,
+		/obj/hud/button/slot/E,
+		/obj/hud/button/slot/F,
+		/obj/hud/button/slot/G,
+		/obj/hud/button/slot/H,
+		/obj/hud/button/slot/I,
+		/obj/hud/button/slot/J,
 
 		/obj/hud/button/toggle_cash_money,
 		/obj/hud/button/cash_money,
@@ -119,7 +126,7 @@
 
 		//obj/hud/button/ping,
 
-		//obj/hud/button/message,
+		/obj/hud/button/message,
 
 		/obj/hud/button/rest,
 
@@ -152,6 +159,21 @@
 		/reagent/blood/human/a_positive,
 		/reagent/blood/human/o_positive
 	)
+
+	var/list/inherent_traits = list( //Traits given by the species.
+
+
+
+
+	)
+
+/species/proc/generate_traits(var/mob/living/L)
+
+	for(var/k in inherent_traits)
+		L.add_trait(k,FALSE,FALSE)
+
+	return TRUE
+
 
 /species/proc/mod_speech(var/mob/living/M,var/text,var/intensity=50)
 

@@ -10,6 +10,7 @@ var/global/world_state = STATE_STARTING
 	icon_size = TILE_SIZE
 	view = VIEW_RANGE
 	map_format = TOPDOWN_MAP
+
 	sleep_offline = TRUE
 
 	name = "Burgerstation 13"
@@ -28,8 +29,9 @@ var/global/world_state = STATE_STARTING
 	loop_checks = 1
 
 /world/New()
+	//sleep_offline = TRUE
 	__detect_rust_g()
-	..()
+	. = ..()
 	life()
 
 /world/proc/update_server_status()
@@ -70,8 +72,16 @@ var/global/world_state = STATE_STARTING
 	SSdiscord.send_message("Shutting down world...")
 	return ..()
 
+/world/proc/play_round_end_sound()
+	sleep(-1)
+	var/chosen_sound = pick(SSsound.round_end_sounds)
+	play_sound_global(chosen_sound,all_mobs_with_clients)
+	sleep(30)
+	return TRUE
+
 /world/proc/shutdown_server()
 	save()
+	play_round_end_sound()
 	world_state = STATE_SHUTDOWN
 	for(var/k in all_clients)
 		var/client/C = all_clients[k]
@@ -82,11 +92,12 @@ var/global/world_state = STATE_STARTING
 
 /world/proc/reboot_server()
 	save()
+	play_round_end_sound()
 	world_state = STATE_SHUTDOWN
 	for(var/k in all_clients)
 		var/client/C = all_clients[k]
 		C << "Rebooting world. Stick around to automatically rejoin."
-	sleep(0)
+	sleep(-1)
 	Reboot(0)
 	return TRUE
 
@@ -105,18 +116,20 @@ var/global/world_state = STATE_STARTING
 /world/proc/save()
 	save_all_globals()
 	//save_all_mechs()
-	for(var/k in all_players)
-		var/mob/living/advanced/player/P = k
-		if(P.dead)
-			P.to_chat(span("danger","Could not save your character because you were dead."))
+	save_deathboxes()
+	save_banks()
+	for(var/ckey in ckey_to_mobdata)
+		var/savedata/client/mob/M = ckey_to_mobdata[ckey]
+		if(!M.attached_mob)
 			continue
-		var/savedata/client/mob/mobdata = MOBDATA(P.ckey_last)
-		mobdata.save_character(P,force = TRUE)
+		var/mob/living/advanced/player/P = M.attached_mob
+		if(P.dead)
+			continue
+		if(!P.allow_save)
+			continue
+		M.save_character(P,force = TRUE)
 		P.to_chat(span("notice","Your character was automatically saved."))
 		sleep(-1)
-	var/chosen_sound = pick(SSsound.round_end_sounds)
-	play_sound_global(chosen_sound,all_mobs_with_clients)
-	sleep(100)
 	return TRUE
 
 /world/proc/end(var/reason,var/shutdown=FALSE)
@@ -134,7 +147,7 @@ var/global/world_state = STATE_STARTING
 			nice_reason = "Adminbus."
 		if(WORLD_END_NANOTRASEN_VICTORY)
 			nice_reason = "Nanotrasen Victory"
-			SSpayday.stored_payday += 10000
+			SSpayday.stored_payday += 5000
 			SSpayday.trigger_payday()
 			announce("Central Command Mission Update","Mission Success","You completed all the objectives without fucking up too hard, so here is a bonus.")
 		if(WORLD_END_SYNDICATE_VICTORY)

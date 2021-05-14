@@ -43,6 +43,8 @@ var/global/list/blood_turfs = list()
 
 	var/slip_factor = 1
 
+	var/organic = FALSE
+
 /turf/simulated/is_safe_teleport(var/check_contents=TRUE)
 
 	if(collision_flags & FLAG_COLLISION_WALKING)
@@ -113,8 +115,12 @@ var/global/list/blood_turfs = list()
 	pixel_x = 0
 	pixel_y = 0
 
-	change_turf(destruction_turf)
+	var/missing_health = health.health_current < 0 ? -health.health_current : 0
 
+	change_turf(destruction_turf)
+	if(missing_health && src.health)
+		src.health.health_current -= missing_health
+		src.health.update_health(caller,missing_health)
 
 /turf/simulated/Initialize()
 	var/area/A = loc
@@ -131,14 +137,15 @@ var/global/list/blood_turfs = list()
 
 /turf/simulated/PostInitialize()
 	. = ..()
-	update_sprite()
+	if(istype(health))
+		health.organic = organic
 
 /turf/simulated/proc/get_smooth_code()
 
 	var/list/calc_list = list()
 
 	for(var/d in DIRECTIONS_ALL)
-		var/dir_to_text = dir2text(d)
+		var/dir_to_text = "[d]"
 		var/turf/T = get_step(src,d)
 
 		calc_list[dir_to_text] = FALSE //Default
@@ -157,30 +164,30 @@ var/global/list/blood_turfs = list()
 	var/se = ""
 
 	if(!tile)
-		if(calc_list["north"])
+		if(calc_list["[NORTH]"])
 			ne += "n"
 			nw += "n"
-		if(calc_list["south"])
+		if(calc_list["[SOUTH]"])
 			se += "s"
 			sw += "s"
 
-		if(calc_list["east"])
+		if(calc_list["[EAST]"])
 			ne += "e"
 			se += "e"
-		if(calc_list["west"])
+		if(calc_list["[WEST]"])
 			nw += "w"
 			sw += "w"
 
-	if(nw == "nw" && calc_list["north-west"])
+	if(nw == "nw" && calc_list["[NORTHWEST]"])
 		nw = "f"
 
-	if(ne == "ne" && calc_list["north-east"])
+	if(ne == "ne" && calc_list["[NORTHEAST]"])
 		ne = "f"
 
-	if(sw == "sw" && calc_list["south-west"])
+	if(sw == "sw" && calc_list["[SOUTHWEST]"])
 		sw = "f"
 
-	if(se == "se" && calc_list["south-east"])
+	if(se == "se" && calc_list["[SOUTHEAST]"])
 		se = "f"
 
 	if(!ne) ne = "i"

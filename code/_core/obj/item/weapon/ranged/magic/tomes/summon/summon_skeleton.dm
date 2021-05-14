@@ -34,6 +34,18 @@
 
 	value = 3000
 
+/obj/item/weapon/ranged/magic/tome/summon/exploding_frog
+	name = "summoning tome of the exploding frog"
+	desc = "None."
+	desc_extended = "Summons a powerful exploding frog to fight for you for 5 minutes. Costs mana to use."
+	icon = 'icons/obj/item/weapons/ranged/magic/tomes/skeleton_summon.dmi'
+
+	cost_mana = 50
+
+	object_to_summon = /mob/living/simple/exploding_frog
+
+	value = 5000
+
 /obj/item/weapon/ranged/magic/tome/summon/crab
 	name = "summoning tome of crabs"
 	desc = "None."
@@ -91,5 +103,29 @@
 	cost_mana = 125
 
 	object_to_summon = /mob/living/advanced/npc/crystal_guardian/
+
+	value = 3000
+
+/obj/item/weapon/ranged/magic/tome/summon/goblin_warrior
+	name = "summoning tome of the goblin warrior"
+	desc = "None."
+	desc_extended = "Summons a powerful goblin warrior to fight for you for 5 minutes. Costs mana to use."
+	icon = 'icons/obj/item/weapons/ranged/magic/tomes/skeleton_summon.dmi'
+
+	cost_mana = 100
+
+	object_to_summon = /mob/living/advanced/npc/goblin/warrior
+
+	value = 3000
+
+/obj/item/weapon/ranged/magic/tome/summon/goblin_mage
+	name = "summoning tome of the goblin mage"
+	desc = "None."
+	desc_extended = "Summons a powerful goblin mage to fight for you for 5 minutes. Costs mana to use."
+	icon = 'icons/obj/item/weapons/ranged/magic/tomes/skeleton_summon.dmi'
+
+	cost_mana = 100
+
+	object_to_summon = /mob/living/advanced/npc/goblin/mage
 
 	value = 3000

@@ -12,6 +12,24 @@
 
 	return TRUE
 
+/client/proc/spectate(var/atom/A)
+
+	if(A == mob)
+		A = null
+
+	if(A != null && A == src.eye)
+		return FALSE
+
+	if(A == null && src.eye == mob)
+		return FALSE
+
+	src.eye = A ? A : mob
+
+	if(src.eye == mob)
+		mob.plane_master_hud?.alpha = 255
+	else
+		mob.plane_master_hud?.alpha = 0
+
 /client/proc/update_view_range()
 
 	if(settings && settings.loaded_data["view_range"])
@@ -26,10 +44,13 @@
 	if(!mob)
 		return ..()
 
-	if(object && examine_mode)
-		mob.examine_overlay.maptext = "[object]"
+	if(object)
+		mob.examine_overlay.maptext = "<center size='3'>[object]</center>"
+	else
+		mob.examine_overlay.maptext = null
 
-	if(is_zoomed && mob && isturf(location))
+
+	if(zoom_held && mob && isturf(location))
 		var/zoom_mul = 1
 		var/real_angle = get_angle(mob,location) + 90
 		var/real_dir = angle2dir(real_angle)

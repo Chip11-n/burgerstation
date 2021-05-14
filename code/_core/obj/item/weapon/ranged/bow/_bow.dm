@@ -21,15 +21,19 @@
 
 	override_icon_state = TRUE
 
-	heat_per_shot = 0.01
+
 	heat_max = 0.03
 
 	inaccuracy_modifier = 0.1
+	movement_inaccuracy_modifier = 0.9
 	movement_spread_base = 0.05
 
 	var/draw_sound = 'sound/weapons/bow/draw_steel.ogg'
 
 	var/spam_prevention = 0
+
+	size = SIZE_3
+	weight = 10
 
 /obj/item/weapon/ranged/bow/post_move(var/atom/old_loc)
 	. = ..()
@@ -41,10 +45,8 @@
 		var/obj/hud/inventory/I = loc
 		if(is_living(I.owner))
 			var/mob/living/L = I.owner
-			var/strength_mod = L.get_attribute_power(ATTRIBUTE_STRENGTH)
-			strength_mod = clamp(0.25 + strength_mod*0.75,0,1)
-			var/dex_mod = L.get_attribute_power(ATTRIBUTE_DEXTERITY)
-			dex_mod = clamp(0.5 + dex_mod*0.5,0,1)
+			var/strength_mod = L.get_attribute_power(ATTRIBUTE_STRENGTH,0.25,1,2)
+			var/dex_mod = L.get_attribute_power(ATTRIBUTE_DEXTERITY,0.5,1,2)
 			stage_per_decisecond *= dex_mod
 			stage_per_decisecond = CEILING(stage_per_decisecond,1)
 			stage_max *= strength_mod
@@ -88,7 +90,7 @@
 
 /obj/item/weapon/ranged/bow/think()
 
-	var/held_down = current_shooter && !current_shooter.qdeleting && ((current_shooter.attack_flags & CONTROL_MOD_LEFT) || (current_shooter.attack_flags & CONTROL_MOD_RIGHT)) && !(current_shooter.attack_flags & CONTROL_MOD_ALT)
+	var/held_down = current_shooter && !current_shooter.qdeleting && ((current_shooter.attack_flags & CONTROL_MOD_LEFT) || (current_shooter.attack_flags & CONTROL_MOD_RIGHT)) && !(current_shooter.attack_flags & CONTROL_MOD_DISARM)
 
 	if(held_down)
 		stage_current = min(stage_max,stage_current + stage_per_decisecond)

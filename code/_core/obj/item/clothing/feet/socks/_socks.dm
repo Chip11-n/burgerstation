@@ -6,8 +6,9 @@
 	icon_state_worn = "worn"
 	flags_clothing = FLAG_CLOTHING_NOBEAST_FEET
 	worn_layer = LAYER_MOB_CLOTHING_SOCKS
-	item_slot = SLOT_FOOT_LEFT_U | SLOT_FOOT_RIGHT_U
-	blocks_clothing = SLOT_FOOT_LEFT_U | SLOT_FOOT_RIGHT_U
+	item_slot = SLOT_FOOT
+	item_slot_mod = SLOT_MOD_RIGHT | SLOT_MOD_LEFT
+
 
 	ignore_other_slots = TRUE
 
@@ -18,14 +19,16 @@
 	dyeable = TRUE
 
 	defense_rating = list(
-		ARCANE = AP_SWORD,
-		COLD = AP_DAGGER,
-		HEAT = -AP_DAGGER
+		ARCANE = 20,
+		COLD = 10,
+		HEAT = -10
 	)
 
 	size = SIZE_0
 
 	speed_bonus = 0.05
+
+	item_slot_layer = 1
 
 
 
@@ -84,14 +87,14 @@
 	name = "programmer sock"
 
 	polymorphs = list(
-		"sock" = "#FFFFFF",
-		"stripes" = "#FFFFFF"
+		"sock" = COLOR_WHITE,
+		"stripes" = "#FFBFEC"
 	)
 
 /obj/item/clothing/feet/socks/thigh/striped/bee
 	name = "bee stockings"
 
 	polymorphs = list(
-		"sock" = "#FFFFFF",
-		"stripes" = "#FFFFFF"
+		"sock" = COLOR_BLACK,
+		"stripes" = "#F7DD5D"
 	)

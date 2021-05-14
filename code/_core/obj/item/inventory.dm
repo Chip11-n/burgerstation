@@ -10,7 +10,7 @@
 		else
 			good_inventory_count += 1
 
-	var/delete_until = good_inventory_count < 8 ? good_inventory_count : CEILING(good_inventory_count,8)
+	var/delete_until = good_inventory_count < max_inventory_x ? good_inventory_count : CEILING(good_inventory_count,8)
 
 	for(var/k in bad_inventories)
 		var/obj/hud/inventory/dynamic/I = k
@@ -27,7 +27,7 @@
 		var/obj/hud/inventory/I = loc
 		if(is_advanced(I.owner))
 			var/mob/living/advanced/A = I.owner
-			A.update_slowdown()
+			A.update_speed()
 
 	return TRUE
 

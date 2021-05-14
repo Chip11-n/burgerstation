@@ -2,12 +2,13 @@
 	name = "belt slot"
 	icon_state = "slot_groin_o"
 	id = BODY_GROIN_O
-	screen_loc = "CENTER-2,BOTTOM"
+	screen_loc = "CENTER-3,BOTTOM"
 
 	max_slots = 1
 	worn = TRUE
 
-	item_slot = SLOT_GROIN_O
+	item_slot = SLOT_GROIN_BELT
+
 
 	essential = TRUE
 
@@ -26,7 +27,7 @@
 	max_slots = 2
 	worn = TRUE
 
-	item_slot = SLOT_GROIN_U | SLOT_GROIN
+	item_slot = SLOT_GROIN
 
 	flags = FLAGS_HUD_INVENTORY | FLAGS_HUD_WORN | FLAGS_HUD_MOB
 

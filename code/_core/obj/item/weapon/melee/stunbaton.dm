@@ -6,7 +6,7 @@
 	damage_type = /damagetype/melee/club/stunbaton
 	damage_type_on = /damagetype/melee/club/stunbaton/on
 
-	value = 20
+	value = 50
 
 	size = SIZE_2
 
@@ -17,4 +17,3 @@
 	if(.)
 		if(enabled)
 			play_sound(pick('sound/effects/sparks/sparks1.ogg','sound/effects/sparks/sparks2.ogg','sound/effects/sparks/sparks3.ogg','sound/effects/sparks/sparks4.ogg'),get_turf(src),range_max=VIEW_RANGE*0.5)
-	

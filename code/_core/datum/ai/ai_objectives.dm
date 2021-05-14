@@ -32,22 +32,25 @@
 			owner.add_player_to_boss(A)
 		if(objective_move == objective_attack)
 			objective_move = null
-		owner.set_intent(objective_attack || owner.stand ? INTENT_HARM : INTENT_HELP)
+		owner.selected_intent = owner.stand ? INTENT_HARM : INTENT_HELP
+		owner.update_intent()
 		return TRUE
 	else if(istype(A))
 		frustration_attack = 0
 		set_active(TRUE)
 		set_alert_level(ALERT_LEVEL_COMBAT,A,A)
 		objective_attack = A
-		owner.set_intent(objective_attack || owner.stand ? INTENT_HARM : INTENT_HELP)
+		owner.selected_intent = owner.stand ? INTENT_HARM : INTENT_HELP
+		owner.update_intent()
 		return TRUE
 
 	frustration_attack = 0
 
 	objective_attack = null
-	owner.set_intent(owner.stand ? INTENT_HARM : INTENT_HELP)
+	owner.selected_intent = owner.stand ? INTENT_HARM : INTENT_HELP
+	owner.update_intent()
 
-	if(old_attack && !old_attack.qdeleting)
+	if(!owner.dead && old_attack && !old_attack.qdeleting)
 		if(is_living(old_attack))
 			var/mob/living/L2 = old_attack
 			if(L2.dead)
@@ -87,7 +90,7 @@
 			if(!should_attack_mob(objective_attack,FALSE))
 				set_objective(null)
 			else
-				var/sight_chance = get_sight_chance(objective_attack)
+				var/sight_chance = get_sight_chance(objective_attack,view_check=TRUE)
 				if(sight_chance <= 0)
 					set_objective(null)
 					frustration_attack = 0
@@ -95,6 +98,8 @@
 					frustration_attack += tick_rate
 				else
 					frustration_attack = 0
+		else if(isturf(objective_attack) && objective_attack.Enter(owner))
+			set_objective(null)
 		else if(get_dist(owner,objective_attack) > attack_distance_max)
 			frustration_attack += tick_rate
 		else
@@ -123,6 +128,7 @@
 	if(!objective_attack && shoot_obstacles && length(obstacles) && !CALLBACK_EXISTS("set_new_objective_\ref[src]"))
 		var/atom/closest_obstacle
 		var/best_distance = INFINITY
+		var/view_range = get_view_range()
 		for(var/k in obstacles)
 			var/atom/A = k
 			if(A.qdeleting)
@@ -136,7 +142,8 @@
 				if(A.Cross(owner))
 					obstacles -= k
 					continue
-			if(!closest_obstacle || get_dist(owner,A) < best_distance)
+			var/distance_check = get_dist(owner,A)
+			if(distance_check <= view_range && (!closest_obstacle || distance_check < best_distance))
 				closest_obstacle = A
 		if(closest_obstacle)
 			if(reaction_time)
@@ -160,7 +167,7 @@
 
 	. = list()
 
-	if(retaliate && attackers)
+	if(retaliate && length(attackers))
 		for(var/k in attackers)
 			CHECK_TICK(75,FPS_SERVER*2)
 			var/atom/A = k
@@ -168,21 +175,24 @@
 				attackers -= k
 				continue
 			.[A] = TRUE
+		if(prob(80)) //Optimization
+			return .
+
+	if(aggression <= 0)
+		return .
 
 	var/range_to_use = get_view_range()
 	if(range_to_use <= 0)
 		return .
 
-	if(aggression > 0)
-		for(var/mob/living/L in view(range_to_use,owner))
-			CHECK_TICK(75,FPS_SERVER*2)
-			var/sight_chance = get_sight_chance(L,FALSE)
-			if(sight_chance < 100 && !prob(sight_chance))
-				continue
-			CHECK_TICK(75,FPS_SERVER*2)
-			if(!should_attack_mob(L))
-				continue
-			.[L] = TRUE
+	for(var/mob/living/L in view(range_to_use,owner))
+		CHECK_TICK(75,FPS_SERVER*2)
+		var/sight_chance = get_sight_chance(L,range_to_use)
+		if(sight_chance < 100 && !prob(sight_chance))
+			continue
+		if(!should_attack_mob(L))
+			continue
+		.[L] = TRUE
 
 /ai/proc/investigate(var/atom/desired_target)
 
@@ -206,6 +216,7 @@
 		return FALSE
 
 	if(!owner || owner.dead)
+		alert_level = ALERT_LEVEL_NONE
 		return FALSE
 
 	if(alert_level <= alert_level && alert_source && is_living(alert_source))

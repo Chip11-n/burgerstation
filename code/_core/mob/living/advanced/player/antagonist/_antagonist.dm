@@ -38,6 +38,8 @@
 	handle_beardstyle_chargen(1,S.default_color_hair,FALSE)
 	handle_skincolor_chargen(S.default_color_skin,FALSE)
 	handle_eyecolor_chargen(S.default_color_eye,FALSE)
+	handle_detail_chargen(S.default_color_detail,FALSE)
+	handle_glow_chargen(S.default_color_glow,FALSE)
 	update_all_blends()
 	return TRUE
 
@@ -47,19 +49,19 @@
 	. = ..()
 
 	if(client) //Sometimes antags go afk.
-		var/savedata/client/globals/G = GLOBALDATA(client.ckey)
-		if(!G) return
-		if(!G.loaded_data["stored_experience"]) G.loaded_data["stored_experience"] = list()
-		G.loaded_data["stored_experience"][E.id] += added_xp
+		var/savedata/client/globals/GD = GLOBALDATA(client.ckey)
+		if(!GD) return FALSE
+		if(!GD.loaded_data["stored_experience"])
+			GD.loaded_data["stored_experience"] = list()
+		GD.loaded_data["stored_experience"][E.id] += added_xp
 
 /mob/living/advanced/player/antagonist/adjust_currency(var/currency_to_add,var/tax=FALSE)
 
 	. = ..()
 
 	if(currency_to_add > 0 && client)
-		var/savedata/client/globals/G = GLOBALDATA(client.ckey)
-		if(!G) return
-		G.loaded_data["stored_currency"] += currency_to_add
+		var/savedata/client/globals/GD = GLOBALDATA(client.ckey)
+		if(GD) GD.loaded_data["stored_currency"] += currency_to_add
 
 
 
