@@ -5,7 +5,7 @@
 	icon = 'icons/mob/living/simple/crab.dmi'
 	icon_state = "crab"
 	damage_type = /damagetype/npc/crab
-	class = /class/crab
+
 
 	health_base = 50
 	stamina_base = 25
@@ -58,16 +58,17 @@
 	boss_icon_state = "crab_king"
 	icon = 'icons/mob/living/simple/crab_king.dmi'
 	icon_state = "king"
-	pixel_x = -32
-	pixel_y = -12
 
 	health_base = 2500
 	stamina_base = 1000
 	mana_base = 100
 
+	pixel_y = -8
+	pixel_x = -32
+
 	ai = /ai/
 
-	class = /class/crab/king
+
 
 	butcher_contents = list(
 		/obj/item/container/food/dynamic/fish/raw_crab/,
@@ -80,7 +81,7 @@
 	)
 
 
-	object_size = 1
+	object_size = 2
 
 	boss = TRUE
 	force_spawn = TRUE

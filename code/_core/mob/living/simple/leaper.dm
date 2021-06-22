@@ -4,11 +4,11 @@
 	icon = 'icons/mob/living/simple/jungle/leaper.dmi'
 	icon_state = "living"
 	damage_type = /damagetype/unarmed/claw/
-	class = /class/leaper
+
+
+	pixel_x = -16
 
 	value = 6000
-
-	pixel_w = -16
 
 	ai = /ai/boss/leaper
 
@@ -23,8 +23,6 @@
 	mana_base = 2000
 
 	boss_loot = /loot/lavaland/leaper
-
-	attack_range = 2
 
 	force_spawn = TRUE
 	boss = TRUE
@@ -76,6 +74,8 @@
 	soul_size = SOUL_SIZE_RARE
 
 	anchored = TRUE
+
+	object_size = 2
 
 /mob/living/simple/leaper/handle_alpha()
 	if(immortal)

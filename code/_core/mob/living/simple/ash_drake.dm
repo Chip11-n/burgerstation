@@ -4,11 +4,11 @@
 	icon = 'icons/mob/living/simple/lavaland/ashdrake.dmi'
 	icon_state = "living"
 	damage_type = /damagetype/unarmed/claw/
-	class = /class/ash_drake
+
+
+	pixel_x = -16
 
 	value = 6000
-
-	pixel_w = -16
 
 	ai = /ai/boss/ash_drake/
 
@@ -33,8 +33,6 @@
 	//0 = walking
 	//1 = flying
 	//2 = landing
-
-	attack_range = 2
 
 	force_spawn = TRUE
 	boss = TRUE
@@ -85,6 +83,8 @@
 	blood_volume = 3000
 
 	soul_size = SOUL_SIZE_RARE
+
+	object_size = 2
 
 
 /*

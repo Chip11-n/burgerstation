@@ -23,13 +23,45 @@
 
 	weight = 1
 
+	var/spent=FALSE
+
+	has_quick_function = TRUE
+
+/obj/item/grenade/quick(var/mob/caller,var/atom/object,location,params)
+
+	if(!is_living(caller) || !object)
+		return FALSE
+
+	var/mob/living/L = caller
+	var/vel_x = object.x - L.x
+	var/vel_y = object.y - L.y
+	var/highest = max(abs(vel_x),abs(vel_y))
+
+	if(!highest)
+		src.drop_item(get_turf(L)) //Drop if we can't throw.
+		return TRUE
+
+	vel_x *= 1/highest
+	vel_y *= 1/highest
+
+	vel_x *= BULLET_SPEED_LARGE_PROJECTILE
+	vel_y *= BULLET_SPEED_LARGE_PROJECTILE
+
+	src.click_self(caller)
+	src.drop_item(get_turf(L),silent=TRUE)
+	src.throw_self(L,get_turf(object),text2num(params[PARAM_ICON_X]),text2num(params[PARAM_ICON_Y]),vel_x,vel_y,steps_allowed = VIEW_RANGE,lifetime = 30,desired_iff = L.iff_tag)
+
+	return TRUE
+
 /obj/item/grenade/save_item_data(var/save_inventory = TRUE)
 	. = ..()
 	SAVEVAR("open")
+	SAVEVAR("spent")
 
 /obj/item/grenade/load_item_data_pre(var/mob/living/advanced/player/P,var/list/object_data)
 	. = ..()
 	LOADVAR("open")
+	LOADVAR("spent")
 
 /obj/item/grenade/Destroy()
 
@@ -82,7 +114,6 @@
 	else
 		trigger(owner,source,-1,-1)
 
-
 /obj/item/grenade/New(var/desired_loc)
 	. = ..()
 	update_sprite()
@@ -107,7 +138,9 @@
 
 /obj/item/grenade/update_icon()
 
-	if(length(stored_containers) && stored_trigger)
+	if(spent)
+		icon_state = "[initial(icon_state)]_spent"
+	else if(length(stored_containers) && stored_trigger)
 		if(stored_trigger.active)
 			icon_state = "[initial(icon_state)]_active"
 		else
@@ -121,6 +154,9 @@
 
 /obj/item/grenade/click_self(var/mob/caller)
 
+	if(spent)
+		return ..()
+
 	INTERACT_CHECK
 
 	if(stored_trigger)
@@ -133,6 +169,9 @@
 	return TRUE
 
 /obj/item/grenade/clicked_on_by_object(var/mob/caller as mob,var/atom/object,location,control,params)
+
+	if(spent)
+		return ..()
 
 	if(is_item(object))
 		var/obj/item/I = object
@@ -224,10 +263,14 @@
 		B.reagents.transfer_reagents_to(src.reagents,B.reagents.volume_current,FALSE,FALSE, caller = caller)
 		B.reagents.update_container()
 
+	spent = TRUE
+
 	src.reagents.update_container()
 	src.reagents.process_recipes(caller)
 
-	return ..()
+	update_sprite()
+
+	. = ..()
 
 /obj/item/grenade/timed/Generate()
 	var/obj/item/device/timer/T = new(src)
@@ -274,4 +317,14 @@
 /obj/item/grenade/timed/lube_smoke/Generate()
 	stored_containers += new /obj/item/container/beaker/large/lube_smoke_01(src)
 	stored_containers += new /obj/item/container/beaker/large/lube_smoke_02(src)
+	return ..()
+
+/obj/item/grenade/timed/flashbang
+	name = "timed flashbang grenade"
+	desc = "Kab-"
+	desc_extended = "A prebuilt timed flashbang grenade. The labeling indicates that the fuse is set to 3 seconds."
+
+/obj/item/grenade/timed/flashbang/Generate()
+	stored_containers += new /obj/item/container/beaker/flashbang_01(src)
+	stored_containers += new /obj/item/container/beaker/flashbang_02(src)
 	return ..()

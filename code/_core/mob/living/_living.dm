@@ -15,7 +15,8 @@
 
 	icon_state = "directional"
 
-	var/class = /class/default
+	var/class = /class/npc
+	var/level = 1
 
 	var/enable_AI = FALSE
 	var/ai/ai
@@ -42,6 +43,8 @@
 	var/blood_type = /reagent/blood
 	var/blood_volume = BLOOD_VOLUME_DEFAULT
 	var/blood_volume_max = 0 //Set to blood_volume on new.
+	var/blood_toxicity = 0 //Value of how toxic your blood is. Increased by consuming chems.
+	var/chem_power = 1 //Multiplier of chemical power. Changed via blood toxicity.
 
 	var/blood_oxygen = 0 //Additional blood oxygen.
 
@@ -71,11 +74,7 @@
 	var/selected_intent = INTENT_HELP
 	var/intent = INTENT_HELP
 
-	var/level = 0
-
 	var/turf/old_turf //Last turf someone has been in.
-
-	var/level_multiplier = 1 //Multiplier for enemies. Basically how much each stat is modified by.
 
 	var/stun_angle = 90
 
@@ -259,7 +258,36 @@
 
 	var/obj/hud/flash/flash_overlay
 
-/mob/living/proc/flash(var/duration=100)
+	var/deafened_duration = 0
+
+	var/list/hit_logs = list()
+
+/mob/living/proc/bang(var/duration=100)
+
+	if(!client)
+		return FALSE
+
+	if(duration <= 0)
+		return FALSE
+
+	deafened_duration = max(deafened_duration,duration)
+
+/mob/living/get_sound_environment()
+
+	if(deafened_duration > 0)
+		return ENVIRONMENT_UNDERWATER
+
+	. = ..()
+
+/mob/living/get_sound_volume(var/volume=100,var/channel=1)
+
+	. = ..()
+
+	if(deafened_duration > 0 && channel != SOUND_CHANNEL_MUSIC && channel != SOUND_CHANNEL_FLASHBANG)
+		. *= 0.01
+
+
+/mob/living/proc/flash(var/duration=100,var/desired_color="#FFFFFF")
 
 	if(!client)
 		return FALSE
@@ -269,11 +297,13 @@
 
 	if(flash_overlay)
 		flash_overlay.duration = max(duration,flash_overlay.duration)
+		flash_overlay.color = desired_color
 		return TRUE
 
 	flash_overlay = new
 	flash_overlay.owner = src
 	flash_overlay.duration = duration
+	flash_overlay.color = desired_color
 	client.screen += flash_overlay
 
 	return TRUE
@@ -353,8 +383,9 @@
 		for(var/k in screen_blood)
 			var/obj/hud/screen_blood/S = k
 			qdel(S)
-
 		screen_blood.Cut()
+
+	hit_logs.Cut()
 
 	all_living -= src
 
@@ -389,7 +420,7 @@
 	blood_volume_max = blood_volume
 
 	if(desired_level_multiplier)
-		level_multiplier *= desired_level_multiplier
+		level *= desired_level_multiplier
 
 	attributes = list()
 	skills = list()
@@ -438,7 +469,7 @@
 
 	initialize_attributes()
 	initialize_skills()
-	update_level(TRUE)
+
 	update_intent(TRUE)
 
 	. = ..()
@@ -480,7 +511,9 @@
 	setup_name()
 
 /mob/living/Finalize()
+
 	. = ..()
+
 	if(boss)
 		for(var/mob/living/advanced/player/P in viewers(VIEW_RANGE,src))
 			for(var/obj/hud/button/boss_health/B in P.buttons)
@@ -489,6 +522,8 @@
 	if(dead)
 		dead = FALSE //I know this feels like shitcode but *dab
 		death()
+
+	update_level(TRUE)
 
 /mob/living/proc/setup_name()
 	if(boss)

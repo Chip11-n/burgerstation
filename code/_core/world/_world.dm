@@ -113,11 +113,16 @@ var/global/world_state = STATE_STARTING
 			continue
 		G.save()
 
+/proc/save_economy()
+	var/subsystem/economy/E = locate() in active_subsystems
+	E.save(TRUE)
+
 /world/proc/save()
 	save_all_globals()
 	//save_all_mechs()
 	save_deathboxes()
 	save_banks()
+	save_economy()
 	for(var/ckey in ckey_to_mobdata)
 		var/savedata/client/mob/M = ckey_to_mobdata[ckey]
 		if(!M.attached_mob)
@@ -156,7 +161,7 @@ var/global/world_state = STATE_STARTING
 
 	play_sound_global('sound/meme/apcdestroyed.ogg',all_mobs_with_clients)
 
-	SSvote.create_vote(/vote/map)
+	//SSvote.create_vote(/vote/map)
 
 	if(shutdown)
 		broadcast_to_clients(span("notice","Shutting down world in [REBOOT_TIME] seconds due to [nice_reason]. Characters will be saved when the server shuts down."))

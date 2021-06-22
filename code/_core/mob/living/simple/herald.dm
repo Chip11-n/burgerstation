@@ -4,7 +4,7 @@
 	icon = 'icons/mob/living/simple/lavaland/herald.dmi'
 	icon_state = "living"
 	damage_type = /damagetype/cqc/sleeping_carp/gnashing_teeth
-	class = /class/herald/
+
 	ai = /ai/boss/herald/
 	value = 3000
 
@@ -17,8 +17,6 @@
 	move_delay = 1
 
 	stun_angle = 0
-
-	attack_range = 1
 
 	force_spawn = TRUE
 	boss = TRUE

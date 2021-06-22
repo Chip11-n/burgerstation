@@ -5,7 +5,9 @@
 	icon = 'icons/mob/living/simple/jungle/arachnid.dmi'
 	icon_state = "living"
 	damage_type = /damagetype/unarmed/claw/
-	class = /class/arachnid
+
+
+	pixel_x = -16
 
 	value = 1000
 
@@ -21,8 +23,6 @@
 		/obj/item/container/food/dynamic/meat/raw_arachnid,
 		/obj/item/container/food/dynamic/meat/raw_arachnid
 	)
-
-	pixel_x = -16
 
 	armor_base = list(
 		BLADE = 20,
@@ -55,6 +55,8 @@
 	blood_volume = 2000
 
 	soul_size = SOUL_SIZE_UNCOMMON
+
+	object_size = 2
 
 /mob/living/simple/arachnid/post_death()
 	. = ..()

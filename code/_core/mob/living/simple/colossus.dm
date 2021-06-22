@@ -4,11 +4,11 @@
 	icon = 'icons/mob/living/simple/lavaland/colossus.dmi'
 	icon_state = "colossus"
 	damage_type = /damagetype/unarmed/claw/
-	class = /class/colossus
+
 
 	value = 4000
 
-	pixel_x = -32
+	pixel_x = -16
 
 	ai = /ai/boss/colossus/
 
@@ -19,8 +19,6 @@
 	health_base = 8000
 	stamina_base = 500
 	mana_base = 2000
-
-	attack_range = 2
 
 	move_delay = DECISECONDS_TO_TICKS(5)
 
@@ -77,6 +75,8 @@
 	)
 
 	soul_size = SOUL_SIZE_RARE
+
+	object_size = 2
 
 /mob/living/simple/colossus/pre_death()
 	do_say("<font color='#DD1C1F' size='4'>I WILL RETURN.</font>",FALSE)

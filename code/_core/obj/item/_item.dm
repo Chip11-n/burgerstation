@@ -189,7 +189,7 @@
 /obj/item/Crossed(atom/movable/O)
 	return TRUE
 
-/obj/item/Cross(atom/movable/O)
+/obj/item/Cross(atom/movable/O,atom/oldloc)
 	return TRUE
 
 /obj/item/Finalize()
@@ -254,9 +254,6 @@
 		drop_item(silent=TRUE)
 
 	return ..()
-
-/atom/proc/quick(var/mob/living/advanced/caller,var/atom/object,location,control,params)
-	return FALSE
 
 /obj/item/can_be_attacked(var/atom/attacker,var/atom/weapon,var/params,var/damagetype/damage_type)
 	return FALSE

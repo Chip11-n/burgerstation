@@ -1,17 +1,17 @@
 //MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
 "a" = (
 /turf/simulated/wall/boss,
-/area/prefab/frog)
+/area/dmm_suite/clear_area)
 "b" = (
-/turf/simulated/floor/grass/jungle,
-/area/prefab/frog)
+/turf/dmm_suite/no_wall,
+/area/dmm_suite/clear_area)
 "c" = (
-/turf/unsimulated/generation/jungle,
-/area/prefab/frog)
+/turf/dmm_suite/clear_turf,
+/area/dmm_suite/clear_area)
 "d" = (
 /mob/living/simple/leaper,
-/turf/simulated/floor/grass/jungle,
-/area/prefab/frog)
+/turf/dmm_suite/no_wall,
+/area/dmm_suite/clear_area)
 
 (1,1,1) = {"
 a

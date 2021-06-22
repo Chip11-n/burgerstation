@@ -68,6 +68,7 @@
 
 		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
 			on_projectile_hit(current_loc)
+			qdel(src)
 			return FALSE
 
 /obj/projectile/magic/rift
@@ -89,6 +90,10 @@
 		if(L.dead && L.loyalty_tag == src.loyalty_tag)
 			L.resurrect()
 
+/obj/projectile/magic/tesla
+	name = "tesla ball"
+	icon_state = "tesla"
+
 
 /obj/projectile/magic/lightning
 	name = "lightning"
@@ -109,6 +114,7 @@
 
 		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
 			on_projectile_hit(current_loc)
+			qdel(src)
 			return FALSE
 
 
@@ -127,6 +133,7 @@
 
 		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
 			on_projectile_hit(current_loc)
+			qdel(src)
 			return FALSE
 
 
@@ -140,12 +147,13 @@
 	. = ..()
 
 	if(.)
-		vel_x *= 0.9
-		vel_y *= 0.9
+		vel_x *= 0.95
+		vel_y *= 0.95
 		alpha = clamp(alpha-5,0,255)
 
 		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
 			on_projectile_hit(current_loc)
+			qdel(src)
 			return FALSE
 
 
@@ -165,6 +173,7 @@
 
 		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
 			on_projectile_hit(current_loc)
+			qdel(src)
 			return FALSE
 
 
@@ -186,6 +195,7 @@
 
 		if(abs(vel_x) <= 1	&& abs(vel_y) <= 1)
 			on_projectile_hit(current_loc)
+			qdel(src)
 			return FALSE
 
 
@@ -210,7 +220,7 @@
 	name = "summon"
 	icon = 'icons/obj/projectiles/magic.dmi'
 	icon_state = "summon_dark"
-	steps_allowed = 6
+	steps_allowed = 4
 	hit_target_turf = TRUE
 	lifetime = SECONDS_TO_DECISECONDS(2)
 	impact_effect_turf = null
@@ -238,3 +248,36 @@
 	if(!found_curse)
 		new /obj/effect/temp/hazard/curse(new_loc,SECONDS_TO_DECISECONDS(10),owner)
 
+
+
+/obj/projectile/magic/arcblade
+	name = "arcblade"
+	icon_state = "cool"
+
+	collision_bullet_flags = FLAG_COLLISION_BULLET_SOLID
+
+	penetrations_left = 3
+
+/obj/projectile/magic/fractal
+	name = "fractal"
+	icon_state = "fractal"
+
+	collision_bullet_flags = FLAG_COLLISION_BULLET_SOLID
+
+/obj/projectile/magic/holy_cross
+	name = "holy cross"
+	icon_state = "cross"
+
+	collision_bullet_flags = FLAG_COLLISION_BULLET_SOLID
+
+/obj/projectile/magic/unholy_skull
+	name = "unholy skull"
+	icon_state = "evil"
+
+	collision_bullet_flags = FLAG_COLLISION_BULLET_SOLID
+
+/obj/projectile/magic/inferno
+	name = "inferno"
+	icon_state = "inferno"
+
+	collision_bullet_flags = FLAG_COLLISION_BULLET_SOLID

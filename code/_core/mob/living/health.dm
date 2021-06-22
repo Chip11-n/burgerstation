@@ -219,7 +219,7 @@
 					var/obj/effect/cleanable/blood/line/L = create_blood(/obj/effect/cleanable/blood/line,T,R.color,0,0)
 					if(L) L.dir = desired_direction
 		if(LASER)
-
+			play_sound('sound/effects/impacts/savage_laser.ogg',T,volume=80)
 		if(ARCANE)
 			add_status_effect(MANAVOID,10,10)
 			play_sound('sound/effects/impacts/savage_arcane.ogg',T,volume=80)
@@ -227,7 +227,6 @@
 			ignite(30,source=weapon)
 			play_sound('sound/effects/impacts/savage_fire.ogg',T,volume=80)
 		if(COLD)
-			add_status_effect(STAGGER,5,5)
 			add_status_effect(SLOW,50,50)
 			play_sound('sound/effects/impacts/savage_cold.ogg',T,volume=80)
 		if(SHOCK)
@@ -235,26 +234,33 @@
 			add_status_effect(STUN,10,10)
 			play_sound('sound/effects/impacts/savage_shock.ogg',T,volume=80)
 		if(BOMB)
-			add_status_effect(STAGGER,5,5)
 			play_sound('sound/effects/impacts/savage_bomb.ogg',T,volume=80)
-
-		/*
+			bang(30)
 		if(BIO)
-
+			add_status_effect(BLIGHTED,100,100)
+			play_sound('sound/effects/impacts/savage_bio.ogg',T,volume=80)
 		if(RAD)
-
+			//TODO: Add radiation bubbles?.
+			play_sound('sound/effects/impacts/savage_rad.ogg',T,volume=80)
 		if(HOLY)
-
+			add_status_effect(CONSECRATED,300,300)
+			play_sound('sound/effects/impacts/savage_holy.ogg',T,volume=80)
 		if(DARK)
-
+			add_status_effect(CURSED,300,300)
+			play_sound('sound/effects/impacts/savage_dark.ogg',T,volume=80)
 		if(FATIGUE)
-
+			add_status_effect(SLOW,50,50)
+			play_sound('sound/effects/impacts/savage_fatigue.ogg',T,volume=80)
 		if(PAIN)
-
+			add_status_effect(STUN,30,30)
+			play_sound('sound/effects/impacts/savage_pain.ogg',T,volume=80)
 		if(ION)
-
+			add_status_effect(PARALYZE,30,30)
+			play_sound('sound/effects/impacts/savage_ion.ogg',T,volume=80)
 		if(SANITY)
-		*/
+			add_status_effect(PARALYZE,30,30)
+			play_sound('sound/effects/impacts/savage_sanity.ogg',T,volume=80)
+
 
 
 

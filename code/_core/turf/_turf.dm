@@ -39,6 +39,78 @@
 
 	var/disallow_generation = FALSE
 
+	var/friction = TRUE //True or false. Can't really do decimals 0 to 1, yet.
+
+
+/turf/proc/get_crossable_neighbors(var/atom/movable/crosser=null,var/cardinal=TRUE,var/intercardinal=TRUE)
+
+	. = list()
+	if(cardinal)
+		for(var/d in DIRECTIONS_CARDINAL)
+			var/turf/T = get_step(src,d)
+			if(!T.Enter(null,src))
+				continue
+			var/can_cross = TRUE
+			for(var/k in T.contents)
+				var/atom/movable/M = k
+				if(!M.density)
+					continue
+				if(M.allow_path)
+					continue
+				if(!M.Cross(crosser,src))
+					continue
+				can_cross = FALSE
+				break
+			if(!can_cross)
+				continue
+			. += T
+
+	if(intercardinal)
+		for(var/d in DIRECTIONS_INTERCARDINAL)
+			var/first_dir = get_true_4dir(d)
+			var/second_dir = d & ~first_dir
+
+			var/turf/T1 = get_step(src,first_dir)
+			if(!T1) continue
+
+			var/turf/T2 = get_step(T1,second_dir)
+
+			if(!T1.Enter(null,src))
+				continue
+
+			if(!T2.Enter(null,T1))
+				continue
+
+			var/can_cross = TRUE
+			for(var/k in T1.contents)
+				var/atom/movable/M = k
+				if(!M.density)
+					continue
+				if(M.allow_path)
+					continue
+				if(!M.Cross(crosser,src))
+					continue
+				can_cross = FALSE
+				break
+			if(!can_cross)
+				continue
+
+			for(var/k in T2.contents)
+				var/atom/movable/M = k
+				if(!M.density)
+					continue
+				if(M.allow_path)
+					continue
+				if(!M.Cross(crosser,T1))
+					continue
+				can_cross = FALSE
+				break
+			if(!can_cross)
+				continue
+
+			. += T2
+
+
 /turf/proc/on_step()
 	return TRUE
 
@@ -150,7 +222,7 @@
 
 /turf/Enter(var/atom/movable/enterer,var/atom/oldloc)
 
-	if(density && (enterer.collision_flags && src.collision_flags) && (enterer.collision_flags & src.collision_flags))
+	if(density && (!enterer || (enterer.collision_flags && src.collision_flags) && (enterer.collision_flags & src.collision_flags)))
 		if(oldloc)
 			var/enter_direction = get_dir(oldloc,src)
 			if((enter_direction & NORTH) && density_north)

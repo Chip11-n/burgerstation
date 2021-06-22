@@ -4,6 +4,8 @@
 	icon_state = "cobble_center"
 	color = "#888888"
 
+	layer = LAYER_FLOOR_TILE
+
 	footstep = /footstep/concrete
 
 	destruction_turf = /turf/simulated/floor/colored/dirt
@@ -37,7 +39,7 @@
 	color = COLOR_GREY_DARK
 
 /turf/simulated/floor/brick/grey/dark/ish
-	color = "#686868"
+	color = "#444444"
 
 /turf/simulated/floor/brick/sand
 	color = "#AE8A67"

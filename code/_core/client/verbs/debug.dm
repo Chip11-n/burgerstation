@@ -16,13 +16,13 @@ var/global/list/debug_verbs = list(
 	/client/verb/set_mob_to_null,
 	/client/verb/should_delete_atom,
 	/client/verb/add_loadout_to_mob,
-	/client/verb/test_pathfinding,
 	/client/verb/force_save_deathbox,
 	/client/verb/force_load_deathbox,
 	/client/verb/force_save_banks,
 	/client/verb/view_dps,
 	/client/verb/test_ranged_weapons,
-	/client/verb/debug_flash
+	/client/verb/debug_flash,
+	/client/verb/test_astar
 )
 
 /client/verb/view_dps()
@@ -157,8 +157,8 @@ client/verb/air_test(var/pressure as num)
 
 			sleep(-1)
 
-	src << "Found [found_tiles] tiles, with [error_tiles] errored tiles."
-	src << "Icon: [new/image(I)]."
+	to_chat("Found [found_tiles] tiles, with [error_tiles] errored tiles.")
+	to_chat("Icon: [new/image(I)].")
 	src << ftp(I,"map_[src.mob.z].png")
 
 
@@ -409,22 +409,6 @@ client/verb/air_test(var/pressure as num)
 
 	log_admin("[src.get_debug_name()] gave a loadout ([desired_loadout]) to [desired_mob.get_debug_name()].")
 
-/client/verb/test_pathfinding()
-	set name = "Test Pathfinding"
-	set category = "Debug"
-
-	var/obj/burger_star_test_start/B = locate() in world
-	if(!B)
-		return FALSE
-
-	if(mob)
-		mob.force_move(get_turf(B))
-
-	B.activate()
-
-	return TRUE
-
-
 /client/verb/force_save_deathbox()
 	set name = "Force Save Deathboxes"
 	set category = "Debug"
@@ -470,3 +454,38 @@ client/verb/air_test(var/pressure as num)
 
 	var/mob/living/L = mob
 	L.flash(SECONDS_TO_DECISECONDS(10))
+	L.bang(SECONDS_TO_DECISECONDS(10))
+
+
+/client/verb/test_astar()
+	set name = "Test AStar"
+	set category = "Debug"
+
+	var/turf/start = get_turf(mob)
+
+	if(!start)
+		return FALSE
+
+	var/list/possible_living = list()
+	for(var/mob/living/L in range(mob,VIEW_RANGE))
+		if(L == mob)
+			continue
+		possible_living += L
+
+	if(!length(possible_living))
+		return FALSE
+
+	var/turf/end = get_turf(pick(possible_living))
+
+	var/list/found_path = AStar_Circle(start,end,mob)
+
+	if(!length(found_path))
+		to_chat(span("notice","Can not find a path to [end.get_debug_name()]."))
+	else
+		to_chat(span("notice","Found [length(found_path)] tiles in path."))
+
+	for(var/k in found_path)
+		var/turf/T = k
+		T.color = "#FF0000"
+
+	return TRUE

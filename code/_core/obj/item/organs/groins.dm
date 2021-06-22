@@ -10,7 +10,8 @@
 		/obj/hud/inventory/organs/groin,
 		/obj/hud/inventory/organs/groin_o,
 		/obj/hud/inventory/organs/groin/pocket/right,
-		/obj/hud/inventory/organs/groin/pocket/left
+		/obj/hud/inventory/organs/groin/pocket/left,
+		/obj/hud/inventory/organs/groin/pocket/contract
 
 	)
 
@@ -124,3 +125,9 @@
 
 /obj/item/organ/groin/moth/female
 	icon_state = BODY_GROIN_FEMALE
+
+
+//Golem
+/obj/item/organ/groin/golem
+	name = "golem groin"
+	icon = 'icons/mob/living/advanced/species/golem.dmi'

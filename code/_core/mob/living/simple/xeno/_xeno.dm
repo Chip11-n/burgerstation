@@ -7,7 +7,7 @@
 
 	ai = /ai/xeno
 	damage_type = /damagetype/npc/xeno
-	class = /class/xeno
+
 
 	pixel_x = -16
 
@@ -127,11 +127,12 @@
 
 	update_sprite()
 
-/mob/living/simple/xeno/Cross(atom/movable/O)
+/mob/living/simple/xeno/Cross(atom/movable/O,atom/oldloc)
 
 	if(is_living(O))
 		var/mob/living/L = O
-		if(L.loyalty_tag == loyalty_tag) return TRUE
+		if(L.loyalty_tag == loyalty_tag)
+			return TRUE
 
 	return ..()
 

@@ -27,6 +27,8 @@
 	var/obj/item/right_item
 	var/obj/item/holster_item
 
+	var/list/obj/hud/button/slot/slot_buttons = list()
+
 	health_base = 100
 	stamina_base = 100
 	mana_base = 100
@@ -36,8 +38,6 @@
 	var/obj/hud/inventory/active_inventory
 
 	var/mob/living/vehicle/driving
-
-	var/quick_mode = null
 
 	random_spawn_dir = FALSE
 
@@ -252,7 +252,11 @@
 
 	move_delay_multiplier = .
 
-	evasion_rating = min(75,max(0,. - 0.5)*50*2)
+	evasion_rating = max(0,. - 0.5)*100*get_skill_power(SKILL_EVASION,0,1,2)
+	if(ckey_last) //Player controlled
+		evasion_rating = clamp(evasion_rating,0,75)
+	else
+		evasion_rating = clamp(evasion_rating*0.25,0,25)
 
 /mob/living/advanced/New(loc,desired_client,desired_level_multiplier)
 
@@ -319,6 +323,9 @@ mob/living/advanced/Login()
 
 	. = ..()
 
+	if(client)
+		add_species_buttons()
+
 	apply_mob_parts(TRUE,TRUE,TRUE)
 
 	var/species/S = SPECIES(species)
@@ -331,7 +338,6 @@ mob/living/advanced/Login()
 
 	if(client)
 		update_health_element_icons(TRUE,TRUE,TRUE)
-		add_species_buttons()
 		add_species_health_elements()
 
 /mob/living/advanced/Finalize()
@@ -493,14 +499,6 @@ mob/living/advanced/Login()
 	if(right_hand)
 		return right_hand.get_top_object()
 	return null
-
-
-/mob/living/advanced/proc/parry(var/atom/attacker,var/atom/weapon,var/atom/hit_object,var/damagetype/DT)
-
-	if(last_hold && (world.time - last_hold <= 5))
-		return TRUE
-
-	return FALSE
 
 /mob/living/advanced/mod_speech(var/text)
 	var/species/S = SPECIES(species)

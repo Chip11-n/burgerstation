@@ -4,7 +4,7 @@
 	icon = 'icons/mob/living/simple/goblin_king.dmi'
 	icon_state = "living"
 	damage_type = /damagetype/unarmed/claw/
-	class = /class/goblin_king/
+
 	ai = /ai/boss/goblin_king/
 
 	boss_loot = /loot/lavaland/goblin_king
@@ -18,8 +18,6 @@
 	move_delay = BOSS_TICK*3
 
 	stun_angle = 0
-
-	attack_range = 2
 
 	force_spawn = TRUE
 	boss = TRUE

@@ -104,6 +104,8 @@
 
 /mob/living/on_sprint()
 	add_hydration(-0.4)
+	if(client)
+		add_attribute_xp(ATTRIBUTE_AGILITY,1)
 	return ..()
 
 /mob/living/on_jog()
@@ -185,9 +187,9 @@
 
 	return FALSE
 
-/mob/living/Cross(atom/movable/O)
+/mob/living/Cross(atom/movable/O,atom/oldloc)
 
-	if(O.density && is_living(O))
+	if(is_living(O) && O.density)
 		var/mob/living/L = O
 		if(L.horizontal || src.horizontal)
 			//If the crosser is horizontal, or the src is horizontal, who cares.

@@ -23,41 +23,6 @@ obj/structure/scenery/grass/jungle_rock/New()
 	..()
 	icon_state = "rock[rand(1,5)]"
 
-/*
-obj/structure/scenery/jungle_trees
-	name = "jungle tree"
-	icon = 'icons/obj/structure/flora/jungletrees.dmi'
-	icon_state = "tree1"
-	collision_flags = FLAG_COLLISION_WALKING
-	collision_bullet_flags = FLAG_COLLISION_BULLET_INORGANIC
-	pixel_x = -48
-	pixel_y = -16
-	layer = LAYER_LARGE_OBJ
-
-	plane = PLANE_SCENERY
-
-obj/structure/scenery/jungle_trees/New()
-	..()
-	icon_state = "tree[rand(1,6)]"
-
-
-obj/structure/scenery/jungle_trees_small
-	name = "small jungle tree"
-	icon = 'icons/obj/structure/flora/jungletreesmall.dmi'
-	icon_state = "tree1"
-	collision_flags = FLAG_COLLISION_WALKING
-	collision_bullet_flags = FLAG_COLLISION_BULLET_INORGANIC
-	pixel_x = -32
-	pixel_y = 0
-	layer = LAYER_LARGE_OBJ
-
-	plane = PLANE_SCENERY
-
-obj/structure/scenery/jungle_trees/New()
-	..()
-	icon_state = "tree[rand(1,6)]"
-*/
-
 obj/structure/scenery/merchant_roof
 	name = "merchant roof"
 	icon = 'icons/obj/structure/merchant.dmi'
